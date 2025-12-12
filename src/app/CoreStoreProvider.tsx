@@ -141,6 +141,10 @@ const CoreStoreProvider: React.FC<{ children: React.ReactNode }> = observer(({ c
             const data = res.data as TSocketResponseData<'balance'>;
             const { msg_type, error } = data;
 
+            if (msg_type === 'balance') {
+                console.log('DEBUG: Balance message received', data);
+            }
+
             if (
                 error?.code === 'AuthorizationRequired' ||
                 error?.code === 'DisabledClient' ||
@@ -152,9 +156,14 @@ const CoreStoreProvider: React.FC<{ children: React.ReactNode }> = observer(({ c
             if (msg_type === 'balance' && data && !error) {
                 const balance = data.balance;
                 if (balance?.accounts) {
+                    console.log('DEBUG: Setting all accounts balance', balance);
                     client.setAllAccountsBalance(balance);
                 } else if (balance?.loginid) {
-                    if (!client?.all_accounts_balance?.accounts || !balance?.loginid) return;
+                    console.log('DEBUG: Updating single account balance', balance);
+                    if (!client?.all_accounts_balance?.accounts || !balance?.loginid) {
+                        console.log('DEBUG: Missing all_accounts_balance or loginid, skipping update');
+                        return;
+                    }
                     const accounts = { ...client.all_accounts_balance.accounts };
                     const currentLoggedInBalance = { ...accounts[balance.loginid] };
                     currentLoggedInBalance.balance = balance.balance;
@@ -167,6 +176,8 @@ const CoreStoreProvider: React.FC<{ children: React.ReactNode }> = observer(({ c
                         },
                     };
                     client.setAllAccountsBalance(updatedAccounts);
+                } else {
+                    console.log('DEBUG: Balance message missing accounts or loginid', balance);
                 }
             }
         },
@@ -189,6 +200,15 @@ const CoreStoreProvider: React.FC<{ children: React.ReactNode }> = observer(({ c
     useEffect(() => {
         if (!isAuthorizing && isAuthorized && !accountInitialization.current && client) {
             accountInitialization.current = true;
+
+            // Explicitly fetch balance to handle potential race conditions with subscription
+            api_base.api?.send({ balance: 1, account: 'all' }).then((res: TSocketResponseData<'balance'>) => {
+                if (res.balance) {
+                    console.log('DEBUG: Explicit balance fetch successful', res.balance);
+                    client.setAllAccountsBalance(res.balance);
+                }
+            });
+
             api_base.api.getSettings().then((settingRes: TSocketResponseData<'get_settings'>) => {
                 client?.setAccountSettings(settingRes.get_settings);
                 const client_information: TClientInformation = {
