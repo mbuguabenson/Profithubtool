@@ -300,8 +300,6 @@
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     border-bottom: var(--glass-border);
-    position: relative;
-    z-index: 999;
 
     // Purple gradient branding text
     &__logo,
