@@ -4,6 +4,7 @@ import ChartStore from './chart-store';
 import ClientStore from './client-store';
 import CommonStore from './common-store';
 import DashboardStore from './dashboard-store';
+import CopyTradingStore from './copy-trading-store';
 import DataCollectionStore from './data-collection-store';
 import FlyoutHelpStore from './flyout-help-store';
 import FlyoutStore from './flyout-store';
@@ -38,6 +39,7 @@ export default class RootStore {
     public quick_strategy: QuickStrategyStore;
     public self_exclusion: SelfExclusionStore;
     public dashboard: DashboardStore;
+    public copy_trading: CopyTradingStore;
 
     public chart_store: ChartStore;
     public blockly_store: BlocklyStore;
@@ -79,6 +81,7 @@ export default class RootStore {
         this.quick_strategy = new QuickStrategyStore(this);
         this.self_exclusion = new SelfExclusionStore(this, this.core);
         this.dashboard = new DashboardStore(this, this.core);
+        this.copy_trading = new CopyTradingStore(this);
 
         // need to be at last for dependency
         this.chart_store = new ChartStore(this);

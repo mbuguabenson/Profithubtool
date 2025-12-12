@@ -36,6 +36,7 @@ import './main.scss';
 const ChartWrapper = lazy(() => import('../chart/chart-wrapper'));
 const Tutorial = lazy(() => import('../tutorials'));
 const ProAnalysis = lazy(() => import('../pro-analysis'));
+const CopyTrading = lazy(() => import('../copy-trading'));
 
 const AppWrapper = observer(() => {
     const { connectionStatus } = useApiBase();
@@ -67,7 +68,7 @@ const AppWrapper = observer(() => {
     const { clear } = summary_card;
     const { DASHBOARD, BOT_BUILDER } = DBOT_TABS;
     const init_render = React.useRef(true);
-    const hash = ['dashboard', 'bot_builder', 'chart', 'tutorial', 'pro_analysis'];
+    const hash = ['dashboard', 'bot_builder', 'chart', 'tutorial', 'pro_analysis', 'copy_trading'];
     const { isDesktop } = useDevice();
     const location = useLocation();
     const navigate = useNavigate();
@@ -366,6 +367,23 @@ const AppWrapper = observer(() => {
                             >
                                 <Suspense fallback={<ChunkLoader message={localize('Loading Pro Analysis...')} />}>
                                     <ProAnalysis />
+                                </Suspense>
+                            </div>
+                            <div
+                                label={
+                                    <>
+                                        <LabelPairedObjectsColumnCaptionRegularIcon // Placeholder icon
+                                            height='24px'
+                                            width='24px'
+                                            fill='var(--text-general)'
+                                        />
+                                        <Localize i18n_default_text='Copy Trading' />
+                                    </>
+                                }
+                                id='id-copy-trading'
+                            >
+                                <Suspense fallback={<ChunkLoader message={localize('Loading Copy Trading...')} />}>
+                                    <CopyTrading />
                                 </Suspense>
                             </div>
                         </Tabs>

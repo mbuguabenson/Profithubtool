@@ -10,9 +10,13 @@ import { useStore } from '@/hooks/useStore';
 import useStoreWalletAccountsList from '@/hooks/useStoreWalletAccountsList';
 import {
     AccountsDerivAccountLightIcon,
+} from '@deriv/quill-icons/Accounts';
+import {
     LabelPairedLockCaptionBoldIcon,
+} from '@deriv/quill-icons/LabelPaired';
+import {
     StandaloneChevronDownBoldIcon,
-} from '@deriv/quill-icons';
+} from '@deriv/quill-icons/Standalone';
 import { TStores } from '@deriv/stores/types';
 import { Localize } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';

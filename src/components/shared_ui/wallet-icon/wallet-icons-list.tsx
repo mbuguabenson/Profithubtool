@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { IconSize } from '@deriv/quill-icons';
+// import { IconSize } from '@deriv/quill-icons';
 
 const WALLET_ICONS = {
     IcWalletDerivDemoLight: lazy(() =>
@@ -71,12 +71,12 @@ const WALLET_ICONS = {
     unknown: lazy(() => import('@deriv/quill-icons/Currencies').then(module => ({ default: module.CurrencyUsdIcon }))),
 };
 
-export const WalletIconList = ({ type, size }: { type: string; size?: IconSize }) => {
+export const WalletIconList = ({ type, size }: { type: string; size?: string }) => {
     const Icon = WALLET_ICONS[type as keyof typeof WALLET_ICONS] || WALLET_ICONS.unknown;
 
     return (
         <Suspense fallback={null}>
-            <Icon iconSize={size ?? 'xs'} />
+            <Icon iconSize={(size ?? 'xs') as any} />
         </Suspense>
     );
 };
