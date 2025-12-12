@@ -220,6 +220,7 @@
         top: 55px;
         right: unset;
         inset-inline-end: 0;
+        z-index: 1000;
     }
 
     &__logout {
@@ -299,6 +300,8 @@
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     border-bottom: var(--glass-border);
+    position: relative;
+    z-index: 999;
 
     // Purple gradient branding text
     &__logo,
