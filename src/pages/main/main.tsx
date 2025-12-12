@@ -35,6 +35,7 @@ import './main.scss';
 
 const ChartWrapper = lazy(() => import('../chart/chart-wrapper'));
 const Tutorial = lazy(() => import('../tutorials'));
+const ProAnalysis = lazy(() => import('../pro-analysis'));
 
 const AppWrapper = observer(() => {
     const { connectionStatus } = useApiBase();
@@ -66,7 +67,7 @@ const AppWrapper = observer(() => {
     const { clear } = summary_card;
     const { DASHBOARD, BOT_BUILDER } = DBOT_TABS;
     const init_render = React.useRef(true);
-    const hash = ['dashboard', 'bot_builder', 'chart', 'tutorial'];
+    const hash = ['dashboard', 'bot_builder', 'chart', 'tutorial', 'pro_analysis'];
     const { isDesktop } = useDevice();
     const location = useLocation();
     const navigate = useNavigate();
@@ -248,10 +249,10 @@ const AppWrapper = observer(() => {
                             redirectCallbackUri: `${window.location.origin}/callback`,
                             ...(query_param_currency
                                 ? {
-                                      state: {
-                                          account: query_param_currency,
-                                      },
-                                  }
+                                    state: {
+                                        account: query_param_currency,
+                                    },
+                                }
                                 : {}),
                         });
                     } catch (err) {
@@ -349,6 +350,23 @@ const AppWrapper = observer(() => {
                                         <Tutorial handleTabChange={handleTabChange} />
                                     </Suspense>
                                 </div>
+                            </div>
+                            <div
+                                label={
+                                    <>
+                                        <LabelPairedChartLineCaptionRegularIcon
+                                            height='24px'
+                                            width='24px'
+                                            fill='var(--text-general)'
+                                        />
+                                        <Localize i18n_default_text='Pro Analysis' />
+                                    </>
+                                }
+                                id='id-pro-analysis'
+                            >
+                                <Suspense fallback={<ChunkLoader message={localize('Loading Pro Analysis...')} />}>
+                                    <ProAnalysis />
+                                </Suspense>
                             </div>
                         </Tabs>
                         {!isDesktop && right_tab_shadow && <span className='tabs-shadow tabs-shadow--right' />}{' '}

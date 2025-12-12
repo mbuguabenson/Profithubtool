@@ -36,6 +36,10 @@ export const AuthManager = {
      * Clears all authentication data
      */
     logout: (is_reload: boolean = true) => {
+        console.group('[AuthManager] Logout Initiated');
+        console.trace('Logout called by:');
+        console.groupEnd();
+
         localStorage.removeItem('accountsList');
         localStorage.removeItem('clientAccounts');
         localStorage.removeItem('callback_token');
