@@ -299,7 +299,7 @@
     // Glassmorphism backdrop for header
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
-    border-bottom: var(--glass-border);
+    // border-bottom: var(--glass-border); // Reverting border to modify size
 
     // Purple gradient branding text
     &__logo,
@@ -309,6 +309,6 @@
         background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-weight: 700;
+        // font-weight: 700; // Reverting font changes
     }
 }

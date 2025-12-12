@@ -177,7 +177,7 @@
         background: var(--glass-bg);
         backdrop-filter: var(--glass-blur);
         border-radius: 16px;
-        padding: 1rem 1.8rem;
+        // padding: 1rem 1.8rem; // Reverting padding
         box-shadow:
             5px 5px 10px rgb(0 0 0 / 10%),
             -2px -2px 8px rgb(255 255 255 / 5%);
@@ -200,7 +200,7 @@
     color: var(--brand-white) !important;
     font-weight: 700;
     border-radius: 16px;
-    padding: 1rem 1.8rem;
+    // padding: 1rem 1.8rem; // Reverting padding
     box-shadow: var(--glow-purple);
     transform: translateY(-2px);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
