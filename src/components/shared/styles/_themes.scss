@@ -38,11 +38,39 @@
     // Brand primary colors
     --brand-white: #{constants.$color-white};
     --brand-dark-grey: #{constants.$color-black};
-    --brand-red-coral: #{constants.$color-red};
+    --brand-red-coral: #{constants.$color-purple-primary}; // Changed to purple
     --brand-orange: #{constants.$color-orange};
 
     // Brand secondary colors
     --brand-secondary: #{constants.$color-green};
+
+    // Modern UI Effects - Glassmorphism
+    --glass-bg: #{constants.$glass-bg};
+    --glass-border: #{constants.$glass-border};
+    --glass-shadow: #{constants.$glass-shadow};
+    --glass-blur: #{constants.$glass-blur};
+
+    // Modern UI Effects - Gradients
+    --gradient-primary: #{constants.$gradient-primary};
+    --gradient-secondary: #{constants.$gradient-secondary};
+    --gradient-accent: #{constants.$gradient-accent};
+    --gradient-purple-primary: #{constants.$gradient-purple-primary};
+
+    // Modern UI Effects - Glow
+    --glow-primary: #{constants.$glow-primary};
+    --glow-secondary: #{constants.$glow-secondary};
+    --glow-purple: #{constants.$glow-purple};
+    --glow-purple-intense: #{constants.$glow-purple-intense};
+    --glow-green: #{constants.$glow-green};
+    --glow-green-intense: #{constants.$glow-green-intense};
+
+    // Modern UI Effects - Green Gradients
+    --gradient-green-primary: #{constants.$gradient-green-primary};
+    --gradient-green-secondary: #{constants.$gradient-green-secondary};
+
+    // Modern UI Effects - Neumorphism
+    --neu-shadow-light: #{constants.$neu-shadow-light};
+    --neu-shadow-dark: #{constants.$neu-shadow-dark};
 
     // App Cards gradient background
     --app-card-virtual: #{constants.$gradient-virtual};

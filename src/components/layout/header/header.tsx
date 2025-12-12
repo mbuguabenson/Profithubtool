@@ -12,7 +12,7 @@ import { useStore } from '@/hooks/useStore';
 import useTMB from '@/hooks/useTMB';
 import { clearAuthData, handleOidcAuthFailure } from '@/utils/auth-utils';
 import { StandaloneCircleUserRegularIcon } from '@deriv/quill-icons/Standalone';
-import { requestOidcAuthentication } from '@deriv-com/auth-client';
+import { AuthManager } from '@/utils/AuthManager';
 import { Localize, useTranslations } from '@deriv-com/translations';
 import { Header, useDevice, Wrapper } from '@deriv-com/ui';
 import { Tooltip } from '@deriv-com/ui';
@@ -38,9 +38,9 @@ const AppHeader = observer(({ isAuthenticating }: TAppHeaderProps) => {
     const has_wallet = Object.keys(accounts ?? {}).some(id => accounts?.[id].account_category === 'wallet');
 
     const currency = getCurrency?.();
-    const { localize } = useTranslations();
+    const { localize, currentLang } = useTranslations();
 
-    const { isSingleLoggingIn } = useOauth2();
+
 
     const { hubEnabledCountryList } = useFirebaseCountriesConfig();
     const { onRenderTMBCheck, isTmbEnabled } = useTMB();
@@ -49,7 +49,7 @@ const AppHeader = observer(({ isAuthenticating }: TAppHeaderProps) => {
 
     const renderAccountSection = useCallback(() => {
         // Show loader during authentication processes
-        if (isAuthenticating || isAuthorizing || (isSingleLoggingIn && !is_tmb_enabled)) {
+        if (isAuthenticating || isAuthorizing) {
             return <AccountsInfoLoader isLoggedIn isMobile={!isDesktop} speed={3} />;
         } else if (activeLoginid) {
             return (
@@ -139,11 +139,6 @@ const AppHeader = observer(({ isAuthenticating }: TAppHeaderProps) => {
                         tertiary
                         onClick={async () => {
                             clearAuthData(false);
-                            const getQueryParams = new URLSearchParams(window.location.search);
-                            const currency = getQueryParams.get('account') ?? '';
-                            const query_param_currency =
-                                currency || sessionStorage.getItem('query_param_currency') || 'USD';
-
                             try {
                                 // First, explicitly wait for TMB status to be determined
                                 const tmbEnabled = await isTmbEnabled();
@@ -153,16 +148,7 @@ const AppHeader = observer(({ isAuthenticating }: TAppHeaderProps) => {
                                 } else {
                                     // Always use OIDC if TMB is not enabled
                                     try {
-                                        await requestOidcAuthentication({
-                                            redirectCallbackUri: `${window.location.origin}/callback`,
-                                            ...(query_param_currency
-                                                ? {
-                                                      state: {
-                                                          account: query_param_currency,
-                                                      },
-                                                  }
-                                                : {}),
-                                        });
+                                        window.location.href = AuthManager.getLoginUrl(currentLang ?? 'en');
                                     } catch (err) {
                                         handleOidcAuthFailure(err);
                                         window.location.replace(generateOAuthURL());
@@ -190,7 +176,6 @@ const AppHeader = observer(({ isAuthenticating }: TAppHeaderProps) => {
     }, [
         isAuthenticating,
         isAuthorizing,
-        isSingleLoggingIn,
         isDesktop,
         activeLoginid,
         standalone_routes,

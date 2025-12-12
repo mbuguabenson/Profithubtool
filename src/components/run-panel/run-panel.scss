@@ -100,6 +100,12 @@
             &--positive {
                 font-weight: bold;
                 color: var(--text-profit-success);
+                // Green glow for profits
+                text-shadow: var(--glow-green);
+                background: var(--gradient-green-primary);
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
             }
 
             &--negative {
@@ -452,5 +458,54 @@
         @include mobile-or-tablet-screen {
             flex-basis: 100%;
         }
+    }
+}
+
+// Purple Theme for Run and Reset Buttons
+.controls__stop-button,
+.controls__run-button {
+    // Purple gradient background
+    background: var(--gradient-purple-primary) !important;
+    color: var(--brand-white) !important;
+    font-weight: 700;
+    box-shadow: var(--glow-purple);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover:not([disabled]) {
+        box-shadow: var(--glow-purple-intense);
+        transform: translateY(-2px) scale(1.02);
+        background: var(--gradient-purple-primary) !important;
+    }
+
+    &:not([disabled]) {
+        animation: button-glow-pulse 3s ease-in-out infinite;
+    }
+}
+
+// Run Panel Footer Button (Reset/Clear)
+.run-panel__footer-button {
+    background: transparent;
+    border: 2px solid var(--brand-red-coral);
+    color: var(--brand-red-coral) !important;
+    font-weight: 600;
+
+    &:hover:not([disabled]) {
+        background: var(--gradient-purple-primary) !important;
+        color: var(--brand-white) !important;
+        box-shadow: var(--glow-purple);
+        transform: translateY(-2px);
+    }
+}
+
+// Button glow pulse animation
+@keyframes button-glow-pulse {
+
+    0%,
+    100% {
+        box-shadow: var(--glow-purple);
+    }
+
+    50% {
+        box-shadow: var(--glow-purple-intense);
     }
 }

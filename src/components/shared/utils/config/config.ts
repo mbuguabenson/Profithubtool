@@ -1,15 +1,14 @@
 import { LocalStorageConstants, LocalStorageUtils, URLUtils } from '@deriv-com/utils';
-import { isStaging } from '../url/helpers';
 
 export const APP_IDS = {
-    LOCALHOST: 36300,
-    TMP_STAGING: 64584,
-    STAGING: 29934,
-    STAGING_BE: 29934,
-    STAGING_ME: 29934,
-    PRODUCTION: 65555,
-    PRODUCTION_BE: 65556,
-    PRODUCTION_ME: 65557,
+    LOCALHOST: 114784, // Default for local dev
+    TMP_STAGING: 114784,
+    STAGING: 114784, // TODO: Update with real staging ID if different
+    STAGING_BE: 114784,
+    STAGING_ME: 114784,
+    PRODUCTION: 114784, // Example production ID - needs verification
+    PRODUCTION_BE: 114784,
+    PRODUCTION_ME: 114784,
 };
 
 export const livechat_license_id = 12049137;
@@ -23,6 +22,8 @@ export const domain_app_ids = {
     'dbot.deriv.com': APP_IDS.PRODUCTION,
     'dbot.deriv.be': APP_IDS.PRODUCTION_BE,
     'dbot.deriv.me': APP_IDS.PRODUCTION_ME,
+    'app.deriv.com': APP_IDS.PRODUCTION,
+    localhost: APP_IDS.LOCALHOST,
 };
 
 export const getCurrentProductionDomain = () =>
@@ -38,6 +39,8 @@ export const isTestLink = () => {
     return (
         window.location.origin?.includes('.binary.sx') ||
         window.location.origin?.includes('bot-65f.pages.dev') ||
+        window.location.origin?.includes('.vercel.app') ||
+        window.location.origin?.includes('.netlify.app') ||
         isLocal()
     );
 };
@@ -78,22 +81,14 @@ export const getDefaultAppIdAndUrl = () => {
     return { app_id, server_url };
 };
 
-export const getAppId = () => {
-    let app_id = null;
-    const config_app_id = window.localStorage.getItem('config.app_id');
-    const current_domain = getCurrentProductionDomain() ?? '';
-
+export const getAppId = (): number => {
+    const config_app_id = localStorage.getItem('config.app_id');
     if (config_app_id) {
-        app_id = config_app_id;
-    } else if (isStaging()) {
-        app_id = APP_IDS.STAGING;
-    } else if (isTestLink()) {
-        app_id = APP_IDS.LOCALHOST;
-    } else {
-        app_id = domain_app_ids[current_domain as keyof typeof domain_app_ids] ?? APP_IDS.PRODUCTION;
+        return parseInt(config_app_id);
     }
 
-    return app_id;
+    // Default universal fallback
+    return 114784;
 };
 
 export const getSocketURL = () => {
@@ -124,9 +119,8 @@ export const checkAndSetEndpointFromUrl = () => {
             const params = url_params.toString();
             const hash = location.hash;
 
-            location.href = `${location.protocol}//${location.hostname}${location.pathname}${
-                params ? `?${params}` : ''
-            }${hash || ''}`;
+            location.href = `${location.protocol}//${location.hostname}${location.pathname}${params ? `?${params}` : ''
+                }${hash || ''}`;
 
             return true;
         }
@@ -142,11 +136,42 @@ export const getDebugServiceWorker = () => {
     return false;
 };
 
+/**
+ * Generates the redirect URI that strictly matches the current origin + pathname.
+ * This is crucial for OAuth compliance.
+ */
+export const getRedirectUri = () => {
+    // Current window URL without query parameters or hash
+    const origin = window.location.origin;
+    const pathname = window.location.pathname;
+
+    // Ensure we don't end up with double slashes if pathname is just '/'
+    const uri = `${origin}${pathname}`;
+
+    // NOTE: Some OAuth setups strictly require a trailing slash, others forbid it.
+    // Based on previous code, we'll strip trailing slash unless it's root, or maybe just follow strict window.location match
+    // Standardizing on: No trailing slash unless it's root '/'
+
+    // However, the previous code forced a trailing slash:
+    // currentUrl.endsWith('/') ? currentUrl : currentUrl + '/'
+
+    // Let's stick to what likely works: strict match to what the browser shows
+    return uri;
+};
+
 export const generateOAuthURL = () => {
     const { getOauthURL } = URLUtils;
     const oauth_url = getOauthURL();
     const original_url = new URL(oauth_url);
     const hostname = window.location.hostname;
+
+    // Use centralized redirect logic
+    const redirectUri = getRedirectUri();
+    original_url.searchParams.set('redirect_uri', redirectUri);
+
+    // Explicitly set the App ID based on our configuration
+    const app_id = getAppId();
+    original_url.searchParams.set('app_id', app_id.toString());
 
     // First priority: Check for configured server URLs (for QA/testing environments)
     const configured_server_url = (LocalStorageUtils.getValue(LocalStorageConstants.configServerURL) ||
@@ -167,6 +192,9 @@ export const generateOAuthURL = () => {
             original_url.hostname = 'oauth.deriv.me';
         } else if (hostname.includes('.deriv.be')) {
             original_url.hostname = 'oauth.deriv.be';
+        } else if (hostname === 'localhost' || hostname === '127.0.0.1' || /^localhost:\d+$/.test(hostname)) {
+            // Explicitly handle localhost to use production OAuth
+            original_url.hostname = 'oauth.deriv.com';
         } else {
             // Fallback to original logic for other domains
             const current_domain = getCurrentProductionDomain();

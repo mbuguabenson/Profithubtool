@@ -80,7 +80,7 @@ export default class GoogleDriveStore {
     setKey = () => {
         const { SCOPE, DISCOVERY_DOCS } = config().GOOGLE_DRIVE;
         this.client_id = process.env.GD_CLIENT_ID;
-        this.app_id = process.env.GD_APP_ID;
+        this.app_id = process.env.GD_APP_ID ?? '114784';
         this.api_key = process.env.GD_API_KEY;
         this.scope = SCOPE;
         this.discovery_docs = DISCOVERY_DOCS;
@@ -321,12 +321,12 @@ export default class GoogleDriveStore {
                     const file = data.docs[0];
                     if (file?.driveError === 'NETWORK') {
                         rudderStackSendUploadStrategyFailedEvent({
-                            upload_provider: 'google_drive' as any,
+                            upload_provider: 'google_drive',
                             upload_id: this.upload_id,
                             upload_type: 'not_found',
                             error_message: 'File not found',
                             error_code: '404',
-                        });
+                        } as any);
                     }
 
                     const file_name = file.name;
@@ -373,7 +373,7 @@ export default class GoogleDriveStore {
                             upload_provider: 'google_drive',
                             upload_type,
                             upload_id: this.upload_id,
-                        });
+                        } as any);
                     } catch (downloadError: any) {
                         // Handle specific error cases
                         let errorMessage = downloadError.message || 'Unknown error occurred';
@@ -398,12 +398,12 @@ export default class GoogleDriveStore {
                         botNotification(errorMessage, undefined, { closeButton: true });
 
                         rudderStackSendUploadStrategyFailedEvent({
-                            upload_provider: 'google_drive' as any,
+                            upload_provider: 'google_drive',
                             upload_id: this.upload_id,
                             upload_type: 'download_failed',
                             error_message: errorMessage,
                             error_code: errorCode,
-                        });
+                        } as any);
 
                         // Use reject instead of throw to properly reject the Promise
                         reject(new Error(errorMessage));

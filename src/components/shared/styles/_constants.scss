@@ -54,18 +54,18 @@ $color-grey-13: #2e2e2e;
 $color-grey-14: #e2e5e7;
 $color-orange: #ff6444;
 $color-purple: #722fe4;
-$color-red: #ff444f;
-$color-red-1: #ec3f3f;
-$color-red-2: #cc2e3d;
-$color-red-3: #a32430;
-$color-red-4: #d33636;
-$color-red-5: #eb3e48;
-$color-red-6: #ec3f3f29;
-$color-red-7: #ffe1e3;
-$color-red-8: #661b20;
-$color-red-9: #b33037;
-$color-red-10: #ff444f;
-$color-red-11: #fce3e3;
+$color-red: #7c3aed; // ProfitHub Primary
+$color-red-1: #6d28d9;
+$color-red-2: #5b21b6;
+$color-red-3: #4c1d95;
+$color-red-4: #8b5cf6;
+$color-red-5: #a78bfa;
+$color-red-6: rgb(124 58 237 / 16%);
+$color-red-7: #ddd6fe;
+$color-red-8: #2e1065;
+$color-red-9: #5b21b6;
+$color-red-10: #7c3aed;
+$color-red-11: #ede9fe;
 $color-violet: #4a3871;
 $color-white: #fff;
 $color-yellow: #ffad3a;
@@ -232,9 +232,48 @@ $ready-banner-tick-bg-color: #4ab4b3;
 $wallet-demo-bg-color: #fff8f9;
 $wallet-dark-demo-bg-color: #140506;
 $wallet-demo-divider-color: #fff0f1;
-$wallet-box-shadow:
-    0 12px 16px -4px rgb(14 14 14 / 8%),
+$wallet-box-shadow: 0 12px 16px -4px rgb(14 14 14 / 8%),
     0 4px 6px -2px rgb(14 14 14 / 3%);
-$btn-shadow:
-    0 24px 24px 0 rgb(0 0 0 / 8%),
+$btn-shadow: 0 24px 24px 0 rgb(0 0 0 / 8%),
     0 0 24px 0 rgb(0 0 0 / 8%);
+
+/* ------------------------------------*
+ *  # Custom Theme Variables
+ *------------------------------------ */
+
+/* Purple/Violet Palette - ProfitHub Primary */
+$color-purple-primary: #7c3aed;
+$color-purple-light: #8b5cf6;
+$color-purple-lighter: #a78bfa;
+$color-purple-medium: #6d28d9;
+$color-purple-dark: #5b21b6;
+$color-purple-darker: #4c1d95;
+$color-purple-darkest: #2e1065;
+
+/* Glassmorphism Variables */
+$glass-bg: rgb(255 255 255 / 10%);
+$glass-border: 1px solid rgb(255 255 255 / 20%);
+$glass-shadow: 0 8px 32px 0 rgb(31 38 135 / 37%);
+$glass-blur: blur(10px);
+
+/* Modern Gradients */
+$gradient-primary: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+$gradient-secondary: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+$gradient-accent: linear-gradient(135deg, #fce38a 0%, #f38181 100%);
+$gradient-purple-primary: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+
+/* Glow Effects */
+$glow-primary: 0 0 15px rgb(0 198 255 / 60%);
+$glow-secondary: 0 0 15px rgb(56 239 125 / 60%);
+$glow-purple: 0 4px 20px rgb(139 92 246 / 50%), 0 0 30px rgb(139 92 246 / 40%);
+$glow-purple-intense: 0 4px 25px rgb(139 92 246 / 70%), 0 0 40px rgb(139 92 246 / 60%);
+$glow-green: 0 4px 20px rgb(75 180 179 / 50%), 0 0 30px rgb(75 180 179 / 40%);
+$glow-green-intense: 0 4px 25px rgb(23 234 189 / 70%), 0 0 40px rgb(23 234 189 / 60%);
+
+/* Green Gradients */
+$gradient-green-primary: linear-gradient(135deg, #17eabd 0%, #4bb4b3 50%, #00a79e 100%);
+$gradient-green-secondary: linear-gradient(135deg, #00a79e 0%, #17eabd 100%);
+
+/* Neumorphism Shadows */
+$neu-shadow-light: 5px 5px 10px #d1d9e6, -5px -5px 10px #fff;
+$neu-shadow-dark: 5px 5px 10px #0b0e18, -5px -5px 10px #191c31;

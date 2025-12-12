@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import Cookies from 'js-cookie';
 import RootStore from '@/stores/root-store';
-import { handleOidcAuthFailure } from '@/utils/auth-utils';
 import { Analytics } from '@deriv-com/analytics';
-import { OAuth2Logout, requestOidcAuthentication } from '@deriv-com/auth-client';
+import { AuthManager } from '@/utils/AuthManager';
+import { LocalStore } from '@/components/shared/utils/storage/storage';
 
 /**
  * Provides an object with properties: `oAuthLogout`, `retriggerOAuth2Login`, and `isSingleLoggingIn`.
@@ -57,37 +57,15 @@ export const useOauth2 = ({
 
     const logoutHandler = async () => {
         client?.setIsLoggingOut(true);
-        try {
-            await OAuth2Logout({
-                redirectCallbackUri: `${window.location.origin}/callback`,
-                WSLogoutAndRedirect: handleLogout ?? (() => Promise.resolve()),
-                postLogoutRedirectUri: window.location.origin,
-            }).catch(err => {
-                // eslint-disable-next-line no-console
-                console.error(err);
-            });
-            await client?.logout().catch(err => {
-                // eslint-disable-next-line no-console
-                console.error('Error during TMB logout:', err);
-            });
-
-            Analytics.reset();
-        } catch (error) {
-            // eslint-disable-next-line no-console
-            console.error(error);
+        if (handleLogout) {
+            await handleLogout();
         }
+        AuthManager.logout();
+        Analytics.reset();
     };
+
     const retriggerOAuth2Login = async () => {
-        try {
-            await requestOidcAuthentication({
-                redirectCallbackUri: `${window.location.origin}/callback`,
-                postLogoutRedirectUri: window.location.origin,
-            }).catch(err => {
-                handleOidcAuthFailure(err);
-            });
-        } catch (error) {
-            handleOidcAuthFailure(error);
-        }
+        window.location.href = AuthManager.getLoginUrl(LocalStore.get('i18n') || 'en');
     };
 
     return { oAuthLogout: logoutHandler, retriggerOAuth2Login, isSingleLoggingIn };
