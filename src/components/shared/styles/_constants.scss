@@ -277,3 +277,19 @@ $gradient-green-secondary: linear-gradient(135deg, #00a79e 0%, #17eabd 100%);
 /* Neumorphism Shadows */
 $neu-shadow-light: 5px 5px 10px #d1d9e6, -5px -5px 10px #fff;
 $neu-shadow-dark: 5px 5px 10px #0b0e18, -5px -5px 10px #191c31;
+
+/* New Dashboard Card Constants */
+$color-cyan: #00c6ff;
+$color-deep-blue: #0072ff;
+$color-teal: #00a79e;
+$color-teal-light: #4bb4b3;
+
+$gradient-dark-card: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+$gradient-card-glow: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+
+$card-glass-light: rgba(255, 255, 255, 0.4);
+$card-glass-dark: rgba(255, 255, 255, 0.07);
+
+$card-shadow-light: 0 4px 6px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+$card-shadow-dark: 0 4px 6px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+$card-shadow-hover: 0 10px 15px rgba(0, 198, 255, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
