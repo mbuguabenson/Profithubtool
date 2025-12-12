@@ -383,7 +383,7 @@
                     line-height: 1.5;
                     color: $color-black-1; // #333
 
-                    @include dark-theme {
+                    @at-root .theme--dark & {
                         color: $color-white;
                     }
 
@@ -420,7 +420,7 @@
                 transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
                 border: 1px solid rgba(255, 255, 255, 0.2);
 
-                @include dark-theme {
+                @at-root .theme--dark & {
                     background: $card-glass-dark;
                     box-shadow: $card-shadow-dark;
                     border: 1px solid rgba(255, 255, 255, 0.05);
