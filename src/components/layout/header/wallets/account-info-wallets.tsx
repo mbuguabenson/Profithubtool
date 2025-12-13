@@ -10,14 +10,10 @@ import { useStore } from '@/hooks/useStore';
 import useStoreWalletAccountsList from '@/hooks/useStoreWalletAccountsList';
 import {
     AccountsDerivAccountLightIcon,
-} from '@deriv/quill-icons/Accounts';
-import {
     LabelPairedLockCaptionBoldIcon,
-} from '@deriv/quill-icons/LabelPaired';
-import {
     StandaloneChevronDownBoldIcon,
-} from '@deriv/quill-icons/Standalone';
-import { TStores } from '@deriv/stores/types';
+} from '@deriv/quill-icons';
+// import { TStores } from '@deriv/stores/types';
 import { Localize } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
 import AccountInfoWrapper from '../account-info-wrapper';
@@ -128,7 +124,7 @@ const AccountInfoWallets = observer(({ is_dialog_on, toggleDialog }: TAccountInf
     const linked_dtrade_trading_account_loginid = loginid;
 
     const linked_wallet = wallet_list?.find(wallet => wallet.dtrade_loginid === linked_dtrade_trading_account_loginid);
-    const show_badge = linked_wallet?.is_virtual;
+    const show_badge = !!linked_wallet?.is_virtual;
 
     return (
         <div className='acc-info__wrapper'>

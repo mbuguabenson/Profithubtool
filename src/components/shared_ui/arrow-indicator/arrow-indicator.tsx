@@ -1,5 +1,5 @@
 import React from 'react';
-import { StandaloneSortDownFillIcon, StandaloneSortUpFillIcon } from '@deriv/quill-icons/Standalone';
+import { StandaloneSortDownFillIcon, StandaloneSortUpFillIcon } from '@deriv/quill-icons';
 
 type TArrowIndicatorProps = {
     className?: string;
@@ -35,7 +35,7 @@ const ArrowIndicator = ({ className, value }: TArrowIndicatorProps) => {
                 </div>
             );
             return {
-                icon: has_comparable_values ? icon_name : '',
+                icon: (has_comparable_values ? icon_name : '') as any,
                 previous_icon: prev_data.icon,
                 previous_value: prev_data.value,
                 value,

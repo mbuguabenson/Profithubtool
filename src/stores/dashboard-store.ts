@@ -2,7 +2,7 @@ import DOMPurify from 'dompurify';
 import { action, makeObservable, observable, reaction } from 'mobx';
 import { botNotification } from '@/components/bot-notification/bot-notification';
 import { notification_message, NOTIFICATION_TYPE } from '@/components/bot-notification/bot-notification-utils';
-import { TStores } from '@deriv/stores/types';
+import { TStores } from '@/types/stores.types';
 import * as strategy_description from '../constants/quick-strategies';
 import { TDescriptionItem } from '../pages/bot-builder/quick-strategy/types';
 import {
@@ -61,6 +61,8 @@ export interface IDashboardStore {
     is_chart_modal_visible: boolean;
     is_trading_view_modal_visible: boolean;
     setPreviewOnPopup: (is_preview_on_popup: boolean) => void;
+    active_bot_subtab: number;
+    setActiveBotSubTab: (active_bot_subtab: number) => void;
 }
 
 export default class DashboardStore implements IDashboardStore {
@@ -121,6 +123,8 @@ export default class DashboardStore implements IDashboardStore {
             is_chart_modal_visible: observable,
             is_trading_view_modal_visible: observable,
             bot_builder_symbol: observable,
+            active_bot_subtab: observable,
+            setActiveBotSubTab: action.bound,
         });
         this.root_store = root_store;
         this.core = core;
@@ -209,6 +213,11 @@ export default class DashboardStore implements IDashboardStore {
 
     setFaqTitle = (faq_title: string) => {
         this.faq_title = faq_title;
+    };
+
+    active_bot_subtab = 0;
+    setActiveBotSubTab = (active_bot_subtab: number) => {
+        this.active_bot_subtab = active_bot_subtab;
     };
 
     resetTutorialTabContent = () => {

@@ -1,0 +1,120 @@
+.welcome-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    color: #ffffff;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
+
+    &__content {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    &__title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeSlideUp 0.8s ease-out forwards;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    &__subtitle {
+        font-size: 1.1rem;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.9);
+        margin: 0;
+        opacity: 0;
+        animation: fadeIn 0.8s ease-out 0.4s forwards;
+    }
+
+    &__loader {
+        margin-top: 2rem;
+        width: 48px;
+        height: 48px;
+        border: 4px solid rgba(255, 255, 255, 0.2);
+        border-left-color: #ffffff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite, fadeIn 0.5s ease-out 0.8s forwards;
+        opacity: 0;
+    }
+
+    &__footer {
+        position: absolute;
+        bottom: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        opacity: 0;
+        animation: fadeIn 0.8s ease-out 1s forwards;
+
+        &-text {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 0.5px;
+        }
+
+        &-logo {
+            height: 24px;
+            width: auto;
+
+            // Assuming we use an SVG or filter for the logo to be white
+            // If using the official Deriv logo component, we might need a wrapper
+            filter: brightness(0) invert(1);
+        }
+    }
+}
+
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .welcome-screen__title {
+        font-size: 1.8rem;
+        padding: 0 1rem;
+    }
+}

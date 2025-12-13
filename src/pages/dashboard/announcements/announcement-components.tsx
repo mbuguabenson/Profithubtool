@@ -1,7 +1,7 @@
 import React from 'react';
 import Text from '@/components/shared_ui/text';
 import { Icon } from '@/utils/tmp/dummy';
-import { LabelPairedCircleInfoCaptionBoldIcon } from '@deriv/quill-icons/LabelPaired';
+import { LabelPairedCircleInfoCaptionBoldIcon } from '@deriv/quill-icons';
 
 export const IconAnnounce = ({ announce }: { announce: boolean }) => (
     <>
@@ -13,7 +13,7 @@ export const IconAnnounce = ({ announce }: { announce: boolean }) => (
 export const TitleAnnounce = ({ title, announce }: { title: string; announce: boolean }) => (
     <Text
         size='xs'
-        line_height='l'
+        lineHeight='l'
         weight={announce ? 'bold' : 'normal'}
         styles={!announce ? { color: 'var(--text-general)' } : {}}
     >
@@ -25,13 +25,13 @@ export const MessageAnnounce = ({ message, date, announce }: { message: string; 
     <>
         <Text
             size='xs'
-            line_height='m'
+            lineHeight='m'
             weight={announce ? 'normal' : 'lighter'}
             styles={!announce ? { color: 'var(--text-general)' } : {}}
         >
             {message}
         </Text>
-        <Text size='xxs' line_height='xl' styles={{ color: 'var(--text-primary)' }}>
+        <Text size='xxs' lineHeight='xl' styles={{ color: 'var(--text-primary)' }}>
             {date}
         </Text>
     </>

@@ -3,7 +3,9 @@ declare global {
     let google: any;
     interface Window {
         sendRequestsStatistic: (is_running: boolean) => void;
+        Blockly: any;
+
     }
 }
 
-export {};
+export { };

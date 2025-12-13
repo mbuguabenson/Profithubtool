@@ -200,7 +200,8 @@ export default class GoogleDriveStore {
         }
     }
 
-    async loadFile() {
+    async loadFile(): Promise<{ xml_doc: string; file_name: string } | undefined> {
+
         if (!this.is_google_drive_token_valid) return;
         await this.signIn();
 
@@ -212,7 +213,8 @@ export default class GoogleDriveStore {
             localize('Select a Deriv Bot Strategy')
         );
 
-        return xml_doc;
+        return xml_doc as { xml_doc: string; file_name: string } | undefined;
+
     }
 
     async checkFolderExists() {

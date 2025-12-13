@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-// import { IconSize } from '@deriv/quill-icons';
+import { IconSize } from '@deriv/quill-icons';
 
 const TRADE_TYPE_ICONS = {
     ACCU: lazy(() =>
@@ -100,12 +100,12 @@ const TRADE_TYPE_ICONS = {
     ),
 };
 
-export const TradeTypeIcon = ({ type, size, className }: { type: string; size?: string; className?: string }) => {
+export const TradeTypeIcon = ({ type, size, className }: { type: string; size?: IconSize; className?: string }) => {
     const Icon = TRADE_TYPE_ICONS[type?.toUpperCase() as keyof typeof TRADE_TYPE_ICONS] || TRADE_TYPE_ICONS.unknown;
 
     return (
         <Suspense fallback={null}>
-            <Icon iconSize={(size ?? 'xs') as any} className={className} />
+            <Icon iconSize={size ?? 'xs'} className={className} />
         </Suspense>
     );
 };

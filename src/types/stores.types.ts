@@ -1,14 +1,22 @@
-import { TStores } from '@deriv/stores/types';
-import DashboardStore from 'Stores/dashboard-store';
-import FlyoutStore from 'Stores/flyout-store';
-import LoadModalStore from 'Stores/load-modal-store';
-import RunPanelStore from 'Stores/run-panel-store';
-import SaveModalStore from 'Stores/save-modal-store';
-import ToolbarStore from 'Stores/toolbar-store';
+import ClientStore from '@/stores/client-store';
+import CommonStore from '@/stores/common-store';
+import DashboardStore from '@/stores/dashboard-store';
+import FlyoutStore from '@/stores/flyout-store';
+import LoadModalStore from '@/stores/load-modal-store';
+import RunPanelStore from '@/stores/run-panel-store';
+import SaveModalStore from '@/stores/save-modal-store';
+import ToolbarStore from '@/stores/toolbar-store';
+import UiStore from '@/stores/ui-store';
 import { TWebSocket } from './ws.types';
 
+export type TStores = {
+    ui: UiStore;
+    client: ClientStore;
+    common: CommonStore;
+};
+
 export type TDbotStore = {
-    client: TStores['client'];
+    client: ClientStore;
     flyout: FlyoutStore;
     toolbar: ToolbarStore;
     save_modal: SaveModalStore;
@@ -25,6 +33,7 @@ export type TDbotStore = {
 };
 
 export type TApiHelpersStore = {
-    server_time: TStores['common']['server_time'];
+    server_time: CommonStore['server_time'];
     ws: TWebSocket;
 };
+

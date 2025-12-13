@@ -1,294 +1,387 @@
-@use 'components/shared/styles/constants' as *;
-@use 'components/shared/styles/mixins' as *;
-
 .copy-trading {
-    width: 100%;
-    height: 100%;
-    padding: 2.4rem;
-    overflow-y: auto;
-    background: var(--general-main-1); // Fallback
-    display: flex;
-    flex-direction: column;
-    gap: 2.4rem;
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    color: var(--text-general);
 
-    // SCROLLBAR styling (optional)
-    &::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: $color-grey-5;
-        border-radius: 4px;
-    }
-
-    // HEADER SECTION
     &__header {
-        background: linear-gradient(135deg, $color-black-3 0%, $color-black-4 100%);
-        border-radius: 24px;
-        padding: 3.2rem;
+        margin-bottom: 2rem;
+    }
+
+    &__title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    &__subtitle {
+        color: var(--text-less-prominent);
+        font-size: 1rem;
+    }
+
+    &__error {
+        background: rgba(255, 68, 68, 0.1);
+        border: 1px solid var(--status-danger);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        color: var(--status-danger);
+    }
 
-        // Glassmorphism overlay
-        &::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(0, 198, 255, 0.1) 0%, rgba(0, 114, 255, 0.1) 100%);
-            backdrop-filter: blur(10px);
-            z-index: 0;
-        }
+    &__error-close {
+        background: none;
+        border: none;
+        color: var(--status-danger);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0 0.5rem;
 
-        &__content {
-            position: relative;
-            z-index: 1;
-        }
-
-        &__title {
-            font-size: 3.2rem;
-            font-weight: 700;
-            background: linear-gradient(to right, #00c6ff, #0072ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.8rem;
-        }
-
-        &__subtitle {
-            font-size: 1.6rem;
-            color: $color-grey-1;
-        }
-
-        &__master-info {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            gap: 2.4rem;
-            align-items: center;
-        }
-
-        &__stat-box {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1.2rem 2rem;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-
-            span {
-                display: block;
-                font-size: 1.2rem;
-                color: $color-grey-2;
-                margin-bottom: 0.4rem;
-            }
-
-            strong {
-                font-size: 1.8rem;
-                color: $color-white;
-            }
-        }
-
-        &__status {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            color: $color-green-1;
-            font-weight: 700;
-
-            &--disconnected {
-                color: $color-red-1;
-            }
-
-            .plug-icon {
-                &--connected {
-                    filter: drop-shadow(0 0 5px $color-green-1);
-                    animation: pulse 2s infinite;
-                }
-            }
+        &:hover {
+            opacity: 0.7;
         }
     }
 
-    // CLIENTS SECTION
-    &__clients {
+    &__section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: var(--text-prominent);
+    }
+
+    &__subsection-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 1.5rem 0 1rem;
+        color: var(--text-prominent);
+    }
+
+    &__active-section {
+        margin-bottom: 3rem;
+    }
+
+    &__sessions {
+        display: grid;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    &__session-card {
+        padding: 1.5rem;
+        border-radius: 12px;
+        background: var(--glass-background);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--shadow-glow);
+    }
+
+    &__session-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    &__session-info h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    &__session-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--status-success);
+    }
+
+    &__status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--status-success);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    &__session-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+
+    &__stat {
         display: flex;
         flex-direction: column;
-        gap: 1.6rem;
+        gap: 0.25rem;
+    }
 
-        &__header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+    &__stat-label {
+        font-size: 0.85rem;
+        color: var(--text-less-prominent);
+    }
+
+    &__stat-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-prominent);
+
+        &.positive {
+            color: var(--status-success);
         }
 
-        &__list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 2rem;
+        &.negative {
+            color: var(--status-danger);
         }
     }
 
-    // CLIENT CARD
-    &__client-card {
-        background: rgba(255, 255, 255, 0.5); // Light mode glass
-        border-radius: 20px;
-        padding: 2rem;
-        border: 1px solid rgba(255, 255, 255, 0.4);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-        transition: transform 0.2s, box-shadow 0.2s;
-        position: relative;
-        overflow: hidden;
+    &__stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--glass-border);
 
-        @at-root .theme--dark & {
-            background: rgba(20, 20, 20, 0.6);
-            border-color: rgba(255, 255, 255, 0.1);
+        &:last-child {
+            border-bottom: none;
         }
+    }
+
+    &__mirrored-trades {
+        margin-top: 2rem;
+    }
+
+    &__trades-list {
+        display: grid;
+        gap: 1rem;
+    }
+
+    &__trade-item {
+        padding: 1rem;
+        border-radius: 8px;
+        background: var(--glass-background);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+    }
+
+    &__trade-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    &__trade-symbol {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    &__trade-status {
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+
+        &.status-active {
+            background: rgba(68, 145, 255, 0.2);
+            color: var(--status-info);
+        }
+
+        &.status-won {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--status-success);
+        }
+
+        &.status-lost {
+            background: rgba(255, 68, 68, 0.2);
+            color: var(--status-danger);
+        }
+    }
+
+    &__trade-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+
+        &>div {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+    }
+
+    &__detail-label {
+        font-size: 0.75rem;
+        color: var(--text-less-prominent);
+    }
+
+    &__traders-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    &__trader-card {
+        padding: 1.5rem;
+        border-radius: 12px;
+        background: var(--glass-background);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        box-shadow: var(--shadow-glow);
+        transition: all 0.3s ease;
 
         &:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0, 198, 255, 0.15);
-        }
-
-        &--syncing {
-            border: 1px solid #00c6ff;
-            box-shadow: 0 0 10px rgba(0, 198, 255, 0.3);
-        }
-
-        &__header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1.6rem;
-        }
-
-        &__badge {
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            font-size: 1.1rem;
-            font-weight: 700;
-
-            &--real {
-                background: rgba(0, 198, 255, 0.1);
-                color: #00c6ff;
-            }
-
-            &--demo {
-                background: rgba(255, 165, 0, 0.1);
-                color: #ffa500;
-            }
-        }
-
-        &__balance {
-            font-size: 2.4rem;
-            font-weight: 700;
-            margin-bottom: 0.8rem;
-            color: var(--text-prominent);
-        }
-
-        &__token {
-            font-family: monospace;
-            color: var(--text-less-prominent);
-            font-size: 1.2rem;
+            box-shadow: var(--shadow-glow-hover);
+            border-color: var(--gradient-primary-start);
         }
     }
 
-    // CONTROLS SECTION
-    &__controls {
+    &__trader-header {
         display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    &__trader-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--gradient-primary);
+        display: flex;
+        align-items: center;
         justify-content: center;
-        gap: 2.4rem;
-        padding: 2rem;
-        background: rgba(255, 255, 255, 0.3);
-        border-radius: 24px;
-        backdrop-filter: blur(8px);
-
-        @at-root .theme--dark & {
-            background: rgba(0, 0, 0, 0.2);
-        }
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: white;
     }
 
-    // STATS SECTION
-    &__stats {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 2rem;
-
-        &__panel {
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-            border-radius: 20px;
-            padding: 2rem;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-
-            &--profit {
-                border-bottom: 4px solid $color-green-1;
-
-                h3 {
-                    color: $color-green-1;
-                }
-            }
-
-            &--loss {
-                border-bottom: 4px solid $color-red-1;
-
-                h3 {
-                    color: $color-red-1;
-                }
-            }
-        }
-    }
-}
-
-// Keyframes
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-        opacity: 1;
+    &__trader-info h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
     }
 
-    50% {
-        transform: scale(1.1);
-        opacity: 0.8;
+    &__trader-followers {
+        font-size: 0.85rem;
+        color: var(--text-less-prominent);
     }
 
-    100% {
-        transform: scale(1);
-        opacity: 1;
+    &__trader-stats {
+        margin-bottom: 1.5rem;
     }
-}
 
-// Inputs and Buttons (Custom overrides for this tab)
-.copy-input {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    padding: 1rem;
-    color: var(--text-prominent);
-    width: 300px;
-
-    &:focus {
-        border-color: #00c6ff;
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(0, 198, 255, 0.2);
-    }
-}
-
-.btn-gradient {
-    &--green {
-        background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+    &__button {
+        width: 100%;
+        padding: 0.75rem 1.5rem;
         border: none;
-        color: white;
-        font-weight: 700;
-        box-shadow: 0 4px 15px rgba(56, 239, 125, 0.3);
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
 
-        &:hover {
-            box-shadow: 0 6px 20px rgba(56, 239, 125, 0.5);
-            transform: translateY(-1px);
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        &--start {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-glow);
+
+            &:hover:not(:disabled) {
+                box-shadow: var(--shadow-glow-hover);
+                transform: translateY(-2px);
+            }
+        }
+
+        &--stop {
+            background: rgba(255, 68, 68, 0.2);
+            color: var(--status-danger);
+            border: 1px solid var(--status-danger);
+
+            &:hover:not(:disabled) {
+                background: rgba(255, 68, 68, 0.3);
+            }
         }
     }
 
-    &--red {
-        background: linear-gradient(90deg, #ff416c 0%, #ff4b2b 100%);
-        color: white;
-        font-weight: 700;
+    &__loading {
+        text-align: center;
+        padding: 3rem;
+    }
+
+    &__spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid var(--glass-border);
+        border-top-color: var(--gradient-primary-start);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    &__empty {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-less-prominent);
+    }
+
+    .positive {
+        color: var(--status-success);
+    }
+
+    .negative {
+        color: var(--status-danger);
+    }
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+    .copy-trading {
+        padding: 1rem;
+
+        &__title {
+            font-size: 1.5rem;
+        }
+
+        &__traders-grid {
+            grid-template-columns: 1fr;
+        }
+
+        &__session-stats {
+            grid-template-columns: 1fr;
+        }
+
+        &__trade-details {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
 }

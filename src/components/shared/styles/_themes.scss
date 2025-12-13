@@ -38,15 +38,15 @@
     // Brand primary colors
     --brand-white: #{constants.$color-white};
     --brand-dark-grey: #{constants.$color-black};
-    --brand-red-coral: #{constants.$color-purple-primary}; // Changed to purple
+    --brand-red-coral: #{constants.$color-blue}; // Updated to Blue as requested
     --brand-orange: #{constants.$color-orange};
 
     // Brand secondary colors
     --brand-secondary: #{constants.$color-green};
 
     // Modern UI Effects - Glassmorphism
-    --glass-bg: #{constants.$glass-bg};
-    --glass-border: #{constants.$glass-border};
+    --glass-bg: #{constants.$glass-bg-light};
+    --glass-border: #{constants.$glass-border-light};
     --glass-shadow: #{constants.$glass-shadow};
     --glass-blur: #{constants.$glass-blur};
 
@@ -365,5 +365,9 @@
         // Header
         --header-background-mt5: #{constants.$color-blue-8};
         --header-background-others: #{constants.$color-green-7};
+
+        // Glassmorphism Overrides for Dark Mode
+        --glass-bg: #{constants.$glass-bg-dark};
+        --glass-border: #{constants.$glass-border-dark};
     }
 }

@@ -87,4 +87,10 @@ export const MenuItems: MenuItemsConfig[] = [
         icon: <ReportsLogo iconSize='xs' />,
         label: localize('Reports'),
     },
+    {
+        as: 'a',
+        href: standalone_routes.reports,
+        icon: <ReportsLogo iconSize='xs' />,
+        label: localize('Reports'),
+    },
 ];

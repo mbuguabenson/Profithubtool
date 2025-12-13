@@ -64,7 +64,7 @@ const GuideContent = ({ guide_tab_content, video_tab_content, is_dialog_open }: 
         }
     };
 
-    const handleKeyboardEvent = (e: KeyboardEvent) => {
+    const handleKeyboardEvent = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter') triggerTour('OnBoard');
     };
 

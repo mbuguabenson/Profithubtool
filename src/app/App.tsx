@@ -2,13 +2,14 @@ import { initSurvicate } from '../public-path';
 import { lazy, Suspense } from 'react';
 import React from 'react';
 import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from 'react-router-dom';
-import ChunkLoader from '@/components/loader/chunk-loader';
+import WelcomeScreen from '@/components/loader/welcome-screen';
 import RoutePromptDialog from '@/components/route-prompt-dialog';
 import { crypto_currencies_display_order, fiat_currencies_display_order } from '@/components/shared';
 import { useOfflineDetection } from '@/hooks/useOfflineDetection';
 import { StoreProvider } from '@/hooks/useStore';
 import CallbackPage from '@/pages/callback';
 import Endpoint from '@/pages/endpoint';
+
 import { TAuthData } from '@/types/api-types';
 import { initializeI18n, localize, TranslationProvider } from '@deriv-com/translations';
 import CoreStoreProvider from './CoreStoreProvider';
@@ -31,7 +32,7 @@ const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => {
         return localize('Please wait while we connect to the server...');
     };
 
-    return <Suspense fallback={<ChunkLoader message={getLoadingMessage()} />}>{children}</Suspense>;
+    return <Suspense fallback={<WelcomeScreen message={getLoadingMessage()} />}>{children}</Suspense>;
 };
 
 const router = createBrowserRouter(
@@ -54,6 +55,7 @@ const router = createBrowserRouter(
             {/* All child routes will be passed as children to Layout */}
             <Route index element={<AppRoot />} />
             <Route path='endpoint' element={<Endpoint />} />
+            <Route path='callback' element={<CallbackPage />} />
             <Route path='callback' element={<CallbackPage />} />
         </Route>
     )

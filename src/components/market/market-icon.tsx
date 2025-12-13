@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-// import { IconSize } from '@deriv/quill-icons';
+import { IconSize } from '@deriv/quill-icons';
 
 const MARKET_ICONS = {
     FRXAUDCAD: lazy(() =>
@@ -343,12 +343,12 @@ const MARKET_ICONS = {
     ),
 };
 
-export const MarketIcon = ({ type, size }: { type: string; size?: string }) => {
+export const MarketIcon = ({ type, size }: { type: string; size?: IconSize }) => {
     const Icon = MARKET_ICONS[type?.toUpperCase() as keyof typeof MARKET_ICONS] || MARKET_ICONS.unknown;
 
     return (
         <Suspense fallback={null}>
-            <Icon iconSize={(size ?? 'xs') as any} />
+            <Icon iconSize={size ?? 'xs'} />
         </Suspense>
     );
 };

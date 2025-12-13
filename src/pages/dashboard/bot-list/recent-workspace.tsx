@@ -69,7 +69,8 @@ const RecentWorkspace = observer(({ workspace, index }: TRecentWorkspace) => {
     const trigger_div_ref = React.useRef<HTMLInputElement | null>(null);
     const toggle_ref = React.useRef<HTMLButtonElement>(null);
     const is_div_triggered_once = React.useRef<boolean>(false);
-    const visible = useComponentVisibility(toggle_ref);
+    const visible = useComponentVisibility(toggle_ref as React.RefObject<HTMLInputElement>);
+
     const { setDropdownVisibility, is_dropdown_visible } = visible;
     const { isDesktop } = useDevice();
 

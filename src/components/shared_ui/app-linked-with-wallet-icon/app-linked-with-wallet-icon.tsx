@@ -1,5 +1,5 @@
 import React from 'react';
-import { AccountsDerivAccountLightIcon } from '@deriv/quill-icons/Accounts';
+import { AccountsDerivAccountLightIcon } from '@deriv/quill-icons';
 import { useDevice } from '@deriv-com/ui';
 import { WalletIcon } from '../wallet-icon';
 import './app-linked-with-wallet-icon.scss';

@@ -74,7 +74,7 @@ const Cards = observer(({ is_mobile, has_dashboard_strategies }: TCardProps) => 
                     subform_source: 'dashboard',
                     subform_name: 'load_strategy',
                     load_strategy_tab: 'local',
-                });
+                } as any);
             },
         },
         {
@@ -88,7 +88,7 @@ const Cards = observer(({ is_mobile, has_dashboard_strategies }: TCardProps) => 
                     subform_source: 'dashboard',
                     subform_name: 'load_strategy',
                     load_strategy_tab: 'google drive',
-                });
+                } as any);
             },
         },
         {
@@ -100,7 +100,7 @@ const Cards = observer(({ is_mobile, has_dashboard_strategies }: TCardProps) => 
                 rudderStackSendDashboardClickEvent({
                     dashboard_click_name: 'bot_builder',
                     subpage_name: 'bot_builder',
-                });
+                } as any);
             },
         },
         {
@@ -114,7 +114,7 @@ const Cards = observer(({ is_mobile, has_dashboard_strategies }: TCardProps) => 
                     subpage_name: 'bot_builder',
                     subform_source: 'dashboard',
                     subform_name: 'quick_strategy',
-                });
+                } as any);
             },
         },
     ];
@@ -180,7 +180,7 @@ const Cards = observer(({ is_mobile, has_dashboard_strategies }: TCardProps) => 
                                 onCloseDialog();
                             }}
                             height_offset='80px'
-                            page_overlay
+
                         >
                             <div label='Google Drive' className='google-drive-label'>
                                 <GoogleDrive />

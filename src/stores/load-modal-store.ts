@@ -10,7 +10,7 @@ import {
 } from '@/external/bot-skeleton';
 import { inject_workspace_options, updateXmlValues } from '@/external/bot-skeleton/scratch/utils';
 import { isDbotRTL } from '@/external/bot-skeleton/utils/workspace';
-import { TStores } from '@deriv/stores/types';
+import { TStores } from '@/types/stores.types';
 import { localize } from '@deriv-com/translations';
 import { TStrategy } from 'Types';
 import {
@@ -39,6 +39,7 @@ export default class LoadModalStore {
             loaded_local_file: observable,
             recent_strategies: observable,
             dashboard_strategies: observable,
+            previewed_strategy_id: observable,
             selected_strategy_id: observable,
             current_workspace_id: observable,
             upload_id: observable,
@@ -114,6 +115,7 @@ export default class LoadModalStore {
     loaded_local_file: File | null = null;
     recent_strategies: Array<TStrategy> = [];
     dashboard_strategies: Array<TStrategy> | [] = [];
+    previewed_strategy_id = '';
     selected_strategy_id = '';
     is_strategy_loaded = false;
     is_delete_modal_open = false;
@@ -178,7 +180,7 @@ export default class LoadModalStore {
         rudderStackSendUploadStrategyStartEvent({
             upload_provider: 'google_drive',
             upload_id: google_drive.upload_id,
-        });
+        } as any);
 
         const { loadFile } = this.root_store.google_drive;
         const load_file = await loadFile();

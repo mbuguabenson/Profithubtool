@@ -1,0 +1,85 @@
+@use 'components/shared/styles/constants' as *;
+@use 'components/shared/styles/mixins' as *;
+
+.bot-filter {
+    margin-bottom: 2.4rem;
+
+    &__buttons {
+        display: flex;
+        gap: 1.2rem;
+        flex-wrap: wrap;
+
+        @include mobile-or-tablet-screen {
+            flex-direction: column;
+        }
+    }
+
+    &__btn {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 1.2rem 2rem;
+        border-radius: 12px;
+        border: 2px solid var(--border-normal);
+        background: var(--general-section-1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--text-general);
+        flex: 1;
+        justify-content: center;
+
+        @include mobile-or-tablet-screen {
+            width: 100%;
+        }
+
+        &:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3), 0 0 16px rgba(76, 175, 80, 0.2);
+        }
+
+        &--active {
+            color: #ffffff;
+            border-color: transparent;
+
+            &.bot-filter__btn--all {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+            }
+
+            &.bot-filter__btn--normal {
+                background: linear-gradient(90deg, #673ab7 0%, #3f51b5 100%);
+                box-shadow: 0 4px 16px rgba(103, 58, 183, 0.3);
+            }
+
+            &.bot-filter__btn--automatic {
+                background: linear-gradient(90deg, #ff9800 0%, #ffc107 100%);
+                box-shadow: 0 4px 16px rgba(255, 152, 0, 0.3);
+            }
+
+            &:hover {
+                transform: translateY(-2px) scale(1.02);
+                box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5), 0 0 24px rgba(76, 175, 80, 0.4);
+            }
+        }
+
+        &-label {
+            font-weight: 600;
+        }
+
+        &-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 2.4rem;
+            height: 2.4rem;
+            padding: 0 0.6rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+    }
+}

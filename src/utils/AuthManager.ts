@@ -36,10 +36,6 @@ export const AuthManager = {
      * Clears all authentication data
      */
     logout: (is_reload: boolean = true) => {
-        console.group('[AuthManager] Logout Initiated');
-        console.trace('Logout called by:');
-        console.groupEnd();
-
         localStorage.removeItem('accountsList');
         localStorage.removeItem('clientAccounts');
         localStorage.removeItem('callback_token');
@@ -127,7 +123,13 @@ export const AuthManager = {
             localStorage.setItem('authToken', primaryToken);
 
             const domain = window.location.hostname.includes('deriv.com') ? '.deriv.com' : undefined;
-            document.cookie = `logged_state=true; path=/; max-age=2592000; ${domain ? `domain=${domain};` : ''} samesite=lax`;
+            Cookies.set('logged_state', 'true', {
+                expires: 30, // 30 days
+                path: '/',
+                domain: domain,
+                secure: true,
+                sameSite: 'lax',
+            });
 
             console.log('[AuthManager] Successfully saved tokens to localStorage');
 

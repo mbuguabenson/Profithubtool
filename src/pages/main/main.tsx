@@ -24,6 +24,7 @@ import {
     LabelPairedPuzzlePieceTwoCaptionBoldIcon,
 } from '@deriv/quill-icons/LabelPaired';
 import { LegacyGuide1pxIcon } from '@deriv/quill-icons/Legacy';
+import RobotIcon from '@/components/shared/icons/robot-icon';
 import { requestOidcAuthentication } from '@deriv-com/auth-client';
 import { Localize, localize } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
@@ -36,7 +37,7 @@ import './main.scss';
 const ChartWrapper = lazy(() => import('../chart/chart-wrapper'));
 const Tutorial = lazy(() => import('../tutorials'));
 const ProAnalysis = lazy(() => import('../pro-analysis'));
-const CopyTrading = lazy(() => import('../copy-trading'));
+const CopyTrading = lazy(() => import('../copy-trading/copy-trading'));
 
 const AppWrapper = observer(() => {
     const { connectionStatus } = useApiBase();
@@ -66,9 +67,9 @@ const AppWrapper = observer(() => {
         [key: string]: string;
     };
     const { clear } = summary_card;
-    const { DASHBOARD, BOT_BUILDER } = DBOT_TABS;
+    const { DASHBOARD, BOT_BUILDER, BOTS } = DBOT_TABS;
     const init_render = React.useRef(true);
-    const hash = ['dashboard', 'bot_builder', 'chart', 'tutorial', 'pro_analysis', 'copy_trading'];
+    const hash = ['dashboard', 'bot_builder', 'chart', 'tutorial', 'pro_analysis', 'bots_list', 'copy_trading'];
     const { isDesktop } = useDevice();
     const location = useLocation();
     const navigate = useNavigate();
@@ -182,7 +183,7 @@ const AppWrapper = observer(() => {
 
     React.useEffect(() => {
         const trashcan_init_id = setTimeout(() => {
-            if (active_tab === BOT_BUILDER && Blockly?.derivWorkspace?.trashcan) {
+            if (active_tab === BOT_BUILDER && window.Blockly?.derivWorkspace?.trashcan) {
                 const trashcanY = window.innerHeight - 250;
                 let trashcanX;
                 if (is_drawer_open) {
@@ -190,7 +191,7 @@ const AppWrapper = observer(() => {
                 } else {
                     trashcanX = isDbotRTL() ? 20 : window.innerWidth - 100;
                 }
-                Blockly?.derivWorkspace?.trashcan?.setTrashcanPosition(trashcanX, trashcanY);
+                window.Blockly?.derivWorkspace?.trashcan?.setTrashcanPosition(trashcanX, trashcanY);
             }
         }, 100);
 
@@ -355,6 +356,17 @@ const AppWrapper = observer(() => {
                             <div
                                 label={
                                     <>
+                                        <RobotIcon />
+                                        <Localize i18n_default_text='Bots' />
+                                    </>
+                                }
+                                id='id-bots-list'
+                            >
+                                <Dashboard handleTabChange={handleTabChange} />
+                            </div>
+                            <div
+                                label={
+                                    <>
                                         <LabelPairedChartLineCaptionRegularIcon
                                             height='24px'
                                             width='24px'
@@ -365,14 +377,16 @@ const AppWrapper = observer(() => {
                                 }
                                 id='id-pro-analysis'
                             >
-                                <Suspense fallback={<ChunkLoader message={localize('Loading Pro Analysis...')} />}>
+                                <Suspense
+                                    fallback={<ChunkLoader message={localize('Please wait, loading analysis...')} />}
+                                >
                                     <ProAnalysis />
                                 </Suspense>
                             </div>
                             <div
                                 label={
                                     <>
-                                        <LabelPairedObjectsColumnCaptionRegularIcon // Placeholder icon
+                                        <LabelPairedChartLineCaptionRegularIcon
                                             height='24px'
                                             width='24px'
                                             fill='var(--text-general)'
@@ -382,7 +396,9 @@ const AppWrapper = observer(() => {
                                 }
                                 id='id-copy-trading'
                             >
-                                <Suspense fallback={<ChunkLoader message={localize('Loading Copy Trading...')} />}>
+                                <Suspense
+                                    fallback={<ChunkLoader message={localize('Please wait, loading copy trading...')} />}
+                                >
                                     <CopyTrading />
                                 </Suspense>
                             </div>

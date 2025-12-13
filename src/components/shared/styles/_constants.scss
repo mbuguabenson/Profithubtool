@@ -18,18 +18,18 @@ $color-black-6: #3e3e3e;
 $color-black-7: #000;
 $color-black-8: #323738;
 $color-black-9: #5c5c5c;
-$color-blue: #377cfc;
+$color-blue: #0072ff; // Updated to primary blue
 $color-blue-1: #0dc2e7;
 $color-blue-2: #2a3052;
-$color-blue-3: #0796e0;
+$color-blue-3: #00c6ff; // Updated to light blue
 $color-blue-4: #0677af;
 $color-blue-5: #dfeaff;
 $color-blue-6: #92b8ff;
 $color-blue-7: #182130;
 $color-blue-8: #e6f5ff;
 $color-brown: #664407;
-$color-green: #85acb0;
-$color-green-1: #4bb4b3;
+$color-green: #38ef7d; // Updated to secondary green
+$color-green-1: #11998e; // Updated to dark green
 $color-green-2: #3d9494;
 $color-green-3: #00a79e;
 $color-green-4: #008079;
@@ -52,7 +52,7 @@ $color-grey-11: #fafafa;
 $color-grey-12: #f5f7fa;
 $color-grey-13: #2e2e2e;
 $color-grey-14: #e2e5e7;
-$color-orange: #ff6444;
+$color-orange: #ff8c00; // Updated to accent orange
 $color-purple: #722fe4;
 $color-red: #7c3aed; // ProfitHub Primary
 $color-red-1: #6d28d9;
@@ -68,7 +68,7 @@ $color-red-10: #7c3aed;
 $color-red-11: #ede9fe;
 $color-violet: #4a3871;
 $color-white: #fff;
-$color-yellow: #ffad3a;
+$color-yellow: #ffea00; // Updated to accent yellow
 $color-yellow-1: #b3760d;
 $color-yellow-2: #ffa912;
 $color-yellow-3: rgb(255 173 58 / 16%);
@@ -110,7 +110,11 @@ $contract-gradient-color-red-1: linear-gradient(to top, $color-white 85%, color.
 $contract-gradient-color-red-2: linear-gradient(to top, $color-black 85%, color.scale($color-red, $alpha: -84%));
 $gradient-color-white: linear-gradient(to right, color.scale($color-white, $alpha: -100%) -5%, $color-white 71%);
 $gradient-color-black: linear-gradient(to right, color.scale($color-black, $alpha: -100%) -5%, $color-black 71%);
-$gradient-color-purple: linear-gradient(274.73deg, #5a205d 3.82%, #7f3883 88.49%);
+// ProfitHub Gradients
+$gradient-primary: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+$gradient-secondary: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+$gradient-accent: linear-gradient(135deg, #ff8c00 0%, #ffea00 100%);
+$gradient-purple-primary: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
 $gradient-color-blue: linear-gradient(274.73deg, #1a205e 3.82%, #122d96 88.49%);
 $gradient-color-orange: linear-gradient(90deg, #eb001b 0%, #f79e1b 100%);
 $gradient-color-black-2: linear-gradient(274.73deg, #464750 3.82%, #0e0f11 88.49%);
@@ -190,8 +194,8 @@ $COLOR_DARK_GRAY_3: #555975;
 $COLOR_DARK_GRAY_4: #999;
 /* stylelint-enable color-no-hex */
 
-$BORDER_RADIUS: 4px;
-$BORDER_RADIUS_2: 8px;
+$BORDER_RADIUS: 0px; // Updated: removed rounding
+$BORDER_RADIUS_2: 0px; // Updated: removed rounding
 $MAX_CONTAINER_WIDTH: 1440px;
 $POSITIONS_DRAWER_WIDTH: 240px;
 $POSITIONS_DRAWER_MARGIN: 8px;
@@ -251,27 +255,26 @@ $color-purple-darker: #4c1d95;
 $color-purple-darkest: #2e1065;
 
 /* Glassmorphism Variables */
-$glass-bg: rgb(255 255 255 / 10%);
-$glass-border: 1px solid rgb(255 255 255 / 20%);
-$glass-shadow: 0 8px 32px 0 rgb(31 38 135 / 37%);
-$glass-blur: blur(10px);
+$glass-bg-light: rgba(255, 255, 255, 0.4);
+$glass-bg-dark: rgba(255, 255, 255, 0.05);
+$glass-border-light: 1px solid rgba(255, 255, 255, 0.5);
+$glass-border-dark: 1px solid rgba(255, 255, 255, 0.1);
+$glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+$glass-blur: blur(12px);
 
 /* Modern Gradients */
-$gradient-primary: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
-$gradient-secondary: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-$gradient-accent: linear-gradient(135deg, #fce38a 0%, #f38181 100%);
-$gradient-purple-primary: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+// $gradient-purple-primary: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
 
 /* Glow Effects */
-$glow-primary: 0 0 15px rgb(0 198 255 / 60%);
-$glow-secondary: 0 0 15px rgb(56 239 125 / 60%);
+$glow-primary: 0 0 20px rgba(0, 198, 255, 0.6); // Blue glow
+$glow-secondary: 0 0 20px rgba(56, 239, 125, 0.6); // Green glow
 $glow-purple: 0 4px 20px rgb(139 92 246 / 50%), 0 0 30px rgb(139 92 246 / 40%);
 $glow-purple-intense: 0 4px 25px rgb(139 92 246 / 70%), 0 0 40px rgb(139 92 246 / 60%);
-$glow-green: 0 4px 20px rgb(75 180 179 / 50%), 0 0 30px rgb(75 180 179 / 40%);
-$glow-green-intense: 0 4px 25px rgb(23 234 189 / 70%), 0 0 40px rgb(23 234 189 / 60%);
+$glow-green: 0 4px 20px rgba(75, 180, 179, 0.5), 0 0 30px rgba(75, 180, 179, 0.4);
+$glow-green-intense: 0 4px 25px rgba(23, 234, 189, 0.7), 0 0 40px rgba(23, 234, 189, 0.6);
 
 /* Green Gradients */
-$gradient-green-primary: linear-gradient(135deg, #17eabd 0%, #4bb4b3 50%, #00a79e 100%);
+$gradient-green-primary: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); // Updated for buttons
 $gradient-green-secondary: linear-gradient(135deg, #00a79e 0%, #17eabd 100%);
 
 /* Neumorphism Shadows */

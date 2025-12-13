@@ -3,7 +3,7 @@ import { useFormikContext } from 'formik';
 import { observer } from 'mobx-react-lite';
 import { DBOT_TABS } from '@/constants/bot-contents';
 import { useStore } from '@/hooks/useStore';
-import { LegacyGuide1pxIcon } from '@deriv/quill-icons/Legacy';
+import { LegacyGuide1pxIcon } from '@deriv/quill-icons';
 import { Chip } from '@deriv-com/quill-ui';
 import { SearchField } from '@deriv-com/quill-ui-next';
 import { localize } from '@deriv-com/translations';

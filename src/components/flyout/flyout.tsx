@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '@/hooks/useStore';
 import GTM from '@/utils/gtm';
 import { help_content_config } from '@/utils/help-content/help-content.config';
-import { LabelPairedCircleExclamationCaptionFillIcon } from '@deriv/quill-icons/LabelPaired';
+import { LabelPairedCircleExclamationCaptionFillIcon } from '@deriv/quill-icons';
 import { localize } from '@deriv-com/translations';
 import { getPlatformSettings } from '../shared';
 import Input from '../shared_ui/input';
@@ -90,7 +90,7 @@ const FlyoutContent = (props: TFlyoutContent) => {
                     flyout_content.map((node, index) => {
                         const tag_name = node.tagName.toUpperCase();
                         switch (tag_name) {
-                            case window.Blockly.Xml.NODE_BLOCK: {
+                            case (window.Blockly as any).Xml.NODE_BLOCK: {
                                 const block_type = (node.getAttribute('type') || '') as string;
 
                                 return (
@@ -152,16 +152,16 @@ const FlyoutContent = (props: TFlyoutContent) => {
                                             `${node.getAttribute('className')}`
                                         )}
                                         onClick={button => {
-                                            const workspace = window.Blockly.derivWorkspace;
+                                            const workspace = (window.Blockly as any).derivWorkspace;
                                             const button_cb = workspace.getButtonCallback(callback_key);
                                             const callback = button_cb;
 
                                             // Workaround for not having a flyout workspace.
                                             // eslint-disable-next-line no-underscore-dangle
-                                            button.targetWorkspace_ = workspace;
-                                            button.getTargetWorkspace = () => {
+                                            (button as any).targetWorkspace_ = workspace;
+                                            (button as any).getTargetWorkspace = () => {
                                                 // eslint-disable-next-line no-underscore-dangle
-                                                return button.targetWorkspace_;
+                                                return (button as any).targetWorkspace_;
                                             };
 
                                             callback?.(button);

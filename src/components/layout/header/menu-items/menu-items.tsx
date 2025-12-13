@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useFirebaseCountriesConfig } from '@/hooks/firebase/useFirebaseCountriesConfig';
 import { useStore } from '@/hooks/useStore';
@@ -8,6 +8,9 @@ import { useTranslations } from '@deriv-com/translations';
 import { MenuItem, Text, useDevice } from '@deriv-com/ui';
 import { MenuItems as items, TRADERS_HUB_LINK_CONFIG } from '../header-config';
 import './menu-items.scss';
+
+// Debug: Check if items are loaded correctly
+console.log('MenuItems loaded:', items);
 
 export const MenuItems = observer(() => {
     const { localize } = useTranslations();
@@ -30,21 +33,25 @@ export const MenuItems = observer(() => {
 
     // Use handleTraderHubRedirect for all links
     const getModifiedHref = (originalHref: string) => {
-        const redirect_url = new URL(originalHref);
+        try {
+            const redirect_url = new URL(originalHref, window.location.origin);
 
-        if (is_virtual) {
-            // For demo accounts, set the account parameter to 'demo'
-            redirect_url.searchParams.set('account', 'demo');
-        } else if (currency) {
-            // For real accounts, set the account parameter to the currency
-            redirect_url.searchParams.set('account', currency);
+            if (is_virtual) {
+                // For demo accounts, set the account parameter to 'demo'
+                redirect_url.searchParams.set('account', 'demo');
+            } else if (currency) {
+                // For real accounts, set the account parameter to the currency
+                redirect_url.searchParams.set('account', currency);
+            }
+
+            return redirect_url.toString();
+        } catch (e) {
+            return originalHref;
         }
-
-        return redirect_url.toString();
     };
 
     // Filter out the Cashier link when the account is a wallet account
-    const filtered_items = items.filter((item, index) => {
+    const filtered_items = items.filter((_item, index) => {
         // Index 0 is the Cashier link
         if (index === 0 && has_wallet) {
             return false;
@@ -58,28 +65,28 @@ export const MenuItems = observer(() => {
             {is_logged_in &&
                 (isDesktop
                     ? filtered_items.map(({ as, href, icon, label }) => (
-                          <MenuItem
-                              as={as}
-                              className='app-header__menu'
-                              href={getModifiedHref(href)}
-                              key={label}
-                              leftComponent={icon}
-                          >
-                              <Text>{localize(label)}</Text>
-                          </MenuItem>
-                      ))
+                        <MenuItem
+                            as={as}
+                            className='app-header__menu'
+                            href={getModifiedHref(href)}
+                            key={label}
+                            leftComponent={icon}
+                        >
+                            <Text>{localize(label)}</Text>
+                        </MenuItem>
+                    ))
                     : // For mobile, show the first available item after filtering
-                      filtered_items.length > 0 && (
-                          <MenuItem
-                              as={filtered_items[0].as}
-                              className='flex gap-2 p-5'
-                              href={getModifiedHref(filtered_items[0].href)}
-                              key={filtered_items[0].label}
-                              leftComponent={filtered_items[0].icon}
-                          >
-                              <Text>{localize(filtered_items[0].label)}</Text>
-                          </MenuItem>
-                      ))}
+                    filtered_items.length > 0 && (
+                        <MenuItem
+                            as={filtered_items[0].as}
+                            className='flex gap-2 p-5'
+                            href={getModifiedHref(filtered_items[0].href)}
+                            key={filtered_items[0].label}
+                            leftComponent={filtered_items[0].icon}
+                        >
+                            <Text>{localize(filtered_items[0].label)}</Text>
+                        </MenuItem>
+                    ))}
         </>
     );
 });

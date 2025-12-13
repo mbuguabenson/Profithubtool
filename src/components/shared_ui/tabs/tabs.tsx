@@ -24,7 +24,7 @@ type TTabsProps = {
     has_active_line?: boolean;
     has_bottom_line?: boolean;
     header_fit_content?: boolean;
-    history: History;
+    history: any;
     icon_color?: string;
     icon_size?: number;
     is_100vw?: boolean;
@@ -185,7 +185,7 @@ const Tabs = ({
                                     icon_color={icon_color}
                                     icon_size={icon_size}
                                     is_active={index === active_tab_index}
-                                    key={label}
+                                    key={id || index}
                                     is_label_hidden={children.length === 1 && single_tab_has_no_label}
                                     label={label}
                                     id={id}

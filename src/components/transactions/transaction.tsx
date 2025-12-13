@@ -6,7 +6,7 @@ import { TContractInfo } from '@/components/summary/summary-card.types';
 import { popover_zindex } from '@/constants/z-indexes';
 import { getContractTypeName } from '@/external/bot-skeleton';
 import { isDbotRTL } from '@/external/bot-skeleton/utils/workspace';
-import { LegacyRadioOffIcon, LegacyRadioOnIcon } from '@deriv/quill-icons/Legacy';
+import { LegacyRadioOffIcon, LegacyRadioOnIcon } from '@deriv/quill-icons';
 import { Localize, localize } from '@deriv-com/translations';
 import { MarketIcon } from '../market/market-icon';
 import { convertDateFormat } from '../shared';
@@ -89,7 +89,7 @@ const PopoverItem = ({ icon, title, children }: TPopoverItem) => (
 const PopoverContent = ({ contract }: TPopoverContent) => (
     <div className='transactions__popover-content'>
         {contract.transaction_ids && (
-            <PopoverItem title={<Localize i18n_default_text='Reference IDs' />}>
+            <PopoverItem title={localize('Reference IDs')}>
                 {contract.transaction_ids.buy && (
                     <div className='transactions__popover-value'>
                         {`${contract.transaction_ids.buy} ${localize('(Buy)')}`}
@@ -169,13 +169,14 @@ const Transaction = ({ contract, active_transaction_id, onClickTransaction }: TT
             <div
                 data-testid='dt_transactions_item'
                 className='transactions__item'
+                data-clipboard-text={(contract?.transaction_ids?.buy || '') as string}
                 onClick={() => onClickTransaction && onClickTransaction(contract?.transaction_ids?.buy || null)}
             >
                 <div className='transactions__cell transactions__trade-type'>
                     <div className='transactions__loader-container'>
                         {contract ? (
                             <TransactionIconWithText
-                                icon={<MarketIcon type={contract.underlying} />}
+                                icon={<MarketIcon type={contract.underlying || ''} />}
                                 title={contract.display_name || ''}
                             />
                         ) : (

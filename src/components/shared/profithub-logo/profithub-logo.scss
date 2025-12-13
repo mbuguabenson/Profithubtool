@@ -1,0 +1,17 @@
+.profithub-logo {
+    display: inline-block;
+    object-fit: contain;
+    user-select: none;
+
+    &--horizontal {
+        max-width: 100%;
+    }
+
+    &--vertical {
+        max-width: 200px;
+    }
+
+    &--icon {
+        max-width: 100px;
+    }
+}

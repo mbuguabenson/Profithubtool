@@ -1,4 +1,4 @@
-import { LegacyDerivIcon } from '@deriv/quill-icons/Legacy';
+import { LegacyDerivIcon } from '@deriv/quill-icons';
 import { Divider } from '@deriv-com/ui';
 
 export const no_account = {
