@@ -1,7 +1,7 @@
-import React from 'react';
-import classNames from 'classnames';
-import Text from '@/components/shared_ui/text';
+
 import { BotStrategy } from '@/constants/bot-strategies';
+import RobotIcon from '@/components/shared/icons/robot-icon';
+import { localize } from '@deriv-com/translations';
 import './bot-card.scss';
 
 interface BotCardProps {
@@ -9,39 +9,32 @@ interface BotCardProps {
     onLoad: (bot: BotStrategy) => void;
 }
 
-const BotCard: React.FC<BotCardProps> = ({ bot, onLoad }) => {
-    const isAutomatic = bot.type === 'automatic';
-
+export default function BotCard({ bot, onLoad }: BotCardProps) {
     return (
-        <div
-            className={classNames('bot-card', {
-                'bot-card--automatic': isAutomatic,
-                'bot-card--normal': !isAutomatic,
-            })}
-        >
-            <div className="bot-card__header">
-                <div className={classNames('bot-card__badge', `bot-card__badge--${bot.type}`)}>
-                    {isAutomatic ? '🤖 Automatic' : '👤 Normal'}
+        <div className={`bot-row bot-row--${bot.type}`} onClick={() => onLoad(bot)}>
+            <div className="bot-row__left">
+                <div className="bot-row__icon-container">
+                    <RobotIcon width={32} height={32} className="bot-row__icon-svg" />
+                </div>
+                <div className="bot-row__info">
+                    <h3 className="bot-row__name">{bot.name}</h3>
+                    <span className="bot-row__status">
+                        {localize('Ready deployment')}
+                    </span>
                 </div>
             </div>
-            <div className="bot-card__content">
-                <Text as="h3" weight="bold" size="s" className="bot-card__title">
-                    {bot.name}
-                </Text>
-                <Text as="p" size="xs" className="bot-card__description">
-                    {bot.description}
-                </Text>
-            </div>
-            <div className="bot-card__footer">
+
+            <div className="bot-row__right">
                 <button
-                    className={classNames('bot-card__load-btn', `bot-card__load-btn--${bot.type}`)}
-                    onClick={() => onLoad(bot)}
+                    className="bot-row__button"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onLoad(bot);
+                    }}
                 >
-                    Load Bot
+                    {localize('Load Bot')}
                 </button>
             </div>
         </div>
     );
-};
-
-export default BotCard;
+}

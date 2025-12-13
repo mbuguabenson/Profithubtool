@@ -23,6 +23,7 @@ import {
     LabelPairedObjectsColumnCaptionRegularIcon,
     LabelPairedPuzzlePieceTwoCaptionBoldIcon,
 } from '@deriv/quill-icons/LabelPaired';
+import { StandaloneUsersRegularIcon } from '@deriv/quill-icons/Standalone';
 import { LegacyGuide1pxIcon } from '@deriv/quill-icons/Legacy';
 import RobotIcon from '@/components/shared/icons/robot-icon';
 import { requestOidcAuthentication } from '@deriv-com/auth-client';
@@ -37,6 +38,7 @@ import './main.scss';
 const ChartWrapper = lazy(() => import('../chart/chart-wrapper'));
 const Tutorial = lazy(() => import('../tutorials'));
 const ProAnalysis = lazy(() => import('../pro-analysis'));
+const Bots = lazy(() => import('../bots/bots'));
 const CopyTrading = lazy(() => import('../copy-trading/copy-trading'));
 
 const AppWrapper = observer(() => {
@@ -356,17 +358,6 @@ const AppWrapper = observer(() => {
                             <div
                                 label={
                                     <>
-                                        <RobotIcon />
-                                        <Localize i18n_default_text='Bots' />
-                                    </>
-                                }
-                                id='id-bots-list'
-                            >
-                                <Dashboard handleTabChange={handleTabChange} />
-                            </div>
-                            <div
-                                label={
-                                    <>
                                         <LabelPairedChartLineCaptionRegularIcon
                                             height='24px'
                                             width='24px'
@@ -386,7 +377,20 @@ const AppWrapper = observer(() => {
                             <div
                                 label={
                                     <>
-                                        <LabelPairedChartLineCaptionRegularIcon
+                                        <RobotIcon />
+                                        <Localize i18n_default_text='Bots' />
+                                    </>
+                                }
+                                id='id-bots-list'
+                            >
+                                <Suspense fallback={<ChunkLoader message={localize('Please wait, loading bots...')} />}>
+                                    <Bots />
+                                </Suspense>
+                            </div>
+                            <div
+                                label={
+                                    <>
+                                        <StandaloneUsersRegularIcon
                                             height='24px'
                                             width='24px'
                                             fill='var(--text-general)'

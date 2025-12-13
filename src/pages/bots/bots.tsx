@@ -1,23 +1,24 @@
-import React, { useState } from 'react';
+
 import { observer } from 'mobx-react-lite';
-import Text from '@/components/shared_ui/text';
-import { BOT_STRATEGIES, BotStrategy } from '@/constants/bot-strategies';
+
+import { BotStrategy, getNormalBots, getAutomaticBots } from '@/constants/bot-strategies';
 import { useStore } from '@/hooks/useStore';
 import { DBOT_TABS } from '@/constants/bot-contents';
-import { useDevice } from '@deriv-com/ui';
-import { RobotIcon } from '@/components/shared/icons/robot-icon';
-import './bots.scss';
 
+import RobotIcon from '@/components/shared/icons/robot-icon';
+import { localize } from '@deriv-com/translations';
+import './bots.scss';
+import BotCard from '@/components/bot-card/bot-card';
 const Bots = observer(() => {
     const { load_modal, dashboard } = useStore();
-    const { loadFileFromRecent } = load_modal;
+    const { loadStrategyToBuilder } = load_modal;
     const { setActiveTab } = dashboard;
-    const { isDesktop } = useDevice();
+
 
     const handleLoadBot = async (bot: BotStrategy) => {
         try {
             // Fetch the XML file
-            const response = await fetch(`/${bot.xmlPath}`);
+            const response = await fetch(`/${encodeURI(bot.xmlPath)}`);
             if (!response.ok) {
                 console.error(`Failed to load bot XML: ${bot.xmlPath}`);
                 return;
@@ -25,10 +26,13 @@ const Bots = observer(() => {
 
             const xmlContent = await response.text();
 
-            // Load the XML into the workspace using the load_modal utility
-            loadFileFromRecent({
-                xml_doc: xmlContent,
-                file_name: bot.name,
+            // Load the XML into the workspace using loadStrategyToBuilder
+            await loadStrategyToBuilder({
+                id: bot.id,
+                name: bot.name,
+                xml: xmlContent,
+                save_type: 'unsaved',
+                timestamp: Date.now(),
             });
 
             // Switch to Bot Builder tab to show the loaded bot
@@ -38,41 +42,60 @@ const Bots = observer(() => {
         }
     };
 
+    const normalBots = getNormalBots();
+    const automaticBots = getAutomaticBots();
+
+
+
     return (
         <div className="bots-page">
             <div className="bots-page__header">
-                <Text as="h1" weight="bold" size="l" className="bots-page__title">
-                    Bot Library
-                </Text>
-                <Text as="p" size="s" className="bots-page__subtitle">
-                    Choose from our collection of proven trading strategies
-                </Text>
+                <div className="bots-page__title-section">
+                    <RobotIcon className="bots-page__title-icon" width={40} height={40} />
+                    <div>
+                        <h1 className="bots-page__title">{localize('Bot Library')}</h1>
+                        <p className="bots-page__subtitle">
+                            {localize('Choose from our collection of proven trading strategies')}
+                        </p>
+                    </div>
+                </div>
             </div>
 
-            <div className="bots-page__list">
-                {BOT_STRATEGIES.map(bot => (
-                    <div
-                        key={bot.id}
-                        className={`bot-list-item bot-list-item--${bot.type}`}
-                        onClick={() => handleLoadBot(bot)}
-                    >
-                        <div className="bot-list-item__icon">
-                            <RobotIcon />
-                        </div>
-                        <div className="bot-list-item__content">
-                            <Text as="h3" weight="bold" size="s" className="bot-list-item__name">
-                                {bot.name}
-                            </Text>
-                            <Text as="p" size="xs" className="bot-list-item__status">
-                                {bot.description} • Click to load
-                            </Text>
-                        </div>
-                        <button className={`bot-list-item__button bot-list-item__button--${bot.type}`}>
-                            Load Bot
-                        </button>
+            {/* Automatic Bots Section */}
+            <section className="bots-page__section">
+                <div className="bots-page__section-header bots-page__section-header--automatic">
+                    <div className="bots-page__section-title-wrapper">
+                        <h2 className="bots-page__section-title">{localize('Automatic Bots')}</h2>
+                        <span className="bots-page__section-count">{automaticBots.length}</span>
                     </div>
-                ))}
-            </div>
+                    <p className="bots-page__section-description">
+                        {localize('Fully automated strategies with built-in risk management and decision-making')}
+                    </p>
+                </div>
+                <div className="bots-page__grid">
+                    {automaticBots.map(bot => (
+                        <BotCard key={bot.id} bot={bot} onLoad={handleLoadBot} />
+                    ))}
+                </div>
+            </section>
+
+            {/* Normal Bots Section */}
+            <section className="bots-page__section">
+                <div className="bots-page__section-header bots-page__section-header--normal">
+                    <div className="bots-page__section-title-wrapper">
+                        <h2 className="bots-page__section-title">{localize('Normal Bots')}</h2>
+                        <span className="bots-page__section-count">{normalBots.length}</span>
+                    </div>
+                    <p className="bots-page__section-description">
+                        {localize('Professional-grade bots with customizable parameters requiring manual oversight')}
+                    </p>
+                </div>
+                <div className="bots-page__grid">
+                    {normalBots.map(bot => (
+                        <BotCard key={bot.id} bot={bot} onLoad={handleLoadBot} />
+                    ))}
+                </div>
+            </section>
         </div>
     );
 });

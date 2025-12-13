@@ -1,0 +1,17 @@
+<xml xmlns="http://www.w3.org/1999/xhtml" collection="false">
+  <block type="trade" id="trade" x="0" y="0">
+    <statement name="SUBMARKET">
+      <block type="market" id="market">
+         <field name="MARKET_LIST">synthetic_index</field>
+         <field name="SUBMARKET_LIST">random_index</field>
+         <field name="SYMBOL_LIST">R_10</field>
+         <field name="TRADETYPECAT_LIST">callput</field>
+         <field name="TRADETYPE_LIST">risefall</field>
+         <field name="TYPE_LIST">both</field>
+         <field name="CANDLEINTERVAL_LIST">60</field>
+         <field name="TIME_MACHINE_ENABLED">FALSE</field>
+         <field name="RESTARTONERROR">TRUE</field>
+      </block>
+    </statement>
+  </block>
+</xml>

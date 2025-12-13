@@ -1,244 +1,212 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '@/hooks/useStore';
-import { ITrader, IActiveCopySession, IMirroredTrade } from '@/stores/copy-trading-store';
 import { localize } from '@deriv-com/translations';
+import Text from '@/components/shared_ui/text';
+import { Button } from '@deriv-com/ui';
 import './copy-trading.scss';
+import classNames from 'classnames';
 
 const CopyTrading = observer(() => {
     const { copy_trading } = useStore();
     const {
-        available_traders,
-        active_sessions,
-        mirrored_trades,
+        main_account,
+        connected_accounts,
+        is_copying,
         is_loading,
         error_message,
-        has_active_sessions,
-        fetchTraders,
-        startCopying,
-        stopCopying,
-        setSelectedTrader,
-        clearError,
+        recent_trades,
+        addApiToken,
+        startMirroring,
+        stopMirroring,
+        initializeMainAccount,
     } = copy_trading;
 
+    const [activeTab, setActiveTab] = useState<'controls' | 'api'>('controls');
+    const [tokenInput, setTokenInput] = useState('');
+
     useEffect(() => {
-        fetchTraders();
+        initializeMainAccount();
     }, []);
 
-    const handleStartCopying = (trader_id: string) => {
-        startCopying(trader_id);
-    };
-
-    const handleStopCopying = (trader_id: string) => {
-        stopCopying(trader_id);
-    };
-
-    const isTraderBeingCopied = (trader_id: string) => {
-        return active_sessions.some(session => session.trader_id === trader_id);
-    };
-
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 2,
-        }).format(amount);
-    };
-
-    const formatPercentage = (value: number) => {
-        return `${value.toFixed(2)}%`;
-    };
-
-    const getRiskColor = (risk_level: string) => {
-        switch (risk_level) {
-            case 'low':
-                return 'var(--status-success)';
-            case 'medium':
-                return 'var(--status-warning)';
-            case 'high':
-                return 'var(--status-danger)';
-            default:
-                return 'var(--text-general)';
-        }
+    const handleAddToken = async () => {
+        if (!tokenInput) return;
+        await addApiToken(tokenInput);
+        setTokenInput('');
     };
 
     return (
-        <div className='copy-trading'>
-            <div className='copy-trading__header'>
-                <h1 className='copy-trading__title'>{localize('Copy Trading')}</h1>
-                <p className='copy-trading__subtitle'>
-                    {localize('Mirror trades from successful traders automatically')}
-                </p>
+        <div className="copy-trading-dashboard">
+            <div className="dashboard-header">
+                <div>
+                    <Text as="h1" size="xl" weight="bold" className="dashboard-title">
+                        {localize('Copy Trading Dashboard')}
+                    </Text>
+                    <Text as="p" size="s" className="dashboard-subtitle">
+                        {localize('Automatically copy trades from your account to others')}
+                    </Text>
+                </div>
+                <div className="status-indicator">
+                    <span className={classNames('status-dot', { 'status-dot--connected': is_copying })}></span>
+                    <Text size="xs" weight="bold" color={is_copying ? 'success' : 'less-prominent'}>
+                        {is_copying ? localize('Connected') : localize('Disconnected')}
+                    </Text>
+                </div>
             </div>
 
-            {error_message && (
-                <div className='copy-trading__error'>
-                    <span>{error_message}</span>
-                    <button onClick={clearError} className='copy-trading__error-close'>
-                        ×
-                    </button>
-                </div>
-            )}
+            <div className="dashboard-tabs">
+                <button
+                    className={classNames('tab-btn', { 'tab-btn--active': activeTab === 'controls' })}
+                    onClick={() => setActiveTab('controls')}
+                >
+                    {localize('Trading Controls')}
+                </button>
+                <button
+                    className={classNames('tab-btn', { 'tab-btn--active': activeTab === 'api' })}
+                    onClick={() => setActiveTab('api')}
+                >
+                    {localize('API Response')}
+                </button>
+            </div>
 
-            {has_active_sessions && (
-                <div className='copy-trading__active-section'>
-                    <h2 className='copy-trading__section-title'>{localize('Active Copy Sessions')}</h2>
-                    <div className='copy-trading__sessions'>
-                        {active_sessions.map((session: IActiveCopySession) => (
-                            <div key={session.trader_id} className='copy-trading__session-card glass-effect'>
-                                <div className='copy-trading__session-header'>
-                                    <div className='copy-trading__session-info'>
-                                        <h3>{session.trader_name}</h3>
-                                        <span className='copy-trading__session-status'>
-                                            <span className='copy-trading__status-dot'></span>
-                                            {localize('Active')}
-                                        </span>
-                                    </div>
-                                    <button
-                                        onClick={() => handleStopCopying(session.trader_id)}
-                                        className='copy-trading__button copy-trading__button--stop'
-                                        disabled={is_loading}
-                                    >
-                                        {localize('Stop Copying')}
-                                    </button>
-                                </div>
-                                <div className='copy-trading__session-stats'>
-                                    <div className='copy-trading__stat'>
-                                        <span className='copy-trading__stat-label'>{localize('Copied Trades')}</span>
-                                        <span className='copy-trading__stat-value'>{session.copied_trades}</span>
-                                    </div>
-                                    <div className='copy-trading__stat'>
-                                        <span className='copy-trading__stat-label'>{localize('P/L')}</span>
-                                        <span
-                                            className={`copy-trading__stat-value ${session.profit_loss >= 0 ? 'positive' : 'negative'
-                                                }`}
-                                        >
-                                            {formatCurrency(session.profit_loss)}
-                                        </span>
-                                    </div>
-                                </div>
+            <div className="dashboard-content">
+                {activeTab === 'controls' ? (
+                    <>
+                        {/* Account Setup Section */}
+                        <section className="dashboard-section">
+                            <div className="section-title-wrapper">
+                                <span className="section-bullet">•</span>
+                                <Text as="h2" size="m" weight="bold" className="section-title">{localize('Account Setup')}</Text>
                             </div>
-                        ))}
-                    </div>
 
-                    {mirrored_trades.length > 0 && (
-                        <div className='copy-trading__mirrored-trades'>
-                            <h3 className='copy-trading__subsection-title'>{localize('Mirrored Trades')}</h3>
-                            <div className='copy-trading__trades-list'>
-                                {mirrored_trades.map((trade: IMirroredTrade) => (
-                                    <div key={trade.contract_id} className='copy-trading__trade-item glass-effect'>
-                                        <div className='copy-trading__trade-header'>
-                                            <span className='copy-trading__trade-symbol'>{trade.symbol}</span>
-                                            <span className={`copy-trading__trade-status status-${trade.status}`}>
-                                                {trade.status.toUpperCase()}
-                                            </span>
-                                        </div>
-                                        <div className='copy-trading__trade-details'>
-                                            <div>
-                                                <span className='copy-trading__detail-label'>{localize('Type')}</span>
-                                                <span>{trade.trade_type}</span>
-                                            </div>
-                                            <div>
-                                                <span className='copy-trading__detail-label'>{localize('Buy Price')}</span>
-                                                <span>{formatCurrency(trade.buy_price)}</span>
-                                            </div>
-                                            <div>
-                                                <span className='copy-trading__detail-label'>{localize('Current')}</span>
-                                                <span>{formatCurrency(trade.current_price)}</span>
-                                            </div>
-                                            <div>
-                                                <span className='copy-trading__detail-label'>{localize('P/L')}</span>
-                                                <span
-                                                    className={trade.profit_loss >= 0 ? 'positive' : 'negative'}
-                                                >
-                                                    {formatCurrency(trade.profit_loss)}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
+                            <div className="input-group">
+                                <label className="input-label">{localize('Your API Token')}</label>
+                                <div className="input-wrapper">
+                                    <input
+                                        type="text"
+                                        className="deriv-input"
+                                        placeholder={localize('Enter your Deriv API token')}
+                                        value={tokenInput}
+                                        onChange={(e) => setTokenInput(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleAddToken()}
+                                    />
+                                    <Button onClick={handleAddToken} isLoading={is_loading} className="add-btn">
+                                        {localize('Add')}
+                                    </Button>
+                                </div>
+                                <Text size="xxs" className="input-hint">
+                                    {localize('This token authenticates the target account for copy trading')}
+                                </Text>
+                                {error_message && <Text size="xs" color="error" className="error-msg">{error_message}</Text>}
                             </div>
-                        </div>
-                    )}
-                </div>
-            )}
 
-            <div className='copy-trading__traders-section'>
-                <h2 className='copy-trading__section-title'>{localize('Available Traders')}</h2>
-                {is_loading && available_traders.length === 0 ? (
-                    <div className='copy-trading__loading'>
-                        <div className='copy-trading__spinner'></div>
-                        <p>{localize('Loading traders...')}</p>
-                    </div>
-                ) : available_traders.length === 0 ? (
-                    <div className='copy-trading__empty'>
-                        <p>{localize('No traders available at the moment')}</p>
-                    </div>
-                ) : (
-                    <div className='copy-trading__traders-grid'>
-                        {available_traders.map((trader: ITrader) => (
-                            <div key={trader.account_id} className='copy-trading__trader-card glass-effect'>
-                                <div className='copy-trading__trader-header'>
-                                    <div className='copy-trading__trader-avatar'>
-                                        {trader.name.charAt(0).toUpperCase()}
-                                    </div>
-                                    <div className='copy-trading__trader-info'>
-                                        <h3>{trader.name}</h3>
-                                        <span className='copy-trading__trader-followers'>
-                                            {trader.followers_count} {localize('followers')}
-                                        </span>
+                            {/* Connected Accounts List (Mini) */}
+                            {connected_accounts.length > 0 && (
+                                <div className="connected-accounts-mini">
+                                    <Text size="xs" weight="bold" className="mb-2">Connected Accounts:</Text>
+                                    <div className="tags-container">
+                                        {connected_accounts.map(acc => (
+                                            <div key={acc.account_id} className="account-tag">
+                                                <span className={`type-dot ${acc.account_type}`}></span>
+                                                {acc.account_id} ({acc.currency} {acc.balance})
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
+                            )}
+                        </section>
 
-                                <div className='copy-trading__trader-stats'>
-                                    <div className='copy-trading__stat-row'>
-                                        <span className='copy-trading__stat-label'>{localize('Total Profit')}</span>
-                                        <span
-                                            className={`copy-trading__stat-value ${trader.total_profit >= 0 ? 'positive' : 'negative'
-                                                }`}
-                                        >
-                                            {formatCurrency(trader.total_profit)}
-                                        </span>
-                                    </div>
-                                    <div className='copy-trading__stat-row'>
-                                        <span className='copy-trading__stat-label'>{localize('Win Rate')}</span>
-                                        <span className='copy-trading__stat-value'>
-                                            {formatPercentage(trader.win_rate)}
-                                        </span>
-                                    </div>
-                                    <div className='copy-trading__stat-row'>
-                                        <span className='copy-trading__stat-label'>{localize('Total Trades')}</span>
-                                        <span className='copy-trading__stat-value'>{trader.total_trades}</span>
-                                    </div>
-                                    <div className='copy-trading__stat-row'>
-                                        <span className='copy-trading__stat-label'>{localize('Risk Level')}</span>
-                                        <span
-                                            className='copy-trading__stat-value'
-                                            style={{ color: getRiskColor(trader.risk_level) }}
-                                        >
-                                            {trader.risk_level.toUpperCase()}
-                                        </span>
-                                    </div>
-                                </div>
+                        {/* Trading Actions Section */}
+                        <section className="dashboard-section">
+                            <div className="section-title-wrapper">
+                                <span className="section-bullet">•</span>
+                                <Text as="h2" size="m" weight="bold" className="section-title">{localize('Trading Actions')}</Text>
+                            </div>
 
+                            <div className="actions-wrapper">
                                 <button
-                                    onClick={() =>
-                                        isTraderBeingCopied(trader.account_id)
-                                            ? handleStopCopying(trader.account_id)
-                                            : handleStartCopying(trader.account_id)
-                                    }
-                                    className={`copy-trading__button ${isTraderBeingCopied(trader.account_id)
-                                            ? 'copy-trading__button--stop'
-                                            : 'copy-trading__button--start'
-                                        }`}
-                                    disabled={is_loading}
+                                    className={classNames('action-btn action-btn--start', { 'disabled': is_copying })}
+                                    onClick={startMirroring}
+                                    disabled={is_copying}
                                 >
-                                    {isTraderBeingCopied(trader.account_id)
-                                        ? localize('Stop Copying')
-                                        : localize('Start Copying')}
+                                    {localize('Start Copy Trading')}
+                                </button>
+                                <button
+                                    className={classNames('action-btn action-btn--stop', { 'disabled': !is_copying })}
+                                    onClick={stopMirroring}
+                                    disabled={!is_copying}
+                                >
+                                    {localize('Stop Copy Trading')}
                                 </button>
                             </div>
-                        ))}
+                        </section>
+
+                        {/* Connection Status Section */}
+                        <section className="dashboard-section">
+                            <div className="section-title-wrapper">
+                                <span className="section-bullet">•</span>
+                                <Text as="h2" size="m" weight="bold" className="section-title">{localize('Connection Status')}</Text>
+                            </div>
+
+                            <div className="status-cards-grid">
+                                {/* WebSocket Status */}
+                                <div className="status-card">
+                                    <div className="status-card__header">
+                                        <span className={`status-dot ${main_account ? 'status-dot--connected' : 'status-dot--disconnected'}`}></span>
+                                        <span className="status-card__title">WebSocket</span>
+                                    </div>
+                                    <Text size="xs" className="status-card__text">
+                                        {main_account ? localize('Connected to trading server') : localize('Disconnected from trading server')}
+                                    </Text>
+                                </div>
+
+                                {/* Account Auth Status */}
+                                <div className="status-card">
+                                    <div className="status-card__header">
+                                        <span className={`status-dot ${connected_accounts.length > 0 ? 'status-dot--auth' : 'status-dot--disconnected'}`}></span>
+                                        <span className="status-card__title">Account Auth</span>
+                                    </div>
+                                    <Text size="xs" className="status-card__text">
+                                        {connected_accounts.length > 0
+                                            ? localize(`${connected_accounts.length} Token(s) provided`)
+                                            : localize('No token provided')}
+                                    </Text>
+                                </div>
+
+                                {/* Trader Ready Status */}
+                                <div className="status-card">
+                                    <div className="status-card__header">
+                                        <span className={`status-dot ${is_copying ? 'status-dot--ready' : 'status-dot--disconnected'}`}></span>
+                                        <span className="status-card__title">Trader Ready</span>
+                                    </div>
+                                    <Text size="xs" className="status-card__text">
+                                        {is_copying ? localize('Expert trader configured') : localize('Waiting to start')}
+                                    </Text>
+                                </div>
+                            </div>
+                        </section>
+                    </>
+                ) : (
+                    <div className="api-response-tab">
+                        <section className="dashboard-section">
+                            <div className="section-title-wrapper">
+                                <span className="section-bullet">•</span>
+                                <Text as="h2" size="m" weight="bold" className="section-title">{localize('Live Transaction Log')}</Text>
+                            </div>
+                            <div className="console-log">
+                                {recent_trades.length === 0 ? (
+                                    <div className="console-line text-muted">Waiting for trade activity...</div>
+                                ) : (
+                                    recent_trades.map((trade, i) => (
+                                        <div key={i} className="console-line">
+                                            <span className="console-time">[{new Date(trade.timestamp).toLocaleTimeString()}]</span>
+                                            <span className="console-action">BUY {trade.symbol}</span>
+                                            <span className="console-detail">Mirrored to {trade.mirrored_to_count} accounts</span>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </section>
                     </div>
                 )}
             </div>

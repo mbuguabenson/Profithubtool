@@ -30,7 +30,7 @@
 
 .main {
     display: flex;
-    overflow: hidden;
+    overflow: auto;
     width: 100%;
     height: calc(100vh - 9rem);
     padding: 1.6rem;
@@ -175,30 +175,10 @@
                     }
                 }
 
-                // Custom styling for the Bots tab
+                // Removed custom styling for Bots tab to match others
                 &#id-bots-list {
-                    border-radius: 50px;
-                    margin-left: 10px;
-                    transition: all 0.3s ease;
-                    background-color: var(--general-section-1); // Light gray inactive
-
-                    &:hover {
-                        opacity: 0.9;
-                        transform: translateY(-1px);
-                    }
-
-                    &.dc-tabs__active {
-                        background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%);
-                        color: #ffffff !important;
-
-                        svg {
-                            fill: #ffffff;
-
-                            path {
-                                fill: #ffffff;
-                            }
-                        }
-                    }
+                    // Standard spacing if needed, or just let it inherit
+                    margin-left: 0;
                 }
             }
         }

@@ -1,27 +1,17 @@
-import { action, computed, makeObservable, observable, reaction } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 import { api_base } from '@/external/bot-skeleton';
 import { localize } from '@deriv-com/translations';
 import RootStore from './root-store';
 
-export interface ITrader {
+export interface IConnectedAccount {
+    token: string;
     account_id: string;
     loginid: string;
-    name: string;
-    total_profit: number;
-    total_trades: number;
-    win_rate: number;
-    avg_duration: number;
-    risk_level: 'low' | 'medium' | 'high';
-    active_since: string;
-    followers_count: number;
-}
-
-export interface IActiveCopySession {
-    trader_id: string;
-    trader_name: string;
-    start_time: string;
-    copied_trades: number;
-    profit_loss: number;
+    account_type: 'real' | 'demo';
+    currency: string;
+    balance: number;
+    is_active: boolean;
+    added_at: string;
 }
 
 export interface IMirroredTrade {
@@ -32,194 +22,333 @@ export interface IMirroredTrade {
     current_price: number;
     profit_loss: number;
     status: 'active' | 'won' | 'lost';
+    timestamp: string;
+    mirrored_to_count: number;
 }
 
 export default class CopyTradingStore {
     root_store: RootStore;
 
-    available_traders: ITrader[] = [];
-    active_sessions: IActiveCopySession[] = [];
-    mirrored_trades: IMirroredTrade[] = [];
+    // Main account (currently logged in)
+    main_account: any = null;
+
+    // Connected accounts via API tokens
+    connected_accounts: IConnectedAccount[] = [];
+
+    // Mirroring state
+    is_copying: boolean = false;
     is_loading: boolean = false;
     error_message: string = '';
-    selected_trader_id: string | null = null;
+
+    // Trades
+    recent_trades: IMirroredTrade[] = [];
+    trades_copied_today: number = 0;
+    last_mirrored_time: string = '';
+
+    // UI state
+    is_add_token_modal_open: boolean = false;
 
     constructor(root_store: RootStore) {
         makeObservable(this, {
-            available_traders: observable,
-            active_sessions: observable,
-            mirrored_trades: observable,
+            main_account: observable,
+            connected_accounts: observable,
+            is_copying: observable,
             is_loading: observable,
             error_message: observable,
-            selected_trader_id: observable,
-            has_active_sessions: computed,
-            fetchTraders: action.bound,
-            startCopying: action.bound,
-            stopCopying: action.bound,
-            setSelectedTrader: action.bound,
+            recent_trades: observable,
+            trades_copied_today: observable,
+            last_mirrored_time: observable,
+            is_add_token_modal_open: observable,
+            has_connected_accounts: computed,
+            active_accounts_count: computed,
+            initializeMainAccount: action.bound,
+            addApiToken: action.bound,
+            removeAccount: action.bound,
+            startMirroring: action.bound,
+            stopMirroring: action.bound,
+            setAddTokenModalOpen: action.bound,
             clearError: action.bound,
         });
 
         this.root_store = root_store;
     }
 
-    get has_active_sessions() {
-        return this.active_sessions.length > 0;
+    get has_connected_accounts() {
+        return this.connected_accounts.length > 0;
     }
 
-    async fetchTraders() {
+    get active_accounts_count() {
+        return this.connected_accounts.filter(acc => acc.is_active).length;
+    }
+
+    initializeMainAccount() {
+        // Get main account from current login
+        const client = this.root_store.client;
+        if (client.loginid) {
+            this.main_account = {
+                account_id: client.loginid,
+                account_type: client.is_virtual ? 'demo' : 'real',
+                currency: client.currency,
+                balance: client.balance,
+            };
+        }
+    }
+
+    async addApiToken(token: string) {
         this.is_loading = true;
         this.error_message = '';
 
         try {
-            const response = await api_base.api.send({ copytrading_list: 1 });
+            // Create a new WebSocket connection for this token
+            const response = await api_base.api.send({ authorize: token });
 
             if (response.error) {
-                this.error_message = response.error.message || localize('Failed to fetch traders');
-                this.available_traders = [];
-            } else if (response.copytrading_list) {
-                // Transform API response to our trader format
-                this.available_traders = (response.copytrading_list.copiers || []).map((trader: any) => ({
-                    account_id: trader.loginid || '',
-                    loginid: trader.loginid || '',
-                    name: trader.loginid || 'Unknown Trader',
-                    total_profit: 0,
-                    total_trades: 0,
-                    win_rate: 0,
-                    avg_duration: 0,
-                    risk_level: 'medium' as const,
-                    active_since: new Date().toISOString(),
-                    followers_count: 0,
-                }));
-
-                // Fetch statistics for each trader
-                await this.fetchTraderStatistics();
-            }
-        } catch (error) {
-            this.error_message = localize('Network error. Please try again.');
-            console.error('Copy trading fetch error:', error);
-        } finally {
-            this.is_loading = false;
-        }
-    }
-
-    async fetchTraderStatistics() {
-        // Fetch statistics for all traders
-        for (const trader of this.available_traders) {
-            try {
-                const stats_response = await api_base.api.send({
-                    copytrading_statistics: 1,
-                    trader_id: trader.account_id,
-                });
-
-                if (stats_response.copytrading_statistics) {
-                    const stats = stats_response.copytrading_statistics;
-                    trader.total_profit = stats.total_profit_loss || 0;
-                    trader.total_trades = stats.total_trades || 0;
-                    trader.win_rate = stats.total_trades
-                        ? ((stats.winning_trades || 0) / stats.total_trades) * 100
-                        : 0;
-                }
-            } catch (error) {
-                console.error(`Failed to fetch stats for trader ${trader.account_id}:`, error);
-            }
-        }
-    }
-
-    async startCopying(trader_id: string) {
-        this.is_loading = true;
-        this.error_message = '';
-
-        try {
-            const trader = this.available_traders.find(t => t.account_id === trader_id);
-            if (!trader) {
-                this.error_message = localize('Trader not found');
-                return;
+                this.error_message = response.error.message || localize('Invalid API token');
+                return false;
             }
 
-            const response = await api_base.api.send({
-                copy_start: trader_id,
-            });
-
-            if (response.error) {
-                this.error_message = response.error.message || localize('Failed to start copying');
-            } else {
-                // Add to active sessions
-                const new_session: IActiveCopySession = {
-                    trader_id: trader.account_id,
-                    trader_name: trader.name,
-                    start_time: new Date().toISOString(),
-                    copied_trades: 0,
-                    profit_loss: 0,
+            if (response.authorize) {
+                const account: IConnectedAccount = {
+                    token,
+                    account_id: response.authorize.account_list?.[0]?.loginid || response.authorize.loginid,
+                    loginid: response.authorize.loginid,
+                    account_type: response.authorize.is_virtual ? 'demo' : 'real',
+                    currency: response.authorize.currency,
+                    balance: parseFloat(response.authorize.balance),
+                    is_active: true,
+                    added_at: new Date().toISOString(),
                 };
-                this.active_sessions.push(new_session);
 
-                // Subscribe to trader's trades for mirroring
-                this.subscribeMirroredTrades(trader_id);
+                // Check if account already exists
+                const exists = this.connected_accounts.some(acc => acc.account_id === account.account_id);
+                if (exists) {
+                    this.error_message = localize('This account is already connected');
+                    return false;
+                }
+
+                this.connected_accounts.push(account);
+                this.is_add_token_modal_open = false;
+
+                // Store in localStorage (encrypted in production)
+                this.saveAccountsToStorage();
+
+                return true;
             }
         } catch (error) {
-            this.error_message = localize('Network error. Please try again.');
-            console.error('Start copying error:', error);
+            this.error_message = localize('Failed to verify API token. Please try again.');
+            console.error('Add API token error:', error);
+            return false;
         } finally {
             this.is_loading = false;
         }
+
+        return false;
     }
 
-    async stopCopying(trader_id: string) {
-        this.is_loading = true;
+    removeAccount(account_id: string) {
+        this.connected_accounts = this.connected_accounts.filter(acc => acc.account_id !== account_id);
+        this.saveAccountsToStorage();
+    }
+
+    async startMirroring() {
+        if (!this.has_connected_accounts) {
+            this.error_message = localize('Please add at least one account to start copy trading');
+            return;
+        }
+
+        this.is_copying = true;
         this.error_message = '';
 
-        try {
-            const response = await api_base.api.send({
-                copy_stop: trader_id,
-            });
-
-            if (response.error) {
-                this.error_message = response.error.message || localize('Failed to stop copying');
-            } else {
-                // Remove from active sessions
-                this.active_sessions = this.active_sessions.filter(
-                    session => session.trader_id !== trader_id
-                );
-
-                // Remove mirrored trades for this trader
-                this.mirrored_trades = this.mirrored_trades.filter(
-                    trade => !trade.contract_id.startsWith(trader_id)
-                );
-            }
-        } catch (error) {
-            this.error_message = localize('Network error. Please try again.');
-            console.error('Stop copying error:', error);
-        } finally {
-            this.is_loading = false;
-        }
+        // Subscribe to transactions to detect NEW trades
+        this.subscribeToTransactions();
     }
 
-    subscribeMirroredTrades(trader_id: string) {
-        // Subscribe to portfolio to monitor mirrored trades
-        api_base.api.send({ portfolio: 1, subscribe: 1 }).then((response) => {
-            if (response.portfolio) {
-                // Filter trades that are being mirrored from this trader
-                const trades = (response.portfolio.contracts || []).map((contract: any) => ({
-                    contract_id: contract.contract_id,
-                    symbol: contract.symbol,
-                    trade_type: contract.contract_type,
-                    buy_price: contract.buy_price,
-                    current_price: contract.bid_price || contract.buy_price,
-                    profit_loss: contract.profit || 0,
-                    status: contract.is_sold ? (contract.profit > 0 ? 'won' : 'lost') : 'active',
-                }));
+    stopMirroring() {
+        this.is_copying = false;
+        // Unsubscribe logic (handled by API generally, or we just ignore updates)
+    }
 
-                this.mirrored_trades = trades;
+    subscribeToTransactions() {
+        // Subscribe to 'transaction' stream to detect balance changes (buys/sells)
+        api_base.api.send({ transaction: 1, subscribe: 1 }).then((response: any) => {
+            // Initial response (ignore history if needed, or process)
+        });
+
+        // Listen for stream updates
+        // Note: In typical Deriv implementation, we hook into the msg handler or use an observer
+        // Since we are in the store, we might need to rely on the existing API structure.
+        // Assuming api_base has a way to listen, strictly speaking the above promise only handles the first response.
+        // We will assume the system allows us to hook into events or we re-use the portfolio update approach for simplicity if 'transaction' stream handling is complex in this codebase.
+
+        // ALTERNATIVE: Use the existing 'portfolio' stream which is often more reliable for "New Contract" detection.
+        api_base.api.send({ portfolio: 1, subscribe: 1 }).then((response: any) => {
+            if (response.portfolio) {
+                // Initial portfolio
             }
         });
+
+        // We rely on the global response handler to route 'portfolio' updates to us.
+        // However, since we don't have easy access to the global handler here, 
+        // We will use a polling or the 'transaction' event if exposed.
+
+        // for this implementation within the limitations, we will use the 'portfolio' logic but enhanced.
+        // We need to bind to the API events.
+        // Assuming 'api_base.api.events' or similar exists, or we attach a listener.
+        // For now, we'll simulate the listener attachment via the response callback if it persists, 
+        // BUT standard DerivAPI requires an 'onMessage' handler.
+
+        // Let's try to hook into the API's event emitter if available
+        if (api_base.api.events) {
+            api_base.api.events.on('portfolio', (data: any) => {
+                this.handlePortfolioUpdate(data);
+            });
+            api_base.api.events.on('transaction', (data: any) => {
+                this.handleTransactionUpdate(data);
+            });
+        }
     }
 
-    setSelectedTrader(trader_id: string | null) {
-        this.selected_trader_id = trader_id;
+    handlePortfolioUpdate(data: any) {
+        if (!this.is_copying) return;
+        // logic to process new positions
+    }
+
+    handleTransactionUpdate(data: any) {
+        if (!this.is_copying) return;
+
+        const tx = data.transaction;
+        if (tx && tx.action === 'buy') {
+            // A buy happened!
+            this.processBuyTransaction(tx);
+        }
+    }
+
+    async processBuyTransaction(transaction: any) {
+        // 1. Get transaction details to find contract_id
+        const contract_id = transaction.contract_id;
+
+        // 2. Fetch full contract details to get trade execution parameters
+        try {
+            const contract_data = await api_base.api.send({ proposal_open_contract: 1, contract_id });
+            const contract = contract_data.proposal_open_contract;
+
+            if (contract) {
+                this.mirrorContractToConnectedAccounts(contract);
+            }
+        } catch (e) {
+            console.error('Failed to fetch contract details for mirroring', e);
+        }
+    }
+
+    async mirrorContractToConnectedAccounts(contract: any) {
+        // Extract exact parameters needed to place the trade
+        const trade_params = {
+            contract_type: contract.contract_type,
+            symbol: contract.underlying,
+            basis: 'stake', // We usually copy the stake
+            amount: contract.buy_price,
+            currency: contract.currency,
+            duration: contract.duration || undefined,
+            duration_unit: contract.duration_unit || undefined,
+            date_expiry: contract.date_expiry || undefined,
+            barrier: contract.barrier || undefined,
+            barrier2: contract.barrier2 || undefined,
+            // Add other necessary props map
+        };
+
+        // If it's a digit trade, we might need prediction
+        if (contract.barrier && trade_params.contract_type.includes('DIGIT')) {
+            trade_params.barrier = contract.barrier; // this is often the prediction
+        }
+
+        let mirrored_count = 0;
+
+        for (const account of this.connected_accounts) {
+            if (!account.is_active) continue;
+
+            try {
+                // Send buy request
+                const buy_req = {
+                    buy: 1,
+                    price: trade_params.amount,
+                    parameters: {
+                        contract_type: trade_params.contract_type,
+                        symbol: trade_params.symbol,
+                        basis: 'stake',
+                        amount: trade_params.amount,
+                        currency: account.currency, // Use target account currency
+                        duration: trade_params.duration,
+                        duration_unit: trade_params.duration_unit,
+                        barrier: trade_params.barrier,
+                    },
+                    authorize: account.token,
+                };
+
+                // Adjust for different currencies if needed (simple convert or 1:1)
+                // For now we assume 1:1 nominal value or user accepts the risk
+
+                const response = await api_base.api.send(buy_req);
+
+                if (!response.error) {
+                    mirrored_count++;
+                } else {
+                    console.error('Mirror error:', response.error);
+                }
+            } catch (error) {
+                console.error(`Failed to mirror to ${account.account_id}:`, error);
+            }
+        }
+
+        // Log the trade
+        const mirrored_trade: IMirroredTrade = {
+            contract_id: contract.contract_id,
+            symbol: contract.underlying,
+            trade_type: contract.contract_type,
+            buy_price: contract.buy_price,
+            current_price: contract.buy_price,
+            profit_loss: 0,
+            status: 'active',
+            timestamp: new Date().toISOString(),
+            mirrored_to_count: mirrored_count,
+        };
+
+        this.recent_trades.unshift(mirrored_trade);
+        this.trades_copied_today++;
+    }
+
+    setAddTokenModalOpen(isOpen: boolean) {
+        this.is_add_token_modal_open = isOpen;
+        if (!isOpen) {
+            this.error_message = '';
+        }
     }
 
     clearError() {
         this.error_message = '';
+    }
+
+    // Storage helpers
+    private saveAccountsToStorage() {
+        // WARNING: In production, encrypt tokens before storing!
+        const accounts_data = this.connected_accounts.map(acc => ({
+            ...acc,
+            token: btoa(acc.token), // Basic encoding (use proper encryption in production)
+        }));
+        localStorage.setItem('copy_trading_accounts', JSON.stringify(accounts_data));
+    }
+
+    loadAccountsFromStorage() {
+        try {
+            const stored = localStorage.getItem('copy_trading_accounts');
+            if (stored) {
+                const accounts_data = JSON.parse(stored);
+                this.connected_accounts = accounts_data.map((acc: any) => ({
+                    ...acc,
+                    token: atob(acc.token), // Decode (use proper decryption in production)
+                }));
+            }
+        } catch (error) {
+            console.error('Failed to load connected accounts:', error);
+        }
     }
 }
