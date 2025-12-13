@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ChunkLoader from '@/components/loader/chunk-loader';
 import { generateOAuthURL } from '@/components/shared';
+import RobotIcon from '@/components/shared/icons/robot-icon';
 import DesktopWrapper from '@/components/shared_ui/desktop-wrapper';
 import Dialog from '@/components/shared_ui/dialog';
 import MobileWrapper from '@/components/shared_ui/mobile-wrapper';
@@ -23,9 +24,8 @@ import {
     LabelPairedObjectsColumnCaptionRegularIcon,
     LabelPairedPuzzlePieceTwoCaptionBoldIcon,
 } from '@deriv/quill-icons/LabelPaired';
-import { StandaloneUsersRegularIcon } from '@deriv/quill-icons/Standalone';
 import { LegacyGuide1pxIcon } from '@deriv/quill-icons/Legacy';
-import RobotIcon from '@/components/shared/icons/robot-icon';
+import { StandaloneUsersRegularIcon } from '@deriv/quill-icons/Standalone';
 import { requestOidcAuthentication } from '@deriv-com/auth-client';
 import { Localize, localize } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
@@ -69,7 +69,7 @@ const AppWrapper = observer(() => {
         [key: string]: string;
     };
     const { clear } = summary_card;
-    const { DASHBOARD, BOT_BUILDER, BOTS } = DBOT_TABS;
+    const { DASHBOARD, BOT_BUILDER } = DBOT_TABS;
     const init_render = React.useRef(true);
     const hash = ['dashboard', 'bot_builder', 'chart', 'tutorial', 'pro_analysis', 'bots_list', 'copy_trading'];
     const { isDesktop } = useDevice();
@@ -253,10 +253,10 @@ const AppWrapper = observer(() => {
                             redirectCallbackUri: `${window.location.origin}/callback`,
                             ...(query_param_currency
                                 ? {
-                                    state: {
-                                        account: query_param_currency,
-                                    },
-                                }
+                                      state: {
+                                          account: query_param_currency,
+                                      },
+                                  }
                                 : {}),
                         });
                     } catch (err) {
@@ -401,7 +401,9 @@ const AppWrapper = observer(() => {
                                 id='id-copy-trading'
                             >
                                 <Suspense
-                                    fallback={<ChunkLoader message={localize('Please wait, loading copy trading...')} />}
+                                    fallback={
+                                        <ChunkLoader message={localize('Please wait, loading copy trading...')} />
+                                    }
                                 >
                                     <CopyTrading />
                                 </Suspense>

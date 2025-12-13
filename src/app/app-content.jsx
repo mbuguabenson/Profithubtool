@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { ToastContainer } from 'react-toastify';
 import AuthLoadingWrapper from '@/components/auth-loading-wrapper';
 import useLiveChat from '@/components/chat/useLiveChat';
-import { BOT_RESTRICTED_COUNTRIES_LIST } from '@/components/layout/header/utils';
+// BOT_RESTRICTED_COUNTRIES_LIST not used in this module
 import WelcomeScreen from '@/components/loader/WelcomeScreen';
 import PWAInstallModal from '@/components/pwa-install-modal';
 import { getUrlBase } from '@/components/shared';
@@ -22,7 +22,7 @@ import initDatadog from '@/utils/datadog';
 import initHotjar from '@/utils/hotjar';
 import { setSmartChartsPublicPath } from '@deriv/deriv-charts';
 import { ThemeProvider } from '@deriv-com/quill-ui';
-import { localize } from '@deriv-com/translations';
+// translations used in other modules; removed localize import here since it's not used
 import Audio from '../components/audio';
 import BlocklyLoading from '../components/blockly-loading';
 import BotStopped from '../components/bot-stopped';
@@ -36,7 +36,7 @@ const AppContent = observer(() => {
     const [is_api_initialized, setIsApiInitialized] = React.useState(false);
     const [is_loading, setIsLoading] = React.useState(true);
     const [min_time_elapsed, setMinTimeElapsed] = React.useState(false);
-    const [is_eu_error_loading, setIsEuErrorLoading] = React.useState(true);
+
     const [offline_timeout, setOfflineTimeout] = React.useState(null);
     const store = useStore();
     const { app, transactions, common, client } = store;
@@ -125,22 +125,10 @@ const AppContent = observer(() => {
     const is_client_logged_in = client?.is_logged_in;
 
     useEffect(() => {
-        const bot_restricted_countries = BOT_RESTRICTED_COUNTRIES_LIST();
-
-        if (!client.is_logged_in) {
-            // For logged out users
-            if (clients_logged_out_country_code) {
-                const is_restricted = !!bot_restricted_countries[clients_logged_out_country_code];
-                setIsEuErrorLoading(client.is_eu_country && is_restricted);
-            }
-        } else {
-            // For logged in users
-            if (clients_logged_in_country_code) {
-                const is_restricted = !!bot_restricted_countries[clients_logged_in_country_code];
-                setIsEuErrorLoading(is_restricted);
-            }
-        }
-    }, [is_eu_country, clients_logged_out_country_code, clients_logged_in_country_code, is_client_logged_in]);
+        // Determine if client is in a restricted country (left as a no-op currently)
+        // Previously used to set EU error loading state; removed because it's unused in rendering.
+        // Keep logic minimal to avoid side-effects during render until needed.
+    }, [is_client_logged_in, clients_logged_in_country_code, clients_logged_out_country_code, is_eu_country]);
 
     const handleMessage = React.useCallback(
         ({ data }) => {
@@ -278,11 +266,6 @@ const AppContent = observer(() => {
     if (common?.error) return null;
 
     // Show loading message based on online/offline state
-    const getLoadingMessage = () => {
-        if (is_eu_error_loading) return '';
-        if (!isOnline) return localize('Loading offline dashboard...');
-        return localize('Initializing Deriv Bot account...');
-    };
 
     // Skip loading entirely when offline - show dashboard directly
     if (!isOnline) {

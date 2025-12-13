@@ -1,11 +1,9 @@
-
 import useModalManager from '@/hooks/useModalManager';
 import { getActiveTabUrl } from '@/utils/getActiveTabUrl';
 import { LANGUAGES } from '@/utils/languages';
 import { useTranslations } from '@deriv-com/translations';
 import { DesktopLanguagesModal } from '@deriv-com/ui';
 import Livechat from '../../chat/Livechat';
-
 import ChangeThemeComponent from './ChangeTheme';
 import Endpoint from './Endpoint';
 import FullScreen from './FullScreen';

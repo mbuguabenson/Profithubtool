@@ -7,7 +7,7 @@ import { popover_zindex } from '@/constants/z-indexes';
 import { getContractTypeName } from '@/external/bot-skeleton';
 import { isDbotRTL } from '@/external/bot-skeleton/utils/workspace';
 import { LegacyRadioOffIcon, LegacyRadioOnIcon } from '@deriv/quill-icons';
-import { Localize, localize } from '@deriv-com/translations';
+import { localize } from '@deriv-com/translations';
 import { MarketIcon } from '../market/market-icon';
 import { convertDateFormat } from '../shared';
 import Popover from '../shared_ui/popover';

@@ -1,5 +1,4 @@
-import { standalone_routes } from '@/components/shared';
-import { DerivLogo, useDevice } from '@deriv-com/ui';
+import { useDevice } from '@deriv-com/ui';
 import './app-logo.scss';
 
 export const AppLogo = () => {
@@ -8,7 +7,7 @@ export const AppLogo = () => {
     if (!isDesktop) return null;
     return (
         <div className='app-header__logo' style={{ display: 'flex', alignItems: 'center' }}>
-            <img src="/profithub-logo.png" alt="Profithub" style={{ height: '50px', objectFit: 'contain' }} />
+            <img src='/profithub-logo.png' alt='Profithub' style={{ height: '50px', objectFit: 'contain' }} />
         </div>
     );
 };

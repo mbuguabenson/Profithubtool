@@ -4,7 +4,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 2rem;
-    background: rgba(255, 255, 255, 0.03); // Very subtle glass base
+    background: rgb(255 255 255 / 3%); // Very subtle glass base
     backdrop-filter: blur(10px);
     border-radius: 16px;
     cursor: pointer;
@@ -14,7 +14,7 @@
     position: relative;
     overflow: hidden;
     text-align: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 15px rgb(0 0 0 / 20%);
     border: 1px solid transparent; // Prepared for gradient border
 
     // Common Text
@@ -69,20 +69,20 @@
     // AUTOMATIC BOTS (Orange/Gold Premium Theme)
     // ==========================================
     &--automatic {
-        background: linear-gradient(145deg, rgba(255, 159, 67, 0.05), rgba(0, 0, 0, 0.4));
-        border-color: rgba(255, 159, 67, 0.3);
+        background: linear-gradient(145deg, rgb(255 159 67 / 5%), rgb(0 0 0 / 40%));
+        border-color: rgb(255 159 67 / 30%);
 
         .bot-row__icon-container {
             background: linear-gradient(135deg, #ff9f43, #ff6b6b);
-            box-shadow: 0 4px 15px rgba(255, 159, 67, 0.4);
+            box-shadow: 0 4px 15px rgb(255 159 67 / 40%);
         }
 
         .bot-row__button {
             background: linear-gradient(90deg, #ff9f43, #ff6b6b);
-            box-shadow: 0 4px 15px rgba(255, 159, 67, 0.3);
+            box-shadow: 0 4px 15px rgb(255 159 67 / 30%);
 
             &:hover {
-                box-shadow: 0 0 20px rgba(255, 159, 67, 0.6);
+                box-shadow: 0 0 20px rgb(255 159 67 / 60%);
                 transform: scale(1.02);
             }
         }
@@ -90,11 +90,13 @@
         &:hover {
             transform: translateY(-5px);
             border-color: #ff9f43;
-            box-shadow: 0 0 30px rgba(255, 159, 67, 0.2), inset 0 0 20px rgba(255, 159, 67, 0.05);
+            box-shadow:
+                0 0 30px rgb(255 159 67 / 20%),
+                inset 0 0 20px rgb(255 159 67 / 5%);
 
             .bot-row__icon-container {
                 transform: scale(1.1) rotate(5deg);
-                box-shadow: 0 0 25px rgba(255, 159, 67, 0.6);
+                box-shadow: 0 0 25px rgb(255 159 67 / 60%);
             }
         }
     }
@@ -103,20 +105,20 @@
     // NORMAL BOTS (Blue/Cyan Tech Theme)
     // ==========================================
     &--normal {
-        background: linear-gradient(145deg, rgba(0, 198, 255, 0.05), rgba(0, 0, 0, 0.4));
-        border-color: rgba(0, 198, 255, 0.3);
+        background: linear-gradient(145deg, rgb(0 198 255 / 5%), rgb(0 0 0 / 40%));
+        border-color: rgb(0 198 255 / 30%);
 
         .bot-row__icon-container {
             background: linear-gradient(135deg, #00c6ff, #0072ff);
-            box-shadow: 0 4px 15px rgba(0, 198, 255, 0.4);
+            box-shadow: 0 4px 15px rgb(0 198 255 / 40%);
         }
 
         .bot-row__button {
             background: linear-gradient(90deg, #00c6ff, #0072ff);
-            box-shadow: 0 4px 15px rgba(0, 198, 255, 0.3);
+            box-shadow: 0 4px 15px rgb(0 198 255 / 30%);
 
             &:hover {
-                box-shadow: 0 0 20px rgba(0, 198, 255, 0.6);
+                box-shadow: 0 0 20px rgb(0 198 255 / 60%);
                 transform: scale(1.02);
             }
         }
@@ -124,11 +126,13 @@
         &:hover {
             transform: translateY(-5px);
             border-color: #00c6ff;
-            box-shadow: 0 0 30px rgba(0, 198, 255, 0.2), inset 0 0 20px rgba(0, 198, 255, 0.05);
+            box-shadow:
+                0 0 30px rgb(0 198 255 / 20%),
+                inset 0 0 20px rgb(0 198 255 / 5%);
 
             .bot-row__icon-container {
                 transform: scale(1.1) rotate(-5deg);
-                box-shadow: 0 0 25px rgba(0, 198, 255, 0.6);
+                box-shadow: 0 0 25px rgb(0 198 255 / 60%);
             }
         }
     }

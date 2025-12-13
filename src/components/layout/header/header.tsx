@@ -5,23 +5,22 @@ import PWAInstallButton from '@/components/pwa-install-button';
 import { generateOAuthURL, standalone_routes } from '@/components/shared';
 import Button from '@/components/shared_ui/button';
 import useActiveAccount from '@/hooks/api/account/useActiveAccount';
-
 import { useFirebaseCountriesConfig } from '@/hooks/firebase/useFirebaseCountriesConfig';
 import { useApiBase } from '@/hooks/useApiBase';
 import { useStore } from '@/hooks/useStore';
 import useTMB from '@/hooks/useTMB';
 import { clearAuthData, handleOidcAuthFailure } from '@/utils/auth-utils';
-import { StandaloneCircleUserRegularIcon } from '@deriv/quill-icons/Standalone';
 import { AuthManager } from '@/utils/AuthManager';
+import { StandaloneCircleUserRegularIcon } from '@deriv/quill-icons/Standalone';
 import { Localize, useTranslations } from '@deriv-com/translations';
 import { Header, useDevice, Wrapper } from '@deriv-com/ui';
 import { Tooltip } from '@deriv-com/ui';
 import { AppLogo } from '../app-logo';
+import WhatsApp from '../footer/WhatsApp';
 import AccountsInfoLoader from './account-info-loader';
 import AccountSwitcher from './account-switcher';
 import MenuItems from './menu-items';
 import MobileMenu from './mobile-menu';
-import WhatsApp from '../footer/WhatsApp';
 import './header.scss';
 
 type TAppHeaderProps = {
@@ -39,8 +38,6 @@ const AppHeader = observer(({ isAuthenticating }: TAppHeaderProps) => {
 
     const currency = getCurrency?.();
     const { localize, currentLang } = useTranslations();
-
-
 
     const { hubEnabledCountryList } = useFirebaseCountriesConfig();
     const { onRenderTMBCheck, isTmbEnabled } = useTMB();

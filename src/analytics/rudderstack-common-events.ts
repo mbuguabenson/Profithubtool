@@ -1,13 +1,8 @@
 import { Analytics, TEvents } from '@deriv-com/analytics';
-import { ACTION, form_name, TFormStrategy } from './constants';
+import { ACTION, form_name } from './constants';
 import { getRsStrategyType } from './utils';
 
-export const rudderStackSendOpenEvent = ({
-    subpage_name,
-    subform_source,
-    subform_name,
-    load_strategy_tab,
-}: any) => {
+export const rudderStackSendOpenEvent = ({ subpage_name, subform_source, subform_name, load_strategy_tab }: any) => {
     Analytics.trackEvent('ce_bot_form', {
         action: ACTION.OPEN,
         form_name,
@@ -55,11 +50,7 @@ export const rudderStackSendUploadStrategyStartEvent = ({ upload_provider, uploa
     } as any);
 };
 
-export const rudderStackSendUploadStrategyCompletedEvent = ({
-    upload_provider,
-    upload_id,
-    upload_type,
-}: any) => {
+export const rudderStackSendUploadStrategyCompletedEvent = ({ upload_provider, upload_id, upload_type }: any) => {
     Analytics.trackEvent('ce_bot_form', {
         action: ACTION.UPLOAD_STRATEGY_COMPLETED,
         form_name,

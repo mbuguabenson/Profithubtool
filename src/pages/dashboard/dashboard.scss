@@ -418,18 +418,18 @@
                 box-shadow: $card-shadow-light;
                 backdrop-filter: blur(16px);
                 transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-                border: 1px solid rgba(255, 255, 255, 0.2);
+                border: 1px solid rgb(255 255 255 / 20%);
 
                 @at-root .theme--dark & {
                     background: $card-glass-dark;
                     box-shadow: $card-shadow-dark;
-                    border: 1px solid rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgb(255 255 255 / 5%);
                 }
 
                 &:hover {
                     transform: translateY(-5px) scale(1.02);
                     box-shadow: $card-shadow-hover;
-                    border-color: rgba(0, 198, 255, 0.4);
+                    border-color: rgb(0 198 255 / 40%);
                 }
 
                 &:active {

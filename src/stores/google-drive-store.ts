@@ -97,6 +97,15 @@ export default class GoogleDriveStore {
     };
 
     initialiseClient = () => {
+        if (!this.client_id) {
+            // Avoid initialization when no Google Drive Client ID is configured
+            // This prevents runtime crashes during local development or when the
+            // environment variable is not set.
+            // eslint-disable-next-line no-console
+            console.warn('GoogleDriveStore: Missing GD_CLIENT_ID; skipping init.');
+            return;
+        }
+
         this.client = google.accounts.oauth2.initTokenClient({
             client_id: this.client_id,
             scope: this.scope,
@@ -201,7 +210,6 @@ export default class GoogleDriveStore {
     }
 
     async loadFile(): Promise<{ xml_doc: string; file_name: string } | undefined> {
-
         if (!this.is_google_drive_token_valid) return;
         await this.signIn();
 
@@ -214,7 +222,6 @@ export default class GoogleDriveStore {
         );
 
         return xml_doc as { xml_doc: string; file_name: string } | undefined;
-
     }
 
     async checkFolderExists() {

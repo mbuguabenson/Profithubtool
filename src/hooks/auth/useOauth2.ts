@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useEffect } from 'react';
 import Cookies from 'js-cookie';
-import RootStore from '@/stores/root-store';
-import { Analytics } from '@deriv-com/analytics';
-import { AuthManager } from '@/utils/AuthManager';
 import { LocalStore } from '@/components/shared/utils/storage/storage';
+import RootStore from '@/stores/root-store';
+import { AuthManager } from '@/utils/AuthManager';
+import { Analytics } from '@deriv-com/analytics';
 
 /**
  * Provides an object with properties: `oAuthLogout`, `retriggerOAuth2Login`, and `isSingleLoggingIn`.

@@ -1,7 +1,6 @@
 import { LegacyWhatsappIcon } from '@deriv/quill-icons/Legacy';
 import { useTranslations } from '@deriv-com/translations';
 import { Tooltip } from '@deriv-com/ui';
-import { URLConstants } from '@deriv-com/utils';
 
 const WhatsApp = () => {
     const { localize } = useTranslations();

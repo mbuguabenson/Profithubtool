@@ -121,6 +121,21 @@
         &:not(.dc-tabs__active) {
             cursor: pointer;
             color: var(--text-general);
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border-radius: 16px;
+            box-shadow:
+                5px 5px 10px rgb(0 0 0 / 10%),
+                -2px -2px 8px rgb(255 255 255 / 5%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+            &:hover {
+                background: rgb(139 92 246 / 15%);
+                transform: translateY(-2px) scale(1.02);
+                box-shadow:
+                    0 8px 16px rgb(139 92 246 / 30%),
+                    0 0 20px rgb(139 92 246 / 20%);
+            }
         }
 
         &:not(&--header-fit-content) {
@@ -129,8 +144,14 @@
     }
 
     &__active {
+        background: var(--gradient-purple-primary) !important;
+        color: var(--brand-white) !important;
         font-weight: 700;
-        color: var(--text-prominent);
+        border-radius: 16px;
+        box-shadow: var(--glow-purple);
+        transform: translateY(-2px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: glow-pulse 2s ease-in-out infinite;
     }
 
     &__active-line {
@@ -169,61 +190,8 @@
     }
 }
 
-// Glassmorphism & Modern Tab Styling
-.dc-tabs__item {
-
-    // Glassmorphic effect for inactive tabs
-    &:not(.dc-tabs__active) {
-        background: var(--glass-bg);
-        backdrop-filter: var(--glass-blur);
-        border-radius: 16px;
-        // padding: 1rem 1.8rem; // Reverting padding
-        box-shadow:
-            5px 5px 10px rgb(0 0 0 / 10%),
-            -2px -2px 8px rgb(255 255 255 / 5%);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-        // Hover state with purple glow
-        &:hover {
-            background: rgb(139 92 246 / 15%);
-            transform: translateY(-2px) scale(1.02);
-            box-shadow:
-                0 8px 16px rgb(139 92 246 / 30%),
-                0 0 20px rgb(139 92 246 / 20%);
-        }
-    }
-}
-
-.dc-tabs__active {
-    // Active tab with purple gradient and glow
-    background: var(--gradient-purple-primary) !important;
-    color: var(--brand-white) !important;
-    font-weight: 700;
-    border-radius: 16px;
-    // padding: 1rem 1.8rem; // Reverting padding
-    box-shadow: var(--glow-purple);
-    transform: translateY(-2px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    animation: glow-pulse 2s ease-in-out infinite;
-
-    // Inset highlight for depth
-    position: relative;
-
-    &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: rgb(255 255 255 / 20%);
-        border-radius: 16px 16px 0 0;
-    }
-}
-
-// Glow pulse animation for active tab
+// Glow pulse animation for active tab (kept at file scope)
 @keyframes glow-pulse {
-
     0%,
     100% {
         box-shadow: var(--glow-purple);

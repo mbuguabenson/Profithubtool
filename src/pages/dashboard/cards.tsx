@@ -8,12 +8,6 @@ import MobileFullPageModal from '@/components/shared_ui/mobile-full-page-modal';
 import Text from '@/components/shared_ui/text';
 import { DBOT_TABS } from '@/constants/bot-contents';
 import { useStore } from '@/hooks/useStore';
-import {
-    NeonComputerIcon,
-    NeonDriveIcon,
-    NeonBotBuilderIcon,
-    NeonQuickStrategyIcon,
-} from './new-card-icons';
 // import {
 //     DerivLightBotBuilderIcon,
 //     DerivLightGoogleDriveIcon,
@@ -26,6 +20,7 @@ import { useDevice } from '@deriv-com/ui';
 import { rudderStackSendOpenEvent } from '../../analytics/rudderstack-common-events';
 import { rudderStackSendDashboardClickEvent } from '../../analytics/rudderstack-dashboard';
 import DashboardBotList from './bot-list/dashboard-bot-list';
+import { NeonBotBuilderIcon, NeonComputerIcon, NeonDriveIcon, NeonQuickStrategyIcon } from './new-card-icons';
 
 type TCardProps = {
     has_dashboard_strategies: boolean;
@@ -61,11 +56,7 @@ const Cards = observer(({ is_mobile, has_dashboard_strategies }: TCardProps) => 
     const actions: TCardArray[] = [
         {
             id: 'my-computer',
-            icon: is_mobile ? (
-                <NeonComputerIcon width={48} height={48} />
-            ) : (
-                <NeonComputerIcon width={64} height={64} />
-            ),
+            icon: is_mobile ? <NeonComputerIcon width={48} height={48} /> : <NeonComputerIcon width={64} height={64} />,
             content: is_mobile ? <Localize i18n_default_text='Local' /> : <Localize i18n_default_text='My computer' />,
             callback: () => {
                 openFileLoader();
@@ -180,7 +171,6 @@ const Cards = observer(({ is_mobile, has_dashboard_strategies }: TCardProps) => 
                                 onCloseDialog();
                             }}
                             height_offset='80px'
-
                         >
                             <div label='Google Drive' className='google-drive-label'>
                                 <GoogleDrive />

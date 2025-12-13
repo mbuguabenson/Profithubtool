@@ -17,12 +17,12 @@
     padding: 2rem;
 
     // Background effects
-    &::before {
+    &:before {
         content: '';
         position: absolute;
         width: 150vw;
         height: 150vh;
-        background: radial-gradient(circle at center, rgba(17, 153, 142, 0.1) 0%, transparent 70%);
+        background: radial-gradient(circle at center, rgb(17 153 142 / 10%) 0%, transparent 70%);
         z-index: -1;
     }
 
@@ -43,10 +43,10 @@
 
         // Gradient Text "Profit Hub"
         background: linear-gradient(90deg, #11998e, #38ef7d);
-        -webkit-background-clip: text;
+        background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
-        filter: drop-shadow(0 0 10px rgba(56, 239, 125, 0.4));
+        filter: drop-shadow(0 0 10px rgb(56 239 125 / 40%));
     }
 
     &__subtitle {
@@ -73,7 +73,7 @@
         font-size: 2.4rem;
         font-weight: 700;
         color: #38ef7d;
-        text-shadow: 0 0 10px rgba(56, 239, 125, 0.5);
+        text-shadow: 0 0 10px rgb(56 239 125 / 50%);
     }
 
     // Steps Container
@@ -84,11 +84,10 @@
         border-radius: 16px;
         padding: 2rem;
         backdrop-filter: blur(10px);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 
         // Green glowing border effect
-        border-color: rgba(56, 239, 125, 0.3);
-        box-shadow: 0 0 15px rgba(56, 239, 125, 0.1);
+        border-color: rgb(56 239 125 / 30%);
+        box-shadow: 0 0 15px rgb(56 239 125 / 10%);
     }
 
     &__steps-title {
@@ -105,7 +104,7 @@
         margin-bottom: 1.2rem;
         padding: 1.2rem;
         border-radius: 8px;
-        background: rgba(255, 255, 255, 0.03);
+        background: rgb(255 255 255 / 3%);
         border: 1px solid transparent;
         transition: all 0.3s ease;
 
@@ -114,8 +113,8 @@
         }
 
         &--active {
-            background: rgba(56, 239, 125, 0.1);
-            border-color: rgba(56, 239, 125, 0.3);
+            background: rgb(56 239 125 / 10%);
+            border-color: rgb(56 239 125 / 30%);
 
             .welcome-screen__step-icon {
                 border-color: #38ef7d;
@@ -154,12 +153,12 @@
     &__footer {
         margin-top: 3rem;
         width: 100%;
-        background: rgba(0, 198, 255, 0.05); // Blue tint
-        border: 1px solid rgba(0, 198, 255, 0.3);
+        background: rgb(0 198 255 / 5%); // Blue tint
+        border: 1px solid rgb(0 198 255 / 30%);
         border-radius: 16px;
         padding: 2rem;
         text-align: center;
-        box-shadow: 0 0 15px rgba(0, 198, 255, 0.1);
+        box-shadow: 0 0 15px rgb(0 198 255 / 10%);
 
         h3 {
             font-size: 1.6rem;

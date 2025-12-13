@@ -1,19 +1,15 @@
-
 import { observer } from 'mobx-react-lite';
-
-import { BotStrategy, getNormalBots, getAutomaticBots } from '@/constants/bot-strategies';
-import { useStore } from '@/hooks/useStore';
-import { DBOT_TABS } from '@/constants/bot-contents';
-
+import BotCard from '@/components/bot-card/bot-card';
 import RobotIcon from '@/components/shared/icons/robot-icon';
+import { DBOT_TABS } from '@/constants/bot-contents';
+import { BotStrategy, getAutomaticBots, getNormalBots } from '@/constants/bot-strategies';
+import { useStore } from '@/hooks/useStore';
 import { localize } from '@deriv-com/translations';
 import './bots.scss';
-import BotCard from '@/components/bot-card/bot-card';
 const Bots = observer(() => {
     const { load_modal, dashboard } = useStore();
     const { loadStrategyToBuilder } = load_modal;
     const { setActiveTab } = dashboard;
-
 
     const handleLoadBot = async (bot: BotStrategy) => {
         try {
@@ -45,16 +41,14 @@ const Bots = observer(() => {
     const normalBots = getNormalBots();
     const automaticBots = getAutomaticBots();
 
-
-
     return (
-        <div className="bots-page">
-            <div className="bots-page__header">
-                <div className="bots-page__title-section">
-                    <RobotIcon className="bots-page__title-icon" width={40} height={40} />
+        <div className='bots-page'>
+            <div className='bots-page__header'>
+                <div className='bots-page__title-section'>
+                    <RobotIcon className='bots-page__title-icon' width={40} height={40} />
                     <div>
-                        <h1 className="bots-page__title">{localize('Bot Library')}</h1>
-                        <p className="bots-page__subtitle">
+                        <h1 className='bots-page__title'>{localize('Bot Library')}</h1>
+                        <p className='bots-page__subtitle'>
                             {localize('Choose from our collection of proven trading strategies')}
                         </p>
                     </div>
@@ -62,17 +56,17 @@ const Bots = observer(() => {
             </div>
 
             {/* Automatic Bots Section */}
-            <section className="bots-page__section">
-                <div className="bots-page__section-header bots-page__section-header--automatic">
-                    <div className="bots-page__section-title-wrapper">
-                        <h2 className="bots-page__section-title">{localize('Automatic Bots')}</h2>
-                        <span className="bots-page__section-count">{automaticBots.length}</span>
+            <section className='bots-page__section'>
+                <div className='bots-page__section-header bots-page__section-header--automatic'>
+                    <div className='bots-page__section-title-wrapper'>
+                        <h2 className='bots-page__section-title'>{localize('Automatic Bots')}</h2>
+                        <span className='bots-page__section-count'>{automaticBots.length}</span>
                     </div>
-                    <p className="bots-page__section-description">
+                    <p className='bots-page__section-description'>
                         {localize('Fully automated strategies with built-in risk management and decision-making')}
                     </p>
                 </div>
-                <div className="bots-page__grid">
+                <div className='bots-page__grid'>
                     {automaticBots.map(bot => (
                         <BotCard key={bot.id} bot={bot} onLoad={handleLoadBot} />
                     ))}
@@ -80,17 +74,17 @@ const Bots = observer(() => {
             </section>
 
             {/* Normal Bots Section */}
-            <section className="bots-page__section">
-                <div className="bots-page__section-header bots-page__section-header--normal">
-                    <div className="bots-page__section-title-wrapper">
-                        <h2 className="bots-page__section-title">{localize('Normal Bots')}</h2>
-                        <span className="bots-page__section-count">{normalBots.length}</span>
+            <section className='bots-page__section'>
+                <div className='bots-page__section-header bots-page__section-header--normal'>
+                    <div className='bots-page__section-title-wrapper'>
+                        <h2 className='bots-page__section-title'>{localize('Normal Bots')}</h2>
+                        <span className='bots-page__section-count'>{normalBots.length}</span>
                     </div>
-                    <p className="bots-page__section-description">
+                    <p className='bots-page__section-description'>
                         {localize('Professional-grade bots with customizable parameters requiring manual oversight')}
                     </p>
                 </div>
-                <div className="bots-page__grid">
+                <div className='bots-page__grid'>
                     {normalBots.map(bot => (
                         <BotCard key={bot.id} bot={bot} onLoad={handleLoadBot} />
                     ))}

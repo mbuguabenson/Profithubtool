@@ -20,8 +20,8 @@ $colour_toolboxSelected: $black;
     .zelos-renderer.zelos_renderer-theme .blocklyMainBackground,
     .load-strategy__container .blocklyMainBackground,
     .zelos-renderer.zelos_renderer-theme rect.blocklyFieldRect.blocklyDropdownRect,
-    .zelos-renderer.zelos_renderer-theme .blocklyNonEditableText>rect:not(.blocklyDropdownRect),
-    .zelos-renderer.zelos_renderer-theme .blocklyEditableText>rect:not(.blocklyDropdownRect),
+    .zelos-renderer.zelos_renderer-theme .blocklyNonEditableText > rect:not(.blocklyDropdownRect),
+    .zelos-renderer.zelos_renderer-theme .blocklyEditableText > rect:not(.blocklyDropdownRect),
     .blocklyPath[fill='#fff'],
     .blocklyVariableGet .blocklyPath,
     .blocklyOutlinePath {
@@ -33,17 +33,17 @@ $colour_toolboxSelected: $black;
         fill: #151816 !important;
     }
 
-    .zelos-renderer.zelos_renderer-theme .blocklyEditableText>image,
-    .zelos-renderer.zelos_renderer-theme .blocklyNonEditableText>image {
+    .zelos-renderer.zelos_renderer-theme .blocklyEditableText > image,
+    .zelos-renderer.zelos_renderer-theme .blocklyNonEditableText > image {
         filter: unset;
     }
 
-    .flyout .zelos-renderer.classic-theme .blocklyEditableText>image {
+    .flyout .zelos-renderer.classic-theme .blocklyEditableText > image {
         filter: invert(0);
     }
 
-    .zelos-renderer.classic-theme .blocklyNonEditableText>rect:not(.blocklyDropdownRect),
-    .zelos-renderer.classic-theme .blocklyEditableText>rect:not(.blocklyDropdownRect) {
+    .zelos-renderer.classic-theme .blocklyNonEditableText > rect:not(.blocklyDropdownRect),
+    .zelos-renderer.classic-theme .blocklyEditableText > rect:not(.blocklyDropdownRect) {
         fill: unset;
     }
 }
@@ -77,7 +77,7 @@ $colour_toolboxSelected: $black;
         }
     }
 
-    .block--error-highlighted>.blocklyPath {
+    .block--error-highlighted > .blocklyPath {
         stroke: #f00;
         stroke-width: 5px;
     }
@@ -97,18 +97,19 @@ $colour_toolboxSelected: $black;
         }
     }
 
-    .block--execution-highlighted>.blocklyPath {
+    .block--execution-highlighted > .blocklyPath {
         stroke: #89b2af;
         animation: fade-in-out 1.5s;
     }
 
-    .block--blink>.blocklyPath {
+    .block--blink > .blocklyPath {
         animation: blink-effect 1s infinite;
     }
 
     .blocklySvg {
         outline: none;
         overflow: hidden;
+
         /* IE overflows by default. */
         position: absolute;
         display: block;
@@ -125,6 +126,7 @@ $colour_toolboxSelected: $black;
         display: none;
         position: absolute;
         z-index: 99999;
+
         /* big value for bootstrap3 compatibility */
     }
 
@@ -189,6 +191,7 @@ $colour_toolboxSelected: $black;
         letter-spacing: normal;
         position: absolute;
         z-index: 100000;
+
         /* big value for bootstrap3 compatibility */
     }
 
@@ -242,7 +245,7 @@ $colour_toolboxSelected: $black;
         box-shadow: 0 0 0 6px rgb(0 0 0 / 10%);
     }
 
-    .blocklyDropDownButton>img {
+    .blocklyDropDownButton > img {
         width: 80%;
         height: 80%;
         margin-top: 5%;
@@ -273,7 +276,7 @@ $colour_toolboxSelected: $black;
         -webkit-tap-highlight-color: rgb(0 0 0 / 0%);
     }
 
-    .blocklyNumPadButton>img {
+    .blocklyNumPadButton > img {
         margin-top: 10%;
         width: 80%;
         height: 80%;
@@ -334,12 +337,12 @@ $colour_toolboxSelected: $black;
         stroke-width: 0.4px;
     }
 
-    .blocklySelected>.blocklyPath {
+    .blocklySelected > .blocklyPath {
         stroke: #ffc358;
         stroke-width: 3px;
     }
 
-    .blocklySelected>.blocklyPathLight {
+    .blocklySelected > .blocklyPathLight {
         display: none;
     }
 
@@ -383,18 +386,18 @@ $colour_toolboxSelected: $black;
         cursor: grabbing;
     }
 
-    .blocklyDragging>.blocklyPath,
-    .blocklyDragging>.blocklyPathLight {
+    .blocklyDragging > .blocklyPath,
+    .blocklyDragging > .blocklyPathLight {
         fill-opacity: 1;
         stroke-opacity: 1;
     }
 
-    .blocklyDisabled>.blocklyPath {
+    .blocklyDisabled > .blocklyPath {
         fill-opacity: 0.5;
         stroke-opacity: 0.5;
     }
 
-    .blocklyInsertionMarker>.blocklyPath {
+    .blocklyInsertionMarker > .blocklyPath {
         stroke: none;
     }
 
@@ -413,21 +416,21 @@ $colour_toolboxSelected: $black;
         font-size: 11px;
     }
 
-    .blocklyNonEditableText>text {
+    .blocklyNonEditableText > text {
         pointer-events: none;
     }
 
-    .blocklyNonEditableText>text,
-    .blocklyEditableText>text {
+    .blocklyNonEditableText > text,
+    .blocklyEditableText > text {
         fill: var(--text-prominent);
     }
 
-    .blocklyEditableText>.blocklyEditableLabel {
+    .blocklyEditableText > .blocklyEditableLabel {
         fill: var(--text-prominent);
     }
 
-    .blocklyNonEditableText>image,
-    .blocklyEditableText>image {
+    .blocklyNonEditableText > image,
+    .blocklyEditableText > image {
         filter: invert(1);
     }
 
@@ -555,12 +558,12 @@ drag a block and selected text moves instead.
         fill: transparent;
     }
 
-    .blocklyFocused>.blocklyCommentRect {
+    .blocklyFocused > .blocklyCommentRect {
         fill: #b9b272;
         stroke: #b9b272;
     }
 
-    .blocklySelected>.blocklyCommentTarget {
+    .blocklySelected > .blocklyCommentTarget {
         stroke: #fc3;
         stroke-width: 3px;
     }
@@ -582,7 +585,7 @@ drag a block and selected text moves instead.
         display: none;
     }
 
-    .blocklySelected>.blocklyCommentDeleteIcon {
+    .blocklySelected > .blocklyCommentDeleteIcon {
         display: block;
     }
 
@@ -701,12 +704,12 @@ drag a block and selected text moves instead.
         fill: $colour_scrollbar;
     }
 
-    .blocklyScrollbarBackground:hover+.blocklyScrollbarHandle,
+    .blocklyScrollbarBackground:hover + .blocklyScrollbarHandle,
     .blocklyScrollbarHandle:hover {
         fill: $colour_scrollbarHover;
     }
 
-    .blocklyZoom>image {
+    .blocklyZoom > image {
         opacity: 1;
     }
 
@@ -714,7 +717,7 @@ drag a block and selected text moves instead.
         fill: #bbb;
     }
 
-    .blocklyFlyout .blocklyScrollbarBackground:hover+.blocklyScrollbarHandle,
+    .blocklyFlyout .blocklyScrollbarBackground:hover + .blocklyScrollbarHandle,
     .blocklyFlyout .blocklyScrollbarHandle:hover {
         fill: #aaa;
     }
@@ -793,8 +796,10 @@ drag a block and selected text moves instead.
         overflow-y: auto;
         position: absolute;
         z-index: 40;
+
         /* so blocks go over toolbox when dragging */
         -webkit-tap-highlight-color: transparent;
+
         /* issue #1345 */
     }
 
@@ -864,20 +869,20 @@ drag a block and selected text moves instead.
         background-position: -16px -1px;
     }
 
-    .blocklyTreeSelected>.blocklyTreeIconClosedLtr {
+    .blocklyTreeSelected > .blocklyTreeIconClosedLtr {
         background-position: -32px -17px;
     }
 
-    .blocklyTreeSelected>.blocklyTreeIconClosedRtl {
+    .blocklyTreeSelected > .blocklyTreeIconClosedRtl {
         background-position: 0 -17px;
     }
 
-    .blocklyTreeSelected>.blocklyTreeIconOpen {
+    .blocklyTreeSelected > .blocklyTreeIconOpen {
         background-position: -16px -17px;
     }
 
     .blocklyTreeIconNone,
-    .blocklyTreeSelected>.blocklyTreeIconNone {
+    .blocklyTreeSelected > .blocklyTreeIconNone {
         background-position: -48px -1px;
     }
 
@@ -1046,9 +1051,8 @@ drag a block and selected text moves instead.
     .flyout .zelos-renderer.classic-theme,
     .gtm-search-results,
     .load-strategy__container {
-
         // Selected blocks with purple glow
-        .blocklySelected>.blocklyPath {
+        .blocklySelected > .blocklyPath {
             stroke: var(--brand-red-coral);
             stroke-width: 3px;
             filter: drop-shadow(0 0 8px rgb(124 58 237 / 60%));

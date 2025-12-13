@@ -10,11 +10,25 @@
     &__account-settings,
     .notifications__wrapper,
     &__menu {
-
-        svg>path,
-        svg>g>path {
+        svg > path,
+        svg > g > path {
             fill: var(--text-prominent);
         }
+    }
+
+    // Purple Gradient Branding for Header
+    // Glassmorphism backdrop for header
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+
+    // Purple gradient branding text
+    &__logo,
+    &__branding,
+    &__title {
+        background: var(--gradient-purple-primary);
+        background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 }
 
@@ -128,7 +142,7 @@
             box-shadow: 0 0 2px 0 var(--du-shadow-box, #00000014);
         }
 
-        .deriv-account-switcher__balance+svg>path {
+        .deriv-account-switcher__balance + svg > path {
             fill: var(--text-general);
         }
 
@@ -294,21 +308,4 @@
     border-bottom: none;
 }
 
-// Purple Gradient Branding for Header
-.app-header {
-    // Glassmorphism backdrop for header
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    // border-bottom: var(--glass-border); // Reverting border to modify size
-
-    // Purple gradient branding text
-    &__logo,
-    &__branding,
-    &__title {
-        background: var(--gradient-purple-primary);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        // font-weight: 700; // Reverting font changes
-    }
-}
+// End of header style adjustments

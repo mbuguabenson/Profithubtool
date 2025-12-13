@@ -170,7 +170,7 @@ export default class CopyTradingStore {
 
     subscribeToTransactions() {
         // Subscribe to 'transaction' stream to detect balance changes (buys/sells)
-        api_base.api.send({ transaction: 1, subscribe: 1 }).then((response: any) => {
+        api_base.api.send({ transaction: 1, subscribe: 1 }).then(() => {
             // Initial response (ignore history if needed, or process)
         });
 
@@ -181,26 +181,24 @@ export default class CopyTradingStore {
         // We will assume the system allows us to hook into events or we re-use the portfolio update approach for simplicity if 'transaction' stream handling is complex in this codebase.
 
         // ALTERNATIVE: Use the existing 'portfolio' stream which is often more reliable for "New Contract" detection.
-        api_base.api.send({ portfolio: 1, subscribe: 1 }).then((response: any) => {
-            if (response.portfolio) {
-                // Initial portfolio
-            }
+        api_base.api.send({ portfolio: 1, subscribe: 1 }).then(() => {
+            // Initial portfolio available via events
         });
 
         // We rely on the global response handler to route 'portfolio' updates to us.
-        // However, since we don't have easy access to the global handler here, 
+        // However, since we don't have easy access to the global handler here,
         // We will use a polling or the 'transaction' event if exposed.
 
         // for this implementation within the limitations, we will use the 'portfolio' logic but enhanced.
         // We need to bind to the API events.
         // Assuming 'api_base.api.events' or similar exists, or we attach a listener.
-        // For now, we'll simulate the listener attachment via the response callback if it persists, 
+        // For now, we'll simulate the listener attachment via the response callback if it persists,
         // BUT standard DerivAPI requires an 'onMessage' handler.
 
         // Let's try to hook into the API's event emitter if available
         if (api_base.api.events) {
-            api_base.api.events.on('portfolio', (data: any) => {
-                this.handlePortfolioUpdate(data);
+            api_base.api.events.on('portfolio', () => {
+                this.handlePortfolioUpdate();
             });
             api_base.api.events.on('transaction', (data: any) => {
                 this.handleTransactionUpdate(data);
@@ -208,7 +206,7 @@ export default class CopyTradingStore {
         }
     }
 
-    handlePortfolioUpdate(data: any) {
+    handlePortfolioUpdate() {
         if (!this.is_copying) return;
         // logic to process new positions
     }

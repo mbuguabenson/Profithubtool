@@ -65,7 +65,6 @@
         border: var(--glass-border);
         backdrop-filter: var(--glass-blur);
         box-shadow: var(--glass-shadow);
-        border-radius: 8px; // Keep slight rounding for the pod itself, or 0px if requested globally? User said "remove rounding from buttons". Let's stick to 0px for consistency/sharpness if desired, but 8px usually looks better for floating glass panels. I'll use 0px to match the "Sharp" directive unless it looks bad. Let's try 4px or keep simple. Actually user said "Remove rounding from ALL buttons". Did not say panels. I'll keep 0px for consistency with the "sharp" look.
         border-radius: 0;
 
         @include mobile-or-tablet-screen {
@@ -105,12 +104,12 @@
             &--positive {
                 font-weight: bold;
                 color: var(--text-profit-success);
-                text-shadow: 0 0 10px rgba(56, 239, 125, 0.4); // Subtle glow for readability
+                text-shadow: 0 0 10px rgb(56 239 125 / 40%); // Subtle glow for readability
                 // Green glow for profits
                 text-shadow: var(--glow-green);
                 background: var(--gradient-green-primary);
                 background-clip: text;
-                -webkit-background-clip: text;
+                background-clip: text;
                 -webkit-text-fill-color: transparent;
             }
 
@@ -137,6 +136,19 @@
             width: 318px;
             height: 32px !important;
             margin: 12px 24px;
+            background: transparent;
+            border: 2px solid var(--brand-secondary);
+            color: var(--brand-secondary) !important;
+            font-weight: 600;
+            border-radius: 0 !important;
+
+            &:hover:not([disabled]) {
+                background: var(--gradient-green-primary) !important;
+                color: var(--brand-white) !important;
+                box-shadow: var(--glow-green);
+                transform: translateY(-2px);
+                border-color: transparent;
+            }
         }
     }
 
@@ -255,7 +267,24 @@
     &__stop-button,
     &__run-button {
         width: 40%;
-        border-radius: 4px 0 0 4px !important;
+
+        /* left-radius removed to keep buttons sharp */
+        background: var(--gradient-green-primary) !important;
+        color: var(--brand-white) !important;
+        font-weight: 700;
+        border-radius: 0 !important;
+        box-shadow: var(--glow-green);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        &:hover:not([disabled]) {
+            box-shadow: var(--glow-green-intense);
+            transform: translateY(-2px);
+            background: var(--gradient-green-primary) !important;
+        }
+
+        &:not([disabled]) {
+            animation: button-glow-pulse 3s ease-in-out infinite;
+        }
     }
 
     &__animation {
@@ -468,48 +497,12 @@
     }
 }
 
-// Purple Theme for Run and Reset Buttons
-.controls__stop-button,
-.controls__run-button {
-    // Green gradient background for run/stop as requested
-    background: var(--gradient-green-primary) !important;
-    color: var(--brand-white) !important;
-    font-weight: 700;
-    border-radius: 0 !important; // Sharp edges
-    box-shadow: var(--glow-green);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* run/stop theme moved into component nested selector to prevent duplicate selectors */
 
-    &:hover:not([disabled]) {
-        box-shadow: var(--glow-green-intense);
-        transform: translateY(-2px); // Removed scale for cleaner look with sharp edges
-        background: var(--gradient-green-primary) !important;
-    }
-
-    &:not([disabled]) {
-        animation: button-glow-pulse 3s ease-in-out infinite;
-    }
-}
-
-// Run Panel Footer Button (Reset/Clear)
-.run-panel__footer-button {
-    background: transparent;
-    border: 2px solid var(--brand-secondary); // Use secondary (green) border
-    color: var(--brand-secondary) !important;
-    font-weight: 600;
-    border-radius: 0 !important; // Sharp edges
-
-    &:hover:not([disabled]) {
-        background: var(--gradient-green-primary) !important;
-        color: var(--brand-white) !important;
-        box-shadow: var(--glow-green);
-        transform: translateY(-2px);
-        border-color: transparent;
-    }
-}
+/* Moved to nested selector under &__footer to avoid duplicate selectors */
 
 // Button glow pulse animation
 @keyframes button-glow-pulse {
-
     0%,
     100% {
         box-shadow: var(--glow-green);

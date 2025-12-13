@@ -6,7 +6,6 @@
     width: 100%;
     margin: 0 auto;
     color: var(--text-general);
-    min-height: calc(100vh - 80px);
     box-sizing: border-box; // Prevent padding from adding to width
     min-height: calc(100vh - 80px);
 
@@ -25,6 +24,7 @@
         .dashboard-title {
             color: var(--text-prominent);
             margin-bottom: 0.8rem;
+
             // Removed forced yellow, using standard text with maybe a subtle gradient text effect if desired
             // Keeping it clean for now to match Bots title
         }
@@ -67,7 +67,7 @@
             &--active {
                 color: #ff9f43; // Matching Automatic Bot Orange
 
-                &::after {
+                &:after {
                     content: '';
                     position: absolute;
                     bottom: -1px;
@@ -89,12 +89,12 @@
     .dashboard-section {
         background: var(--glass-background);
         backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
         border: 1px solid var(--glass-border);
         border-radius: 16px;
         padding: 2.4rem;
         margin-bottom: 2.4rem;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 24px rgb(0 0 0 / 5%);
 
         .section-title-wrapper {
             display: flex;
@@ -134,7 +134,7 @@
 
         .deriv-input {
             flex: 1;
-            background: rgba(0, 0, 0, 0.2); // Semi-transparent dark
+            background: rgb(0 0 0 / 20%); // Semi-transparent dark
             border: 1px solid var(--glass-border);
             color: var(--text-prominent);
             padding: 1.2rem;
@@ -144,7 +144,7 @@
 
             &:focus {
                 border-color: #ff9f43;
-                box-shadow: 0 0 0 2px rgba(255, 159, 67, 0.2);
+                box-shadow: 0 0 0 2px rgb(255 159 67 / 20%);
                 outline: none;
             }
         }
@@ -153,12 +153,12 @@
             padding: 0 2.4rem;
             background: linear-gradient(135deg, #00d2ff, #3a7bd5); // Use Normal Bot Blue for generic actions
             border: none;
-            color: white;
+            color: #fff;
             border-radius: 12px;
             font-weight: 700;
 
             &:hover {
-                box-shadow: 0 4px 12px rgba(0, 210, 255, 0.3);
+                box-shadow: 0 4px 12px rgb(0 210 255 / 30%);
             }
         }
 
@@ -184,7 +184,7 @@
         }
 
         .account-tag {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgb(255 255 255 / 5%);
             border: 1px solid var(--glass-border);
             padding: 0.6rem 1.2rem;
             border-radius: 20px;
@@ -203,7 +203,7 @@
 
             &.real {
                 background: #38ef7d;
-                box-shadow: 0 0 5px rgba(56, 239, 125, 0.4);
+                box-shadow: 0 0 5px rgb(56 239 125 / 40%);
             }
 
             &.demo {
@@ -232,29 +232,29 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: white;
+            color: #fff;
             position: relative;
             overflow: hidden;
 
             &--start {
                 // Bots "Automatic" Gradient
                 background: linear-gradient(135deg, #ff9f43, #ff6b6b);
-                box-shadow: 0 4px 15px rgba(255, 159, 67, 0.3);
+                box-shadow: 0 4px 15px rgb(255 159 67 / 30%);
 
                 &:hover:not(.disabled) {
                     transform: translateY(-2px);
-                    box-shadow: 0 8px 25px rgba(255, 159, 67, 0.4);
+                    box-shadow: 0 8px 25px rgb(255 159 67 / 40%);
                 }
             }
 
             &--stop {
                 // Standard Red Gradient
                 background: linear-gradient(135deg, #ff5252, #d32f2f);
-                box-shadow: 0 4px 15px rgba(255, 82, 82, 0.3);
+                box-shadow: 0 4px 15px rgb(255 82 82 / 30%);
 
                 &:hover:not(.disabled) {
                     transform: translateY(-2px);
-                    box-shadow: 0 8px 25px rgba(255, 82, 82, 0.4);
+                    box-shadow: 0 8px 25px rgb(255 82 82 / 40%);
                 }
             }
 
@@ -280,7 +280,7 @@
     }
 
     .status-card {
-        background: rgba(255, 255, 255, 0.03);
+        background: rgb(255 255 255 / 3%);
         border: 1px solid var(--glass-border);
         border-radius: 16px;
         padding: 2.4rem;
@@ -288,7 +288,7 @@
         overflow: hidden;
         transition: all 0.3s;
 
-        &::before {
+        &:before {
             content: '';
             position: absolute;
             left: 0;
@@ -300,10 +300,10 @@
         }
 
         &:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgb(255 255 255 / 5%);
             transform: translateY(-2px);
 
-            &::before {
+            &:before {
                 background: #ff9f43;
                 box-shadow: 0 0 10px #ff9f43;
             }
@@ -357,7 +357,7 @@
 
     // Console
     .console-log {
-        background: rgba(0, 0, 0, 0.3);
+        background: rgb(0 0 0 / 30%);
         padding: 1.6rem;
         border-radius: 12px;
         border: 1px solid var(--glass-border);
@@ -373,7 +373,7 @@
     .console-line {
         display: flex;
         gap: 1.2rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        border-bottom: 1px solid rgb(255 255 255 / 5%);
         padding-bottom: 0.8rem;
         color: var(--text-general);
 

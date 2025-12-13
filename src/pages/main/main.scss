@@ -2,7 +2,6 @@
 @use 'components/shared/styles/mixins' as *;
 
 .run-panel {
-
     // fix for the RTL issue on tab active line
     .dc-tabs__active-line {
         right: auto;
@@ -51,7 +50,6 @@
         }
 
         &--active {
-
             // css for onboard tour overlay
             &:before {
                 content: '';
@@ -726,7 +724,6 @@
 }
 
 @keyframes blink {
-
     0%,
     100% {
         border: 1px solid $color-red;

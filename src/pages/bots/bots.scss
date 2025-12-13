@@ -53,12 +53,12 @@
         border: 1px solid var(--border-normal);
 
         &--automatic {
-            background: linear-gradient(90deg, rgba(255, 159, 67, 0.1) 0%, transparent 100%);
+            background: linear-gradient(90deg, rgb(255 159 67 / 10%) 0%, transparent 100%);
             border-left: 4px solid #ff9f43; // Orange
         }
 
         &--normal {
-            background: linear-gradient(90deg, rgba(0, 198, 255, 0.1) 0%, transparent 100%);
+            background: linear-gradient(90deg, rgb(0 198 255 / 10%) 0%, transparent 100%);
             border-left: 4px solid #00c6ff; // Blue
         }
     }
