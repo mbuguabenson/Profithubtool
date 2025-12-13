@@ -262,6 +262,8 @@ const useTMB = (): UseTMBReturn => {
             setIsTmbCheckComplete(true);
         }, 2500);
 
+        let mounted = true;
+
         const initializeHook = async () => {
             try {
                 // Pre-fetch active sessions if needed
@@ -269,6 +271,7 @@ const useTMB = (): UseTMBReturn => {
                     try {
                         // This is a critical step - we need to await this
                         const activeSessions = await getActiveSessions();
+                        if (!mounted) return;
                         activeSessionsRef.current = activeSessions;
 
                         // Process tokens in advance if available
@@ -282,25 +285,29 @@ const useTMB = (): UseTMBReturn => {
                             localStorage.setItem('clientAccounts', JSON.stringify(clientAccounts));
                         }
                     } catch (error) {
-                        console.error('Failed to pre-fetch active sessions:', error);
+                        if (mounted) console.error('Failed to pre-fetch active sessions:', error);
                     } finally {
-                        setIsApiInitialized(true);
+                        if (mounted) setIsApiInitialized(true);
                     }
                 } else {
-                    setIsApiInitialized(true);
+                    if (mounted) setIsApiInitialized(true);
                 }
 
                 // Only after all operations are complete, mark as initialized
-                setIsInitialized(true);
-                setIsTmbCheckComplete(true);
+                if (mounted) {
+                    setIsInitialized(true);
+                    setIsTmbCheckComplete(true);
+                }
 
                 // Clear the safety timeout since we completed normally
                 clearTimeout(safetyTimeout);
             } catch (error) {
-                console.error('Failed to initialize TMB hook:', error);
+                if (mounted) console.error('Failed to initialize TMB hook:', error);
                 // Still mark as initialized to avoid blocking the app completely
-                setIsInitialized(true);
-                setIsTmbCheckComplete(true);
+                if (mounted) {
+                    setIsInitialized(true);
+                    setIsTmbCheckComplete(true);
+                }
 
                 // Clear the safety timeout since we're handling the error
                 clearTimeout(safetyTimeout);
@@ -312,6 +319,7 @@ const useTMB = (): UseTMBReturn => {
 
         // Clean up the safety timeout if the component unmounts
         return () => {
+            mounted = false;
             clearTimeout(safetyTimeout);
         };
     }, [isTmbEnabled, isCallbackPage, processTokens, getActiveSessions]);

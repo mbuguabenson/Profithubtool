@@ -12,12 +12,13 @@ const useTrackjs = () => {
 
     const initTrackJS = (loginid: string) => {
         try {
+            if (!TRACKJS_TOKEN || !isProduction) return;
             if (!TrackJS.isInstalled()) {
                 TrackJS.install({
                     application: 'standalone-deriv-bot',
                     dedupe: false,
-                    enabled: isProduction,
-                    token: TRACKJS_TOKEN!,
+                    enabled: true,
+                    token: TRACKJS_TOKEN,
                     userId: loginid,
                     version:
                         (document.querySelector('meta[name=version]') as HTMLMetaElement)?.content ?? trackjs_version,

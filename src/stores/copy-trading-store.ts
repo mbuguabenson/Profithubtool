@@ -47,6 +47,8 @@ export default class CopyTradingStore {
 
     // UI state
     is_add_token_modal_open: boolean = false;
+    // Internal subscription reference to avoid duplicate subscriptions
+    message_subscription: { unsubscribe: () => void } | null = null;
 
     constructor(root_store: RootStore) {
         makeObservable(this, {
@@ -165,7 +167,15 @@ export default class CopyTradingStore {
 
     stopMirroring() {
         this.is_copying = false;
-        // Unsubscribe logic (handled by API generally, or we just ignore updates)
+        // Unsubscribe from message listener if present
+        if (this.message_subscription) {
+            try {
+                this.message_subscription.unsubscribe();
+            } catch (e) {
+                // ignore
+            }
+            this.message_subscription = null;
+        }
     }
 
     subscribeToTransactions() {
@@ -185,24 +195,28 @@ export default class CopyTradingStore {
             // Initial portfolio available via events
         });
 
-        // We rely on the global response handler to route 'portfolio' updates to us.
-        // However, since we don't have easy access to the global handler here,
-        // We will use a polling or the 'transaction' event if exposed.
+        // We rely on the global response handler to route 'portfolio' and 'transaction' updates to us.
+        // Use the API's onMessage observable for message subscription and push subscription to api_base for cleanup.
+        if (api_base.api) {
+            try {
+                // Avoid duplicate subscription
+                if (this.message_subscription) return;
 
-        // for this implementation within the limitations, we will use the 'portfolio' logic but enhanced.
-        // We need to bind to the API events.
-        // Assuming 'api_base.api.events' or similar exists, or we attach a listener.
-        // For now, we'll simulate the listener attachment via the response callback if it persists,
-        // BUT standard DerivAPI requires an 'onMessage' handler.
-
-        // Let's try to hook into the API's event emitter if available
-        if (api_base.api.events) {
-            api_base.api.events.on('portfolio', () => {
-                this.handlePortfolioUpdate();
-            });
-            api_base.api.events.on('transaction', (data: any) => {
-                this.handleTransactionUpdate(data);
-            });
+                const subscription = api_base.api.onMessage().subscribe(({ data }: any) => {
+                    if (!data) return;
+                    if (data.msg_type === 'portfolio') {
+                        this.handlePortfolioUpdate();
+                    }
+                    if (data.msg_type === 'transaction') {
+                        this.handleTransactionUpdate(data);
+                    }
+                });
+                this.message_subscription = subscription;
+                api_base.pushSubscription(subscription);
+            } catch (e) {
+                // eslint-disable-next-line no-console
+                console.error('Failed to subscribe to API messages for copy trading', e);
+            }
         }
     }
 

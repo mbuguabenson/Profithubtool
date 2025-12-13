@@ -4,7 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import AuthLoadingWrapper from '@/components/auth-loading-wrapper';
 import useLiveChat from '@/components/chat/useLiveChat';
 // BOT_RESTRICTED_COUNTRIES_LIST not used in this module
-import WelcomeScreen from '@/components/loader/WelcomeScreen';
+// intentionally not showing initial WelcomeScreen to prevent duplicate loaders
 import PWAInstallModal from '@/components/pwa-install-modal';
 import { getUrlBase } from '@/components/shared';
 import TncStatusUpdateModal from '@/components/tnc-status-update-modal';
@@ -35,7 +35,7 @@ import '../components/bot-notification/bot-notification.scss';
 const AppContent = observer(() => {
     const [is_api_initialized, setIsApiInitialized] = React.useState(false);
     const [is_loading, setIsLoading] = React.useState(true);
-    const [min_time_elapsed, setMinTimeElapsed] = React.useState(false);
+    // removed min_time_elapsed as WelcomeScreen has been removed
 
     const [offline_timeout, setOfflineTimeout] = React.useState(null);
     const store = useStore();
@@ -256,11 +256,7 @@ const AppContent = observer(() => {
         if (client) {
             initHotjar(client);
         }
-        // Enforce minimum 5 seconds welcome screen
-        const timer = setTimeout(() => {
-            setMinTimeElapsed(true);
-        }, 5000);
-        return () => clearTimeout(timer);
+        // Previously enforced a minimum welcome screen duration; removed because WelcomeScreen is no longer used
     }, []);
 
     if (common?.error) return null;
@@ -290,9 +286,7 @@ const AppContent = observer(() => {
         );
     }
 
-    return is_loading || !min_time_elapsed ? (
-        <WelcomeScreen />
-    ) : (
+    return (
         <AuthLoadingWrapper>
             <ThemeProvider theme={is_dark_mode_on ? 'dark' : 'light'}>
                 <BlocklyLoading />
