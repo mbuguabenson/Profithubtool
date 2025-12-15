@@ -55,7 +55,7 @@ const AnnouncementDialog = ({
                 rudderStackSendCloseEvent({
                     subform_name: 'announcements',
                     announcement_name: main_title,
-                } as any);
+                });
             }}
             className={is_tablet ? `${base_classname} ${base_classname}--tablet` : base_classname}
         >

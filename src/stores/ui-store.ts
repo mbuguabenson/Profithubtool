@@ -63,6 +63,14 @@ export default class UiStore {
         this.is_tablet = value === 'tablet';
     };
 
+    addToast = (toast: unknown) => {
+        // console.warn('addToast not implemented in UiStore', toast);
+    };
+
+    removeToast = (id: unknown) => {
+        // console.warn('removeToast not implemented in UiStore', id);
+    };
+
     toggleAccountsDialog(status = !this.is_accounts_switcher_on) {
         this.is_accounts_switcher_on = status;
     }

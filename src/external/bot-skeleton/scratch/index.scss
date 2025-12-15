@@ -108,9 +108,7 @@ $colour_toolboxSelected: $black;
 
     .blocklySvg {
         outline: none;
-        overflow: hidden;
-
-        /* IE overflows by default. */
+        overflow: hidden; /* IE overflows by default. */
         position: absolute;
         display: block;
     }
@@ -125,9 +123,7 @@ $colour_toolboxSelected: $black;
     .blocklyWidgetDiv {
         display: none;
         position: absolute;
-        z-index: 99999;
-
-        /* big value for bootstrap3 compatibility */
+        z-index: 99999; /* big value for bootstrap3 compatibility */
     }
 
     .blocklyNonSelectable {
@@ -190,9 +186,7 @@ $colour_toolboxSelected: $black;
         line-height: 1.5;
         letter-spacing: normal;
         position: absolute;
-        z-index: 100000;
-
-        /* big value for bootstrap3 compatibility */
+        z-index: 100000; /* big value for bootstrap3 compatibility */
     }
 
     .blocklyDropDownDiv {
@@ -795,12 +789,8 @@ drag a block and selected text moves instead.
         overflow-x: visible;
         overflow-y: auto;
         position: absolute;
-        z-index: 40;
-
-        /* so blocks go over toolbox when dragging */
-        -webkit-tap-highlight-color: transparent;
-
-        /* issue #1345 */
+        z-index: 40; /* so blocks go over toolbox when dragging */
+        -webkit-tap-highlight-color: transparent; /* issue #1345 */
     }
 
     .blocklyTreeRoot {
@@ -1044,37 +1034,6 @@ drag a block and selected text moves instead.
         height: 16px;
         y: 7;
         x: 2;
-    }
-
-    // Purple Theme for Blockly Workspace
-    .zelos-renderer.zelos_renderer-theme,
-    .flyout .zelos-renderer.classic-theme,
-    .gtm-search-results,
-    .load-strategy__container {
-        // Selected blocks with purple glow
-        .blocklySelected > .blocklyPath {
-            stroke: var(--brand-red-coral);
-            stroke-width: 3px;
-            filter: drop-shadow(0 0 8px rgb(124 58 237 / 60%));
-        }
-
-        // Highlighted connection with purple
-        .blocklyHighlightedConnectionPath {
-            stroke: var(--brand-red-coral);
-            stroke-width: 4px;
-        }
-
-        // Category labels with purple accent
-        .blocklyFlyoutLabelText {
-            fill: var(--brand-red-coral);
-            font-weight: bold;
-        }
-
-        // Toolbox selected with purple background
-        .blocklyToolboxCategory.blocklyTreeSelected {
-            background: var(--gradient-purple-primary) !important;
-            color: var(--brand-white) !important;
-        }
     }
 
     .header__title {

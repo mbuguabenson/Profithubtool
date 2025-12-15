@@ -224,11 +224,16 @@ const AppContent = observer(() => {
             // Set a maximum timeout to prevent infinite loading
             setTimeout(() => {
                 clearInterval(intervalId);
-                if (is_loading) {
-                    console.log('[Timeout] Active symbols loading timeout, showing dashboard');
+                if (is_loading && !isOnline) {
+                    console.log('[Timeout] Active symbols loading timeout, showing dashboard (Offline)');
+                    setIsLoading(false);
+                } else if (is_loading) {
+                    console.log('[Timeout] Active symbols loading timeout, but Online - continuing to wait...');
+                    // Don't force close if online, as we need symbols!
+                    // But if it's been 30s, maybe we must.
                     setIsLoading(false);
                 }
-            }, 10000); // 10 second timeout
+            }, 30000); // 30 second timeout
         }
     };
 
@@ -241,7 +246,7 @@ const AppContent = observer(() => {
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [is_api_initialized]);
+    }, [is_api_initialized, client.is_logged_in]);
 
     // use is_landing_company_loaded to know got details of accounts to identify should show an error or not
     React.useEffect(() => {
@@ -256,8 +261,8 @@ const AppContent = observer(() => {
         if (client) {
             initHotjar(client);
         }
-        // Previously enforced a minimum welcome screen duration; removed because WelcomeScreen is no longer used
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [client]);
 
     if (common?.error) return null;
 
@@ -294,7 +299,6 @@ const AppContent = observer(() => {
                     {/* <PWAInstallModalTest /> */}
                     <Audio />
                     <Main />
-                    <BotBuilder />
                     <BotStopped />
                     <TransactionDetailsModal />
                     <PWAInstallModal />

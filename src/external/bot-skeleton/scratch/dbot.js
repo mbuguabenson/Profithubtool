@@ -25,7 +25,13 @@ class DBot {
      * Initialises the workspace and mounts it to a container element (app_contents).
      */
     async initWorkspace(public_path, store, api_helpers_store, is_mobile, is_dark_mode) {
+        // Debug: starting to load Blockly
+        // eslint-disable-next-line no-console
+        console.log('[DEBUG] DBot.initWorkspace: calling loadBlockly');
         await loadBlockly(is_dark_mode);
+        // Debug: Blockly loaded
+        // eslint-disable-next-line no-console
+        console.log('[DEBUG] DBot.initWorkspace: loadBlockly resolved');
         const recent_files = await getSavedWorkspaces();
         this.interpreter = Interpreter();
 
@@ -96,7 +102,7 @@ class DBot {
             }
         };
 
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             __webpack_public_path__ = public_path; // eslint-disable-line no-global-assign
             ApiHelpers.setInstance(api_helpers_store);
             DBotStore.setInstance(store);
@@ -115,14 +121,21 @@ class DBot {
                     }
                 }
                 const el_scratch_div = document.getElementById('scratch_div');
+                // Debug: report whether scratch_div found
+                // eslint-disable-next-line no-console
+                console.log('[DEBUG] DBot.initWorkspace: scratch_div element', !!el_scratch_div);
                 if (!el_scratch_div) {
                     return;
                 }
 
+                // Debug: injecting Blockly workspace
+                // eslint-disable-next-line no-console
+                console.log('[DEBUG] DBot.initWorkspace: injecting Blockly into element', el_scratch_div);
                 this.workspace = window.Blockly.inject(el_scratch_div, {
                     media: 'assets/media/',
                     renderer: 'zelos',
-                    trashcan: !is_mobile,
+                    trashcan: false, // Disabled to avoid iframe access error
+                    sounds: false, // Disabled to avoid iframe access error
                     zoom: { wheel: true, startScale: workspaceScale },
                     scrollbars: true,
                     theme: window.Blockly.Themes.zelos_renderer,
@@ -146,6 +159,22 @@ class DBot {
                 });
 
                 window.Blockly.derivWorkspace = this.workspace;
+
+                // Debug: wrap Workspace.dispose to log calls and stack traces in dev
+                try {
+                    if (process.env.NODE_ENV !== 'production' && window.Blockly && window.Blockly.Workspace && !window.Blockly._deriv_dispose_wrapped) {
+                        const origDispose = window.Blockly.Workspace.prototype.dispose;
+                        window.Blockly.Workspace.prototype.dispose = function () {
+                            // eslint-disable-next-line no-console
+                            console.warn('[DEBUG] Blockly.Workspace.dispose called on workspace', this, new Error().stack);
+                            return origDispose.apply(this, arguments);
+                        };
+                        window.Blockly._deriv_dispose_wrapped = true;
+                    }
+                } catch (e) {
+                    // eslint-disable-next-line no-console
+                    console.error('[DEBUG] DBot.initWorkspace: failed to wrap dispose for debugging', e);
+                }
 
                 const varDB = new window.Blockly.Names('window');
                 varDB.variableMap = window.Blockly.derivWorkspace.getVariableMap();
@@ -176,10 +205,75 @@ class DBot {
 
                 const event_group = `dbot-load${Date.now()}`;
                 window.Blockly.Events.setGroup(event_group);
-                window.Blockly.Xml.domToWorkspace(
-                    window.Blockly.utils.xml.textToDom(window.Blockly.derivWorkspace.strategy_to_load),
-                    this.workspace
-                );
+
+                // Robust import: try bulk import with retries, then per-block fallback,
+                // and finally fall back to `main_xml` if saved xml consistently fails.
+                const importStrategy = async xmlString => {
+                    // Try a few quick retries in case of transient timing issues
+                    for (let attempt = 0; attempt < 3; attempt++) {
+                        try {
+                            window.Blockly.Xml.domToWorkspace(
+                                window.Blockly.utils.xml.textToDom(xmlString),
+                                this.workspace
+                            );
+                            return true;
+                        } catch (err) {
+                            // eslint-disable-next-line no-console
+                            console.warn(
+                                '[WARN] DBot.initWorkspace: domToWorkspace attempt',
+                                attempt + 1,
+                                'failed',
+                                err
+                            );
+                            // small backoff
+                            // eslint-disable-next-line no-await-in-loop
+                            await new Promise(r => setTimeout(r, 50));
+                        }
+                    }
+
+                    // Bulk import failed: try per-block import to skip bad blocks
+                    try {
+                        const xml = window.Blockly.utils.xml.textToDom(xmlString);
+                        const blocks = xml.querySelectorAll('block');
+                        Array.from(blocks).forEach(block_node => {
+                            try {
+                                window.Blockly.Xml.domToBlock(block_node, this.workspace);
+                            } catch (blockErr) {
+                                // eslint-disable-next-line no-console
+                                console.error(
+                                    '[ERROR] DBot.initWorkspace: failed to import block',
+                                    block_node?.getAttribute?.('type'),
+                                    blockErr
+                                );
+                            }
+                        });
+                        return true;
+                    } catch (fallbackErr) {
+                        // eslint-disable-next-line no-console
+                        console.error('[ERROR] DBot.initWorkspace: per-block fallback also failed', fallbackErr);
+                        return false;
+                    }
+                };
+
+                // Ensure executor can use await
+                try {
+                    const xml_to_load = window.Blockly.derivWorkspace.strategy_to_load;
+                    let imported = await importStrategy(xml_to_load);
+                    if (!imported && xml_to_load !== main_xml) {
+                        // Try a safe known-good fallback (main_xml)
+                        // eslint-disable-next-line no-console
+                        console.warn('[WARN] DBot.initWorkspace: failed to import saved xml; attempting main_xml fallback');
+                        imported = await importStrategy(main_xml);
+                    }
+                    if (!imported) {
+                        // At this point we failed to import anything; log and continue with empty workspace
+                        // eslint-disable-next-line no-console
+                        console.error('[ERROR] DBot.initWorkspace: unable to import any blocks; workspace will be empty');
+                    }
+                } catch (err) {
+                    // eslint-disable-next-line no-console
+                    console.error('[ERROR] DBot.initWorkspace: unexpected error during import', err);
+                }
                 const { save_modal } = DBotStore.instance;
 
                 save_modal.updateBotName(file_name);
@@ -187,6 +281,9 @@ class DBot {
                 this.workspace.clearUndo();
 
                 window.dispatchEvent(new Event('resize'));
+                // Debug: injection completed
+                // eslint-disable-next-line no-console
+                console.log('[DEBUG] DBot.initWorkspace: injection completed, workspace assigned', !!this.workspace);
                 window.addEventListener('dragover', DBot.handleDragOver);
                 window.addEventListener('drop', e => DBot.handleDropOver(e, handleFileChange));
                 // disable overflow

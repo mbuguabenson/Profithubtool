@@ -406,7 +406,7 @@
             }
 
             &__images {
-                background: $card-glass-light; // Light mode default
+                background: var(--general-section-1); // Revert to solid color
                 border-radius: 20px;
                 padding: 2.4rem;
                 margin-bottom: 1.6rem;
@@ -416,20 +416,19 @@
                 align-items: center;
                 justify-content: center;
                 box-shadow: $card-shadow-light;
-                backdrop-filter: blur(16px);
                 transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-                border: 1px solid rgb(255 255 255 / 20%);
+                border: 1px solid var(--border-normal);
 
                 @at-root .theme--dark & {
-                    background: $card-glass-dark;
+                    background: var(--general-section-1);
                     box-shadow: $card-shadow-dark;
-                    border: 1px solid rgb(255 255 255 / 5%);
+                    border: 1px solid var(--border-normal);
                 }
 
                 &:hover {
                     transform: translateY(-5px) scale(1.02);
                     box-shadow: $card-shadow-hover;
-                    border-color: rgb(0 198 255 / 40%);
+                    border-color: var(--border-active);
                 }
 
                 &:active {

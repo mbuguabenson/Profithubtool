@@ -49,11 +49,15 @@ export default class RootStore {
     public client: ClientStore;
     public common: CommonStore;
 
-    core = {
-        ui: {},
-        client: {},
-        common: {},
-    };
+    public core: {
+        ui: UiStore;
+        client: ClientStore;
+        common: CommonStore;
+    } = {
+            ui: {} as UiStore,
+            client: {} as ClientStore,
+            common: {} as CommonStore,
+        };
 
     constructor(dbot: unknown) {
         this.dbot = dbot;
@@ -62,9 +66,11 @@ export default class RootStore {
         this.ui = new UiStore();
         this.client = new ClientStore();
         this.common = new CommonStore();
-        this.core.ui = this.ui;
-        this.core.client = this.client;
-        this.core.common = this.common;
+        this.core = {
+            ui: this.ui,
+            client: this.client,
+            common: this.common,
+        };
 
         this.app = new AppStore(this, this.core);
         this.summary_card = new SummaryCardStore(this, this.core);

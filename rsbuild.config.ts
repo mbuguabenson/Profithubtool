@@ -18,7 +18,7 @@ export default defineConfig({
             exclude: /node_modules/,
         }),
         pluginReact(),
-        pluginBasicSsl(),
+        // pluginBasicSsl(), // Disabled to use HTTP and avoid antivirus interference
     ],
     source: {
         entry: {
@@ -68,6 +68,8 @@ export default defineConfig({
             { from: 'node_modules/@deriv/deriv-charts/dist/chart/assets/*', to: 'assets/[name][ext]' },
             { from: 'node_modules/@deriv/deriv-charts/dist/chart/assets/fonts/*', to: 'assets/fonts/[name][ext]' },
             { from: 'node_modules/@deriv/deriv-charts/dist/chart/assets/shaders/*', to: 'assets/shaders/[name][ext]' },
+            // Add Blockly media copy
+            { from: 'node_modules/blockly/media/*', to: 'assets/media/[name][ext]' },
             { from: path.join(__dirname, 'public') },
         ],
         // Ensure service worker is not cached by the browser
@@ -90,6 +92,13 @@ export default defineConfig({
         headers: {
             'Cross-Origin-Opener-Policy': 'unsafe-none',
             'Cross-Origin-Embedder-Policy': 'unsafe-none',
+        },
+        proxy: {
+            '/oauth2': {
+                target: 'https://oauth.deriv.com',
+                changeOrigin: true,
+                secure: false,
+            },
         },
     },
     dev: {

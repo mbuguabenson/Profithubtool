@@ -118,7 +118,9 @@ const useTMB = (): UseTMBReturn => {
 
             const hostname = window.location.hostname;
             let sessionsUrl = 'https://oauth.deriv.com/oauth2/sessions/active';
-            if (hostname.includes('.deriv.me')) {
+            if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.includes('localhost')) {
+                sessionsUrl = '/oauth2/sessions/active';
+            } else if (hostname.includes('.deriv.me')) {
                 sessionsUrl = 'https://oauth.deriv.me/oauth2/sessions/active';
             } else if (hostname.includes('.deriv.be')) {
                 sessionsUrl = 'https://oauth.deriv.be/oauth2/sessions/active';

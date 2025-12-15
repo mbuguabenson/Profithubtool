@@ -1,5 +1,5 @@
 // Bot strategy metadata and categorization
-export type BotType = 'normal' | 'automatic';
+export type BotType = 'normal' | 'automatic' | 'hybrid';
 
 export interface BotStrategy {
     id: string;
@@ -55,6 +55,23 @@ export const BOT_STRATEGIES: BotStrategy[] = [
         xmlPath: 'Automatic/OVER UNDER AUTOMATIC X .xml',
     },
 
+    // Hybrid Bots (New)
+    {
+        id: 'hybrid-bot-1',
+        name: 'Hybrid Bot 1',
+        description: 'A hybrid strategy combining automatic entry with manual exit',
+        type: 'hybrid',
+        xmlPath: 'Hybridbots/Hybrid Bot 1.xml',
+    },
+    {
+        id: 'hybrid-bot-2',
+        name: 'Hybrid Bot 2',
+        description: 'Experimental hybrid strategy for trend following',
+        type: 'hybrid',
+        xmlPath: 'Hybridbots/Hybrid Bot 2.xml',
+    },
+
+
     // Normal Bots (3) - Require manual oversight and parameter tuning
     {
         id: 'profit-hub-pro',
@@ -82,4 +99,5 @@ export const BOT_STRATEGIES: BotStrategy[] = [
 // Helper functions
 export const getNormalBots = (): BotStrategy[] => BOT_STRATEGIES.filter(bot => bot.type === 'normal');
 export const getAutomaticBots = (): BotStrategy[] => BOT_STRATEGIES.filter(bot => bot.type === 'automatic');
+export const getHybridBots = (): BotStrategy[] => BOT_STRATEGIES.filter(bot => bot.type === 'hybrid');
 export const getBotById = (id: string): BotStrategy | undefined => BOT_STRATEGIES.find(bot => bot.id === id);

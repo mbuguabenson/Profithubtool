@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite';
 import BotCard from '@/components/bot-card/bot-card';
 import RobotIcon from '@/components/shared/icons/robot-icon';
 import { DBOT_TABS } from '@/constants/bot-contents';
-import { BotStrategy, getAutomaticBots, getNormalBots } from '@/constants/bot-strategies';
+import { BotStrategy, getAutomaticBots, getHybridBots, getNormalBots } from '@/constants/bot-strategies';
 import { useStore } from '@/hooks/useStore';
 import { localize } from '@deriv-com/translations';
 import './bots.scss';
@@ -31,6 +31,9 @@ const Bots = observer(() => {
                 timestamp: Date.now(),
             });
 
+            // Close the load modal if it's open (to prevent "double screen" issues)
+            load_modal.toggleLoadModal(false);
+
             // Switch to Bot Builder tab to show the loaded bot
             setActiveTab(DBOT_TABS.BOT_BUILDER);
         } catch (error) {
@@ -40,6 +43,7 @@ const Bots = observer(() => {
 
     const normalBots = getNormalBots();
     const automaticBots = getAutomaticBots();
+    const hybridBots = getHybridBots();
 
     return (
         <div className='bots-page'>
@@ -68,6 +72,24 @@ const Bots = observer(() => {
                 </div>
                 <div className='bots-page__grid'>
                     {automaticBots.map(bot => (
+                        <BotCard key={bot.id} bot={bot} onLoad={handleLoadBot} />
+                    ))}
+                </div>
+            </section>
+
+            {/* Hybrid Bots Section */}
+            <section className='bots-page__section'>
+                <div className='bots-page__section-header bots-page__section-header--hybrid'>
+                    <div className='bots-page__section-title-wrapper'>
+                        <h2 className='bots-page__section-title'>{localize('Hybrid Bots')}</h2>
+                        <span className='bots-page__section-count'>{hybridBots.length}</span>
+                    </div>
+                    <p className='bots-page__section-description'>
+                        {localize('Semi-automated strategies leveraging green signals for optimal entry points')}
+                    </p>
+                </div>
+                <div className='bots-page__grid'>
+                    {hybridBots.map(bot => (
                         <BotCard key={bot.id} bot={bot} onLoad={handleLoadBot} />
                     ))}
                 </div>

@@ -8,19 +8,18 @@ import MobileFullPageModal from '@/components/shared_ui/mobile-full-page-modal';
 import Text from '@/components/shared_ui/text';
 import { DBOT_TABS } from '@/constants/bot-contents';
 import { useStore } from '@/hooks/useStore';
-// import {
-//     DerivLightBotBuilderIcon,
-//     DerivLightGoogleDriveIcon,
-//     DerivLightLocalDeviceIcon,
-//     DerivLightMyComputerIcon,
-//     DerivLightQuickStrategyIcon,
-// } from '@deriv/quill-icons/Illustration';
+import {
+    DerivLightBotBuilderIcon,
+    DerivLightGoogleDriveIcon,
+    DerivLightLocalDeviceIcon,
+    DerivLightMyComputerIcon,
+    DerivLightQuickStrategyIcon,
+} from '@deriv/quill-icons/Illustration';
 import { Localize, localize } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
 import { rudderStackSendOpenEvent } from '../../analytics/rudderstack-common-events';
 import { rudderStackSendDashboardClickEvent } from '../../analytics/rudderstack-dashboard';
 import DashboardBotList from './bot-list/dashboard-bot-list';
-import { NeonBotBuilderIcon, NeonComputerIcon, NeonDriveIcon, NeonQuickStrategyIcon } from './new-card-icons';
 
 type TCardProps = {
     has_dashboard_strategies: boolean;
@@ -56,7 +55,11 @@ const Cards = observer(({ is_mobile, has_dashboard_strategies }: TCardProps) => 
     const actions: TCardArray[] = [
         {
             id: 'my-computer',
-            icon: is_mobile ? <NeonComputerIcon width={48} height={48} /> : <NeonComputerIcon width={64} height={64} />,
+            icon: is_mobile ? (
+                <DerivLightLocalDeviceIcon height='48px' width='48px' />
+            ) : (
+                <DerivLightMyComputerIcon height='48px' width='48px' />
+            ),
             content: is_mobile ? <Localize i18n_default_text='Local' /> : <Localize i18n_default_text='My computer' />,
             callback: () => {
                 openFileLoader();
@@ -65,12 +68,12 @@ const Cards = observer(({ is_mobile, has_dashboard_strategies }: TCardProps) => 
                     subform_source: 'dashboard',
                     subform_name: 'load_strategy',
                     load_strategy_tab: 'local',
-                } as any);
+                });
             },
         },
         {
             id: 'google-drive',
-            icon: <NeonDriveIcon width={64} height={64} />,
+            icon: <DerivLightGoogleDriveIcon height='48px' width='48px' />,
             content: <Localize i18n_default_text='Google Drive' />,
             callback: () => {
                 openGoogleDriveDialog();
@@ -79,24 +82,24 @@ const Cards = observer(({ is_mobile, has_dashboard_strategies }: TCardProps) => 
                     subform_source: 'dashboard',
                     subform_name: 'load_strategy',
                     load_strategy_tab: 'google drive',
-                } as any);
+                });
             },
         },
         {
             id: 'bot-builder',
-            icon: <NeonBotBuilderIcon width={64} height={64} />,
+            icon: <DerivLightBotBuilderIcon height='48px' width='48px' />,
             content: <Localize i18n_default_text='Bot builder' />,
             callback: () => {
                 setActiveTab(DBOT_TABS.BOT_BUILDER);
                 rudderStackSendDashboardClickEvent({
                     dashboard_click_name: 'bot_builder',
                     subpage_name: 'bot_builder',
-                } as any);
+                });
             },
         },
         {
             id: 'quick-strategy',
-            icon: <NeonQuickStrategyIcon width={64} height={64} />,
+            icon: <DerivLightQuickStrategyIcon height='48px' width='48px' />,
             content: <Localize i18n_default_text='Quick strategy' />,
             callback: () => {
                 setActiveTab(DBOT_TABS.BOT_BUILDER);
@@ -105,7 +108,7 @@ const Cards = observer(({ is_mobile, has_dashboard_strategies }: TCardProps) => 
                     subpage_name: 'bot_builder',
                     subform_source: 'dashboard',
                     subform_name: 'quick_strategy',
-                } as any);
+                });
             },
         },
     ];
@@ -136,6 +139,9 @@ const Cards = observer(({ is_mobile, has_dashboard_strategies }: TCardProps) => 
                                     className={classNames('tab__dashboard__table__images', {
                                         'tab__dashboard__table__images--minimized': has_dashboard_strategies,
                                     })}
+                                    width='8rem'
+                                    height='8rem'
+                                    icon={icon}
                                     id={id}
                                     onClick={() => {
                                         callback();
@@ -171,6 +177,7 @@ const Cards = observer(({ is_mobile, has_dashboard_strategies }: TCardProps) => 
                                 onCloseDialog();
                             }}
                             height_offset='80px'
+                            page_overlay
                         >
                             <div label='Google Drive' className='google-drive-label'>
                                 <GoogleDrive />

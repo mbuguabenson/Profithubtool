@@ -136,4 +136,40 @@
             }
         }
     }
+
+    // ==========================================
+    // HYBRID BOTS (Green/Nature Theme)
+    // ==========================================
+    &--hybrid {
+        background: linear-gradient(145deg, rgba(40, 199, 111, 0.05), rgba(0, 0, 0, 0.4));
+        border-color: rgba(40, 199, 111, 0.3);
+
+        .bot-row__icon-container {
+            background: var(--gradient-green-primary); // Using the defined variable
+            box-shadow: 0 4px 15px rgba(40, 199, 111, 0.4);
+        }
+
+        .bot-row__button {
+            background: var(--gradient-green-primary);
+            box-shadow: 0 4px 15px rgba(40, 199, 111, 0.3);
+
+            &:hover {
+                box-shadow: 0 0 20px rgba(40, 199, 111, 0.6);
+                transform: scale(1.02);
+            }
+        }
+
+        &:hover {
+            transform: translateY(-5px);
+            border-color: #28c76f;
+            box-shadow:
+                0 0 30px rgba(40, 199, 111, 0.2),
+                inset 0 0 20px rgba(40, 199, 111, 0.05);
+
+            .bot-row__icon-container {
+                transform: scale(1.1) rotate(5deg);
+                box-shadow: 0 0 25px rgba(40, 199, 111, 0.6);
+            }
+        }
+    }
 }

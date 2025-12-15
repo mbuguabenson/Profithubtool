@@ -1,0 +1,37 @@
+<xml xmlns="http://www.w3.org/1999/xhtml" collection="false">
+  <block type="trade_definition" x="0" y="0">
+    <statement name="TRADE_OPTIONS">
+      <block type="trade_definition_market" id="market" movable="false">
+        <field name="MARKET_LIST">synthetic_index</field>
+        <field name="SUBMARKET_LIST">random_index</field>
+        <field name="SYMBOL_LIST">1HZ10V</field>
+        <next>
+            <block type="trade_definition_tradetype" id="tradetype" movable="false">
+                <field name="TRADETYPECAT_LIST">callput</field>
+                <field name="TRADETYPE_LIST">risefall</field>
+                <next>
+                    <block type="trade_definition_contracttype" id="contracttype" movable="false">
+                        <field name="TYPE_LIST">both</field>
+                        <next>
+                            <block type="trade_definition_candleinterval" id="candleinterval" movable="false">
+                                <field name="CANDLEINTERVAL_LIST">60</field>
+                                <next>
+                                    <block type="trade_definition_restartbuysell" id="restartbuysell" movable="false">
+                                        <field name="TIME_MACHINE_ENABLED">FALSE</field>
+                                        <next>
+                                            <block type="trade_definition_restartonerror" id="restartonerror" movable="false">
+                                                <field name="RESTARTONERROR">TRUE</field>
+                                            </block>
+                                        </next>
+                                    </block>
+                                </next>
+                            </block>
+                        </next>
+                    </block>
+                </next>
+            </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

@@ -32,9 +32,9 @@ window.Blockly.Blocks.logic_ternary = {
             inputsInline: true,
             output: null,
             outputShape: window.Blockly.OUTPUT_SHAPE_ROUND,
-            colour: window.Blockly.Colours.Base.colour,
-            colourSecondary: window.Blockly.Colours.Base.colourSecondary,
-            colourTertiary: window.Blockly.Colours.Base.colourTertiary,
+            colour: window.Blockly.Colours.Special1.colour,
+            colourSecondary: window.Blockly.Colours.Special1.colourSecondary,
+            colourTertiary: window.Blockly.Colours.Special1.colourTertiary,
             tooltip: localize(
                 'This block tests if a given value is true or false and returns “True” or “False” accordingly.'
             ),

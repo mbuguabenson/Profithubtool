@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import { action, makeObservable, reaction, when } from 'mobx';
+import { action, makeObservable, observable, reaction, when } from 'mobx';
 import { BOT_RESTRICTED_COUNTRIES_LIST } from '@/components/layout/header/utils';
 import {
     ContentFlag,
@@ -36,6 +36,7 @@ export default class AppStore {
             setDBotEngineStores: action,
             onClickOutsideBlockly: action,
             showDigitalOptionsMaltainvestError: action,
+            dbot_store: observable.ref,
         });
 
         this.root_store = root_store;
@@ -173,13 +174,30 @@ export default class AppStore {
             }
         }, 10000);
 
-        if (!this.dbot_store) return;
-
-        blockly_store.setLoading(true);
-        await DBot.initWorkspace('/', this.dbot_store, this.api_helpers_store, ui.is_mobile, false);
-
-        blockly_store.setContainerSize();
-        blockly_store.setLoading(false);
+        // Wait for dbot_store to be initialized before initializing workspace
+        when(
+            () => !!this.dbot_store,
+            async () => {
+                // Debug: trace DBot init start
+                // eslint-disable-next-line no-console
+                console.log('[DEBUG] AppStore.onMount: starting DBot.initWorkspace');
+                blockly_store.setLoading(true);
+                try {
+                    await DBot.initWorkspace('/', this.dbot_store, this.api_helpers_store, ui.is_mobile, false);
+                    // Debug: init succeeded
+                    // eslint-disable-next-line no-console
+                    console.log('[DEBUG] AppStore.onMount: DBot.initWorkspace resolved');
+                } catch (err) {
+                    // Ensure errors during workspace init, don't leave the UI in a permanent loading state
+                    // eslint-disable-next-line no-console
+                    console.error('DBot.initWorkspace failed:', err);
+                } finally {
+                    blockly_store.setContainerSize();
+                    blockly_store.setLoading(false);
+                }
+            },
+            { timeout: 5000, onError: () => console.error('AppStore.onMount: dbot_store initialization timed out') }
+        );
 
         this.registerCurrencyReaction.call(this);
         this.registerOnAccountSwitch.call(this);
@@ -202,6 +220,9 @@ export default class AppStore {
     };
 
     onUnmount = () => {
+        // Debug: trace when AppStore.onUnmount is called
+        // eslint-disable-next-line no-console
+        console.warn('[DEBUG] AppStore.onUnmount called', new Error().stack);
         DBot.terminateBot();
         DBot.terminateConnection();
         if (window.Blockly?.derivWorkspace) {
@@ -351,7 +372,7 @@ export default class AppStore {
 
     onClickOutsideBlockly = (event: Event) => {
         if (document.querySelector('.injectionDiv')) {
-            const path = event.path || (event.composedPath && event.composedPath());
+            const path = (event as any).path || (event.composedPath && event.composedPath());
             const is_click_outside_blockly = !path.some(
                 (el: Element) => el.classList && el.classList.contains('injectionDiv')
             );

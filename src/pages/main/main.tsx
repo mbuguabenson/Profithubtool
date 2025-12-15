@@ -40,6 +40,7 @@ const Tutorial = lazy(() => import('../tutorials'));
 const ProAnalysis = lazy(() => import('../pro-analysis'));
 const Bots = lazy(() => import('../bots/bots'));
 const CopyTrading = lazy(() => import('../copy-trading/copy-trading'));
+const BotBuilder = lazy(() => import('../bot-builder'));
 
 const AppWrapper = observer(() => {
     const { connectionStatus } = useApiBase();
@@ -307,7 +308,11 @@ const AppWrapper = observer(() => {
                                     </>
                                 }
                                 id='id-bot-builder'
-                            />
+                            >
+                                <Suspense fallback={<ChunkLoader message={localize('Please wait, loading bot builder...')} />}>
+                                    <BotBuilder />
+                                </Suspense>
+                            </div>
                             <div
                                 label={
                                     <>

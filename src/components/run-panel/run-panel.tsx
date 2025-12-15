@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Journal from '@/components/journal';
 import SelfExclusion from '@/components/self-exclusion';
 import Button from '@/components/shared_ui/button';
@@ -21,9 +22,10 @@ import { useDevice } from '@deriv-com/ui';
 import ThemedScrollbars from '../shared_ui/themed-scrollbars';
 
 type TStatisticsTile = {
-    content: React.ElementType | string;
-    contentClassName: string;
+    content: React.ReactNode;
+    contentClassName?: string;
     title: string;
+    alignment?: 'top' | 'bottom';
 };
 
 type TStatisticsSummary = {
@@ -37,18 +39,19 @@ type TStatisticsSummary = {
     total_profit: number;
     won_contracts: number;
 };
+
+type TDrawerContent = TStatisticsSummary & {
+    active_index: number;
+    is_drawer_open: boolean;
+    active_tour: string;
+    setActiveTabIndex: (index: number) => void;
+};
+
 type TDrawerHeader = {
     is_clear_stat_disabled: boolean;
     is_mobile: boolean;
     is_drawer_open: boolean;
     onClearStatClick: () => void;
-};
-
-type TDrawerContent = {
-    active_index: number;
-    is_drawer_open: boolean;
-    active_tour: string;
-    setActiveTabIndex: () => void;
 };
 
 type TDrawerFooter = {
@@ -121,7 +124,6 @@ const DrawerHeader = ({ is_clear_stat_disabled, is_mobile, is_drawer_open, onCle
     is_mobile &&
     is_drawer_open && (
         <Button
-            id='db-run-panel__clear-button'
             className='run-panel__clear-button'
             disabled={is_clear_stat_disabled}
             text={localize('Reset')}
@@ -132,7 +134,15 @@ const DrawerHeader = ({ is_clear_stat_disabled, is_mobile, is_drawer_open, onCle
 
 const DrawerContent = ({ active_index, is_drawer_open, active_tour, setActiveTabIndex, ...props }: TDrawerContent) => {
     const { isDesktop } = useDevice();
-    // Use the useBlockScroll hook to prevent body scrolling when drawer is open on mobile
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    // Adapter for Tabs which expects history.replace/location (legacy compat)
+    const history = React.useMemo(() => ({
+        replace: (path: string) => navigate(path, { replace: true }),
+        push: (path: string) => navigate(path),
+        location
+    }), [navigate, location]);
 
     React.useEffect(() => {
         if (!isDesktop && is_drawer_open) {
@@ -148,7 +158,7 @@ const DrawerContent = ({ active_index, is_drawer_open, active_tour, setActiveTab
 
     return (
         <>
-            <Tabs active_index={active_index} onTabItemClick={setActiveTabIndex} top>
+            <Tabs active_index={active_index} onTabItemClick={setActiveTabIndex} top history={history}>
                 <div id='db-run-panel-tab__summary' label={<Localize i18n_default_text='Summary' />}>
                     <Summary is_drawer_open={is_drawer_open} />
                 </div>
@@ -167,7 +177,6 @@ const DrawerContent = ({ active_index, is_drawer_open, active_tour, setActiveTab
 const DrawerFooter = ({ is_clear_stat_disabled, onClearStatClick }: TDrawerFooter) => (
     <div className='run-panel__footer'>
         <Button
-            id='db-run-panel__clear-button'
             className='run-panel__footer-button'
             disabled={is_clear_stat_disabled}
             onClick={onClearStatClick}
@@ -270,7 +279,7 @@ const RunPanel = observer(() => {
     const { statistics } = transactions;
     const { active_tour, active_tab } = dashboard;
     const { total_payout, total_profit, total_stake, won_contracts, lost_contracts, number_of_runs } = statistics;
-    const { BOT_BUILDER, CHART } = DBOT_TABS;
+    const { BOT_BUILDER, CHART, BOTS, DASHBOARD, PRO_ANALYSIS, COPY_TRADING } = DBOT_TABS;
 
     React.useEffect(() => {
         onMount();
@@ -313,8 +322,11 @@ const RunPanel = observer(() => {
         />
     );
 
-    const show_run_panel = [BOT_BUILDER, CHART].includes(active_tab) || active_tour;
+    const show_run_panel = [BOT_BUILDER, CHART, BOTS, DASHBOARD, PRO_ANALYSIS, COPY_TRADING].includes(active_tab) || active_tour;
     if ((!show_run_panel && isDesktop) || active_tour === 'bot_builder') return null;
+
+    // Cast SelfExclusion to any to avoid strict prop type checking for JS component
+    const SelfExclusionComponent = SelfExclusion as any;
 
     return (
         <>
@@ -327,7 +339,7 @@ const RunPanel = observer(() => {
                     })}
                     contentClassName='run-panel__content'
                     header={header}
-                    footer={isDesktop && footer}
+                    footer={isDesktop ? footer : undefined}
                     is_open={is_drawer_open}
                     toggleDrawer={toggleDrawer}
                     width={366}
@@ -337,7 +349,7 @@ const RunPanel = observer(() => {
                 </Drawer>
                 {!isDesktop && <MobileDrawerFooter />}
             </div>
-            <SelfExclusion onRunButtonClick={onRunButtonClick} />
+            <SelfExclusionComponent onRunButtonClick={onRunButtonClick} />
             <StatisticsInfoModal
                 is_mobile={!isDesktop}
                 is_statistics_info_modal_open={is_statistics_info_modal_open}

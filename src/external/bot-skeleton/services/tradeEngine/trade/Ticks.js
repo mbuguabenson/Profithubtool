@@ -14,24 +14,28 @@ export default Engine =>
     class Ticks extends Engine {
         async watchTicks(symbol) {
             if (symbol && this.symbol !== symbol) {
-                this.symbol = symbol;
-                const { ticksService } = this.$scope;
+                try {
+                    this.symbol = symbol;
+                    const { ticksService } = this.$scope;
 
-                await ticksService.stopMonitor({
-                    symbol,
-                    key: tickListenerKey,
-                });
-                const callback = ticks => {
-                    if (this.is_proposal_subscription_required) {
-                        this.checkProposalReady();
-                    }
-                    const lastTick = ticks.slice(-1)[0];
-                    const { epoch } = lastTick;
-                    this.store.dispatch({ type: constants.NEW_TICK, payload: epoch });
-                };
+                    await ticksService.stopMonitor({
+                        symbol,
+                        key: tickListenerKey,
+                    });
+                    const callback = ticks => {
+                        if (this.is_proposal_subscription_required) {
+                            this.checkProposalReady();
+                        }
+                        const lastTick = ticks.slice(-1)[0];
+                        const { epoch } = lastTick;
+                        this.store.dispatch({ type: constants.NEW_TICK, payload: epoch });
+                    };
 
-                const key = await ticksService.monitor({ symbol, callback });
-                tickListenerKey = key;
+                    const key = await ticksService.monitor({ symbol, callback });
+                    tickListenerKey = key;
+                } catch (error) {
+                    globalObserver.emit('Error', error);
+                }
             }
         }
 
@@ -40,22 +44,24 @@ export default Engine =>
         }
 
         getTicks(toString = false) {
-            return new Promise(resolve => {
-                this.$scope.ticksService.request({ symbol: this.symbol }).then(ticks => {
-                    const ticks_list = ticks.map(tick => {
-                        if (toString) {
-                            return tick.quote.toFixed(this.getPipSize());
-                        }
-                        return tick.quote;
-                    });
-
-                    resolve(ticks_list);
-                });
+            return new Promise((resolve, reject) => {
+                this.$scope.ticksService
+                    .request({ symbol: this.symbol })
+                    .then(ticks => {
+                        const ticks_list = ticks.map(tick => {
+                            if (toString) {
+                                return tick.quote.toFixed(this.getPipSize());
+                            }
+                            return tick.quote;
+                        });
+                        resolve(ticks_list);
+                    })
+                    .catch(reject);
             });
         }
 
         getLastTick(raw, toString = false) {
-            return new Promise(resolve =>
+            return new Promise((resolve, reject) =>
                 this.$scope.ticksService
                     .request({ symbol: this.symbol })
                     .then(ticks => {
@@ -69,6 +75,8 @@ export default Engine =>
                         if (e.code === 'MarketIsClosed') {
                             globalObserver.emit('Error', e);
                             resolve(e.code);
+                        } else {
+                            reject(e);
                         }
                     })
             );
@@ -89,20 +97,22 @@ export default Engine =>
         }
 
         checkDirection(dir) {
-            return new Promise(resolve =>
+            return new Promise((resolve, reject) =>
                 this.$scope.ticksService
                     .request({ symbol: this.symbol })
                     .then(ticks => resolve(getDirection(ticks) === dir))
+                    .catch(reject)
             );
         }
 
         getOhlc(args) {
             const { granularity = this.options.candleInterval || 60, field } = args || {};
 
-            return new Promise(resolve =>
+            return new Promise((resolve, reject) =>
                 this.$scope.ticksService
                     .request({ symbol: this.symbol, granularity })
                     .then(ohlc => resolve(field ? ohlc.map(o => o[field]) : ohlc))
+                    .catch(reject)
             );
         }
 

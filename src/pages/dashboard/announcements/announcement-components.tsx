@@ -13,7 +13,7 @@ export const IconAnnounce = ({ announce }: { announce: boolean }) => (
 export const TitleAnnounce = ({ title, announce }: { title: string; announce: boolean }) => (
     <Text
         size='xs'
-        lineHeight='l'
+        line_height='l'
         weight={announce ? 'bold' : 'normal'}
         styles={!announce ? { color: 'var(--text-general)' } : {}}
     >
@@ -25,13 +25,13 @@ export const MessageAnnounce = ({ message, date, announce }: { message: string; 
     <>
         <Text
             size='xs'
-            lineHeight='m'
+            line_height='m'
             weight={announce ? 'normal' : 'lighter'}
             styles={!announce ? { color: 'var(--text-general)' } : {}}
         >
             {message}
         </Text>
-        <Text size='xxs' lineHeight='xl' styles={{ color: 'var(--text-primary)' }}>
+        <Text size='xxs' line_height='xl' styles={{ color: 'var(--text-primary)' }}>
             {date}
         </Text>
     </>

@@ -10,6 +10,7 @@ import ContractCardLoader from '../contract-card-loading';
 import { getCardLabels } from '../shared';
 import ContractCard from '../shared_ui/contract-card';
 import { TSummaryCardProps } from './summary-card.types';
+import RunnerIcon from '../shared/icons/runner-icon';
 
 const SummaryCard = observer(({ contract_info, is_contract_loading, is_bot_running }: TSummaryCardProps) => {
     const { summary_card, run_panel, ui, common } = useStore();
@@ -28,9 +29,9 @@ const SummaryCard = observer(({ contract_info, is_contract_loading, is_bot_runni
 
     const card_header = (
         <ContractCard.Header
-            contract_info={contract_info}
+            contract_info={contract_info as any}
             getCardLabels={getCardLabels}
-            getContractTypeDisplay={getContractTypeDisplay}
+            getContractTypeDisplay={getContractTypeDisplay as any}
             has_progress_slider={!is_multiplier}
             is_sold={is_contract_completed}
             server_time={server_time}
@@ -40,12 +41,12 @@ const SummaryCard = observer(({ contract_info, is_contract_loading, is_bot_runni
     const card_body = (
         <ContractCard.Body
             addToast={addToast}
-            contract_info={contract_info}
+            contract_info={contract_info as any}
             currency={contract_info?.currency ?? ''}
             current_focus={current_focus}
             error_message_alignment='left'
             getCardLabels={getCardLabels}
-            getContractById={() => summary_card}
+            getContractById={() => summary_card as any}
             is_mobile={!isDesktop}
             is_multiplier={is_multiplier}
             is_accumulator={is_accumulator}
@@ -58,11 +59,13 @@ const SummaryCard = observer(({ contract_info, is_contract_loading, is_bot_runni
 
     const card_footer = (
         <ContractCard.Footer
-            contract_info={contract_info}
+            contract_info={contract_info as any}
             getCardLabels={getCardLabels}
             is_multiplier={is_multiplier}
             is_sell_requested={is_sell_requested}
             onClickSell={onClickSell}
+            server_time={server_time}
+            onClickCancel={() => { }}
         />
     );
 
@@ -92,13 +95,13 @@ const SummaryCard = observer(({ contract_info, is_contract_loading, is_bot_runni
                     contract_info={contract_info}
                     getCardLabels={getCardLabels}
                     is_multiplier={is_multiplier}
-                    profit_loss={contract_info.profit}
+                    profit_loss={contract_info.profit ?? 0}
                     should_show_result_overlay={true}
                 >
                     <div
                         className={classNames('dc-contract-card', {
-                            'dc-contract-card--green': contract_info.profit > 0,
-                            'dc-contract-card--red': contract_info.profit < 0,
+                            'dc-contract-card--green': (contract_info.profit ?? 0) > 0,
+                            'dc-contract-card--red': (contract_info.profit ?? 0) < 0,
                         })}
                     >
                         {contract_el}
@@ -106,11 +109,14 @@ const SummaryCard = observer(({ contract_info, is_contract_loading, is_bot_runni
                 </ContractCard>
             )}
             {!is_contract_loading && !contract_info && !is_bot_running && (
-                <Text as='p' align='center' lineHeight='s' size='xs'>
-                    {localize('When you’re ready to trade, hit ')}
-                    <strong className='summary-panel-inactive__strong'>{localize('Run')}</strong>
-                    {localize('. You’ll be able to track your bot’s performance here.')}
-                </Text>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1.6rem' }}>
+                    <RunnerIcon width={96} height={96} fill="var(--text-general)" />
+                    <Text as='p' align='center' lineHeight='s' size='xs'>
+                        {localize('When you’re ready to trade, hit ')}
+                        <strong className='summary-panel-inactive__strong'>{localize('Run')}</strong>
+                        {localize('. You’ll be able to track your bot’s performance here.')}
+                    </Text>
+                </div>
             )}
         </div>
     );
