@@ -36,8 +36,19 @@ const BotBuilder = observer(() => {
     }, [onMount, onUnmount]);
 
     React.useEffect(() => {
-        if (active_tab === 1 && !is_preview_on_popup) {
-            window.dispatchEvent(new Event('resize'));
+        const workspace = window.Blockly?.derivWorkspace;
+        if (workspace) {
+            const is_visible = active_tab === 1 && !is_preview_on_popup;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (workspace as any).setVisible?.(is_visible);
+
+            if (is_visible) {
+                // Determine the correct resize event based on browser behavior
+                // Modern browsers might need a slight delay or specific event
+                setTimeout(() => {
+                    window.dispatchEvent(new Event('resize'));
+                }, 0);
+            }
         }
     }, [active_tab, is_preview_on_popup]);
 
