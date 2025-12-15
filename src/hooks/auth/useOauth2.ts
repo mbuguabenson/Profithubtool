@@ -19,7 +19,7 @@ import { Analytics } from '@deriv-com/analytics';
  * If `handleLogout` is not provided, the function will resolve immediately.
  *
  * @param {{ handleLogout?: () => Promise<void> }} [options] - An object with an optional `handleLogout` property.
- * @returns {{ oAuthLogout: () => Promise<void>; retriggerOAuth2Login: () => Promise<void>; isSingleLoggingIn: boolean }}
+ * @returns {{ oAuthLogout: () => Promise<void>; retriggerOAuth2Login: () => Promise<void>; isSingleLoggingIn: boolean; isOAuth2Enabled: boolean }}
  */
 export const useOauth2 = ({
     handleLogout,
@@ -68,5 +68,5 @@ export const useOauth2 = ({
         window.location.href = AuthManager.getLoginUrl(LocalStore.get('i18n') || 'en');
     };
 
-    return { oAuthLogout: logoutHandler, retriggerOAuth2Login, isSingleLoggingIn };
+    return { oAuthLogout: logoutHandler, retriggerOAuth2Login, isSingleLoggingIn, isOAuth2Enabled: true };
 };

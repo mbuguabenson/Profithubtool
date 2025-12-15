@@ -36,6 +36,12 @@ const BotBuilder = observer(() => {
     }, [onMount, onUnmount]);
 
     React.useEffect(() => {
+        if (active_tab === 1 && !is_preview_on_popup) {
+            window.dispatchEvent(new Event('resize'));
+        }
+    }, [active_tab, is_preview_on_popup]);
+
+    React.useEffect(() => {
         const workspace = window.Blockly?.derivWorkspace;
         if (workspace && is_running && !is_blockly_listener_registered.current) {
             is_blockly_listener_registered.current = true;
@@ -85,14 +91,17 @@ const BotBuilder = observer(() => {
         if (e.type === 'delete' && !is_reset_button_clicked) {
             deleted_block_id = e.blockId;
         }
-        if (e.type === 'selected' && deleted_block_id === e.oldElementId) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (e.type === 'selected' && deleted_block_id === (e as any).oldElementId) {
             handleBlockDeleteNotification();
             deleted_block_id = null;
         }
         if (
             e.type === 'change' &&
-            e.name === 'AMOUNT_LIMITS' &&
-            e.newValue === '(min: 0.35 - max: 50000)' &&
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (e as any).name === 'AMOUNT_LIMITS' &&
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (e as any).newValue === '(min: 0.35 - max: 50000)' &&
             is_reset_button_clicked
         ) {
             setResetButtonState(false);
@@ -114,7 +123,7 @@ const BotBuilder = observer(() => {
             <div
                 className={classNames('bot-builder', {
                     'bot-builder--active': active_tab === 1 && !is_preview_on_popup,
-                    'bot-builder--inactive': is_preview_on_popup,
+                    'bot-builder--inactive': is_preview_on_popup || active_tab !== 1, // Ensure inactive class is applied when not active
                     'bot-builder--tour-active': active_tour,
                 })}
             >

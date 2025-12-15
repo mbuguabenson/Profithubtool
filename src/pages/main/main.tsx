@@ -120,8 +120,8 @@ const AppWrapper = observer(() => {
                 threshold: 0.5, // set offset 0.1 means trigger if atleast 10% of element in viewport
             }
         );
-        observer_dashboard.observe(el_dashboard);
-        observer_tutorial.observe(el_tutorial);
+        if (el_dashboard) observer_dashboard.observe(el_dashboard);
+        if (el_tutorial) observer_tutorial.observe(el_tutorial);
     });
 
     React.useEffect(() => {
@@ -308,8 +308,11 @@ const AppWrapper = observer(() => {
                                     </>
                                 }
                                 id='id-bot-builder'
+                                data-keep-mounted
                             >
-                                <Suspense fallback={<ChunkLoader message={localize('Please wait, loading bot builder...')} />}>
+                                <Suspense
+                                    fallback={<ChunkLoader message={localize('Please wait, loading bot builder...')} />}
+                                >
                                     <BotBuilder />
                                 </Suspense>
                             </div>
@@ -436,12 +439,12 @@ const AppWrapper = observer(() => {
                 is_visible={is_dialog_open}
                 onCancel={onCancelButtonClick}
                 onClose={onCloseDialog}
-                onConfirm={onOkButtonClick || onCloseDialog}
+                onConfirm={onOkButtonClick || onCloseDialog || undefined}
                 portal_element_id='modal_root'
                 title={title}
                 login={handleLoginGeneration}
-                dismissable={dismissable} // Prevents closing on outside clicks
-                is_closed_on_cancel={is_closed_on_cancel}
+                dismissable={!!dismissable} // Prevents closing on outside clicks
+                is_closed_on_cancel={!!is_closed_on_cancel}
             >
                 {message}
             </Dialog>

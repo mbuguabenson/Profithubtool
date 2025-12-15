@@ -9,7 +9,7 @@ export default defineConfig({
     plugins: [
         pluginSass({
             sassLoaderOptions: {
-                sourceMap: true,
+                sourceMap: false,
                 sassOptions: {
                     // includePaths: [path.resolve(__dirname, 'src')],
                 },

@@ -24,7 +24,7 @@ type TTabsProps = {
     has_active_line?: boolean;
     has_bottom_line?: boolean;
     header_fit_content?: boolean;
-    history: any;
+    history?: any;
     icon_color?: string;
     icon_size?: number;
     is_100vw?: boolean;
@@ -65,7 +65,7 @@ const Tabs = ({
     const active_tab_ref = React.useRef<HTMLLIElement>(null);
     const tabs_wrapper_ref = React.useRef<HTMLUListElement>(null);
     const pushHash = (hash: string) => {
-        history.replace(`${history.location.pathname}${window.location.search}#${hash}`);
+        history?.replace(`${history.location.pathname}${window.location.search}#${hash}`);
     };
 
     const setActiveLineStyle = React.useCallback(() => {
@@ -222,10 +222,19 @@ const Tabs = ({
             >
                 {React.Children.map(children, (child, index) => {
                     if (!child) return null;
-                    if (index !== active_tab_index) {
-                        return undefined;
+                    const keep_mounted = child.props.keep_mounted || child.props['data-keep-mounted'];
+
+                    // If tab is active, render it
+                    if (index === active_tab_index) {
+                        return child.props.children;
                     }
-                    return child.props.children;
+
+                    // If tab is not active but should be kept mounted, render it hidden
+                    if (keep_mounted) {
+                        return <div style={{ display: 'none' }}>{child.props.children}</div>;
+                    }
+
+                    return null;
                 })}
             </div>
         </div>
