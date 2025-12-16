@@ -90,6 +90,12 @@ const BotBuilder = observer(() => {
             workspace.addChangeListener(handleBlockDelete);
         }
 
+        return () => {
+            if (workspace && is_blockly_delete_listener_registered.current) {
+                is_blockly_delete_listener_registered.current = false;
+                workspace.removeChangeListener(handleBlockDelete);
+            }
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [is_loading]);
 

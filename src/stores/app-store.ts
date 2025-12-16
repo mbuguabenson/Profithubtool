@@ -242,7 +242,11 @@ export default class AppStore {
         DBot.terminateConnection();
         if (window.Blockly?.derivWorkspace) {
             clearInterval(window.Blockly?.derivWorkspace.save_workspace_interval);
-            window.Blockly.derivWorkspace?.dispose();
+            try {
+                window.Blockly.derivWorkspace?.dispose();
+            } catch (e) {
+                console.warn('Blockly workspace dispose error:', e);
+            }
         }
         if (typeof this.disposeReloadOnLanguageChangeReaction === 'function') {
             (this.disposeReloadOnLanguageChangeReaction as () => void)();
