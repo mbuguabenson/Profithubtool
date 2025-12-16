@@ -1,7 +1,5 @@
 import { action, makeObservable, observable, runInAction } from 'mobx';
 import { api_base } from '@/external/bot-skeleton';
-import { observer as globalObserver } from '@/external/bot-skeleton/utils/observer';
-import { TAuthData } from '@/types/api-types';
 import RootStore from './root-store';
 
 export type TStrategyStatus = 'IDLE' | 'RUNNING' | 'BUYING' | 'WON' | 'LOST' | 'ERROR';
@@ -25,7 +23,7 @@ export type TStrategy = {
 export default class BulkTradeStore {
     root_store: RootStore;
     strategies: TStrategy[] = [];
-    active_symbols_subscriptions: Map<string, any> = new Map();
+    active_symbols_subscriptions: Map<string, { unsubscribe: () => void }> = new Map();
 
     constructor(root_store: RootStore) {
         makeObservable(this, {
@@ -93,7 +91,7 @@ export default class BulkTradeStore {
     subscribeToSymbol = (symbol: string) => {
         if (!this.active_symbols_subscriptions.has(symbol)) {
             // New subscription needed
-            const subscription = api_base.api.onMessage().subscribe(({ data }: { data: any }) => {
+            const subscription = api_base.api.onMessage().subscribe(({ data }: { data: { msg_type: string; tick: { quote: number, symbol: string } } }) => {
                 if (data.msg_type === 'tick' && data.tick.symbol === symbol) {
                     this.handleTick(symbol, data.tick);
                 }
@@ -121,7 +119,7 @@ export default class BulkTradeStore {
         }
     };
 
-    handleTick = (symbol: string, tick: any) => {
+    handleTick = (symbol: string, tick: { quote: number; symbol: string }) => {
         const quote = tick.quote;
         const last_digit = parseInt(quote.toFixed(this.getPipSize(symbol)).slice(-1));
 
@@ -136,7 +134,8 @@ export default class BulkTradeStore {
     };
 
     getPipSize = (symbol: string) => {
-        return api_base.pip_sizes[symbol] || 2;
+        const sizes = api_base.pip_sizes as Record<string, number> | undefined;
+        return sizes?.[symbol] || 2;
     };
 
     checkCondition = (strategy: TStrategy, last_digit: number) => {
@@ -181,12 +180,12 @@ export default class BulkTradeStore {
                 duration: strategy.duration,
                 duration_unit: strategy.duration_unit,
                 symbol: strategy.symbol,
-                ...(strategy.contract_type.startsWith('DIGIT') ? { barrier: strategy.parameter.toString() } : {}),
+                ...(strategy.contract_type.startsWith('DIGIT') ? { barrier: strategy.parameter.toString(), selected_tick: strategy.parameter } : {}),
             },
         };
 
         try {
-            const buy_response: any = await api_base.api.send(contract_request);
+            const buy_response: { error?: any; buy?: { contract_id: number } } = await api_base.api.send(contract_request);
             if (buy_response.error) {
                 console.error('Bulk Trade Error:', buy_response.error);
                 runInAction(() => {
@@ -195,11 +194,17 @@ export default class BulkTradeStore {
                 return;
             }
 
-            const contract_id = buy_response.buy.contract_id;
+            const contract_id = buy_response.buy?.contract_id;
+            if (!contract_id) {
+                 runInAction(() => {
+                    strategy.status = 'ERROR';
+                 });
+                 return;
+            }
             
             // Subscribe to contract proposal to get result
             // Or just Proposal Open Contract
-            const poc_subscription = api_base.api.onMessage().subscribe(({ data }: { data: any }) => {
+            const poc_subscription = api_base.api.onMessage().subscribe(({ data }: { data: { msg_type: string; proposal_open_contract: { contract_id: number; is_sold: boolean; profit: number } } }) => {
                 if (data.msg_type === 'proposal_open_contract' && data.proposal_open_contract.contract_id === contract_id) {
                     const contract = data.proposal_open_contract;
                     if (contract.is_sold) {

@@ -1,7 +1,5 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { useStore } from '@/hooks/useStore';
-import { runInAction } from 'mobx';
 import { TStrategy } from '@/stores/bulk-trade-store';
 
 const BulkTraderTab = observer(() => {
@@ -73,7 +71,7 @@ const BulkTraderTab = observer(() => {
                     <label>Type</label><br/>
                     <select 
                         value={newStrategy.contract_type} 
-                        onChange={(e) => setNewStrategy({...newStrategy, contract_type: e.target.value as any})}
+                        onChange={(e) => setNewStrategy({...newStrategy, contract_type: e.target.value as TStrategy['contract_type']})}
                         style={{ background: 'var(--general-main-1)', color: 'var(--text-general)', border: '1px solid var(--border-normal)', padding: '5px' }}
                     >
                         <option value="DIGITMATCH">Matches</option>
