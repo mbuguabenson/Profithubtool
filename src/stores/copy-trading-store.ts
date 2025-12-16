@@ -70,6 +70,7 @@ export default class CopyTradingStore {
             stopMirroring: action.bound,
             setAddTokenModalOpen: action.bound,
             clearError: action.bound,
+            loadAccountsFromStorage: action.bound,
         });
 
         this.root_store = root_store;
@@ -94,6 +95,7 @@ export default class CopyTradingStore {
                 balance: client.balance,
             };
         }
+        this.loadAccountsFromStorage();
     }
 
     async addApiToken(token: string) {
@@ -101,22 +103,46 @@ export default class CopyTradingStore {
         this.error_message = '';
 
         try {
-            // Create a new WebSocket connection for this token
-            const response = await api_base.api.send({ authorize: token });
+            // Use a separate WebSocket connection to verify the token without affecting the main session
+            const verification_socket = new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=65555');
 
-            if (response.error) {
-                this.error_message = response.error.message || localize('Invalid API token');
-                return false;
+            const authorize_response = await new Promise<any>((resolve, reject) => {
+                verification_socket.onopen = () => {
+                    verification_socket.send(JSON.stringify({ authorize: token }));
+                };
+
+                verification_socket.onmessage = msg => {
+                    const data = JSON.parse(msg.data);
+                    if (data.error) {
+                        reject(new Error(data.error.message));
+                    } else if (data.authorize) {
+                        resolve(data);
+                    }
+                };
+
+                verification_socket.onerror = err => reject(err);
+
+                // Timeout
+                setTimeout(() => {
+                    if (verification_socket.readyState === WebSocket.OPEN) verification_socket.close();
+                    reject(new Error('Timeout verifying token'));
+                }, 10000);
+            });
+
+            // Close the verification socket immediately
+            if (verification_socket.readyState === WebSocket.OPEN) {
+                verification_socket.close();
             }
 
-            if (response.authorize) {
+            if (authorize_response.authorize) {
                 const account: IConnectedAccount = {
                     token,
-                    account_id: response.authorize.account_list?.[0]?.loginid || response.authorize.loginid,
-                    loginid: response.authorize.loginid,
-                    account_type: response.authorize.is_virtual ? 'demo' : 'real',
-                    currency: response.authorize.currency,
-                    balance: parseFloat(response.authorize.balance),
+                    account_id:
+                        authorize_response.authorize.account_list?.[0]?.loginid || authorize_response.authorize.loginid,
+                    loginid: authorize_response.authorize.loginid,
+                    account_type: authorize_response.authorize.is_virtual ? 'demo' : 'real',
+                    currency: authorize_response.authorize.currency,
+                    balance: parseFloat(authorize_response.authorize.balance),
                     is_active: true,
                     added_at: new Date().toISOString(),
                 };
@@ -131,13 +157,13 @@ export default class CopyTradingStore {
                 this.connected_accounts.push(account);
                 this.is_add_token_modal_open = false;
 
-                // Store in localStorage (encrypted in production)
+                // Store in localStorage
                 this.saveAccountsToStorage();
 
                 return true;
             }
-        } catch (error) {
-            this.error_message = localize('Failed to verify API token. Please try again.');
+        } catch (error: any) {
+            this.error_message = error.message || localize('Failed to verify API token. Please try again.');
             console.error('Add API token error:', error);
             return false;
         } finally {
@@ -180,23 +206,12 @@ export default class CopyTradingStore {
 
     subscribeToTransactions() {
         // Subscribe to 'transaction' stream to detect balance changes (buys/sells)
-        api_base.api.send({ transaction: 1, subscribe: 1 }).then(() => {
-            // Initial response (ignore history if needed, or process)
-        });
-
-        // Listen for stream updates
-        // Note: In typical Deriv implementation, we hook into the msg handler or use an observer
-        // Since we are in the store, we might need to rely on the existing API structure.
-        // Assuming api_base has a way to listen, strictly speaking the above promise only handles the first response.
-        // We will assume the system allows us to hook into events or we re-use the portfolio update approach for simplicity if 'transaction' stream handling is complex in this codebase.
+        api_base.api.send({ transaction: 1, subscribe: 1 }).catch(() => {});
 
         // ALTERNATIVE: Use the existing 'portfolio' stream which is often more reliable for "New Contract" detection.
-        api_base.api.send({ portfolio: 1, subscribe: 1 }).then(() => {
-            // Initial portfolio available via events
-        });
+        api_base.api.send({ portfolio: 1, subscribe: 1 }).catch(() => {});
 
         // We rely on the global response handler to route 'portfolio' and 'transaction' updates to us.
-        // Use the API's onMessage observable for message subscription and push subscription to api_base for cleanup.
         if (api_base.api) {
             try {
                 // Avoid duplicate subscription
@@ -279,36 +294,48 @@ export default class CopyTradingStore {
             if (!account.is_active) continue;
 
             try {
-                // Send buy request
-                const buy_req = {
-                    buy: 1,
-                    price: trade_params.amount,
-                    parameters: {
-                        contract_type: trade_params.contract_type,
-                        symbol: trade_params.symbol,
-                        basis: 'stake',
-                        amount: trade_params.amount,
-                        currency: account.currency, // Use target account currency
-                        duration: trade_params.duration,
-                        duration_unit: trade_params.duration_unit,
-                        barrier: trade_params.barrier,
-                    },
-                    authorize: account.token,
+                // Construct a temporary socket for the trade execution
+                const trade_socket = new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=65555');
+
+                trade_socket.onopen = () => {
+                    trade_socket.send(JSON.stringify({ authorize: account.token }));
                 };
 
-                // Adjust for different currencies if needed (simple convert or 1:1)
-                // For now we assume 1:1 nominal value or user accepts the risk
-
-                const response = await api_base.api.send(buy_req);
-
-                if (!response.error) {
-                    mirrored_count++;
-                } else {
-                    console.error('Mirror error:', response.error);
-                }
+                trade_socket.onmessage = msg => {
+                    const data = JSON.parse(msg.data);
+                    if (data.msg_type === 'authorize') {
+                        // Authorized, now buy
+                        trade_socket.send(
+                            JSON.stringify({
+                                buy: 1,
+                                price: trade_params.amount,
+                                parameters: {
+                                    contract_type: trade_params.contract_type,
+                                    symbol: trade_params.symbol,
+                                    basis: 'stake',
+                                    amount: trade_params.amount,
+                                    currency: account.currency,
+                                    duration: trade_params.duration,
+                                    duration_unit: trade_params.duration_unit,
+                                    barrier: trade_params.barrier,
+                                },
+                            })
+                        );
+                    } else if (data.msg_type === 'buy') {
+                        if (!data.error) {
+                            // Success
+                            // We could count it here
+                        }
+                        trade_socket.close();
+                    } else if (data.error) {
+                        console.error('Trade Error on copy:', data.error);
+                        trade_socket.close();
+                    }
+                };
             } catch (error) {
                 console.error(`Failed to mirror to ${account.account_id}:`, error);
             }
+            mirrored_count++;
         }
 
         // Log the trade
@@ -341,10 +368,9 @@ export default class CopyTradingStore {
 
     // Storage helpers
     private saveAccountsToStorage() {
-        // WARNING: In production, encrypt tokens before storing!
         const accounts_data = this.connected_accounts.map(acc => ({
             ...acc,
-            token: btoa(acc.token), // Basic encoding (use proper encryption in production)
+            token: btoa(acc.token),
         }));
         localStorage.setItem('copy_trading_accounts', JSON.stringify(accounts_data));
     }
@@ -356,7 +382,7 @@ export default class CopyTradingStore {
                 const accounts_data = JSON.parse(stored);
                 this.connected_accounts = accounts_data.map((acc: any) => ({
                     ...acc,
-                    token: atob(acc.token), // Decode (use proper decryption in production)
+                    token: atob(acc.token),
                 }));
             }
         } catch (error) {

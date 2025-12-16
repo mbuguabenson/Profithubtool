@@ -105,7 +105,7 @@ export default class LoadModalStore {
 
     recent_workspace: window.Blockly.WorkspaceSvg | null = null;
     local_workspace: window.Blockly.WorkspaceSvg | null = null;
-    drop_zone: unknown;
+    drop_zone: HTMLElement | null = null;
 
     active_index = 0;
     is_load_modal_open = false;
@@ -224,7 +224,7 @@ export default class LoadModalStore {
 
     onZoomInOutClick = (is_zoom_in: string): void => {
         if (this.preview_workspace) {
-            this.preview_workspace.zoomCenter(is_zoom_in ? 1 : -1);
+            (this.preview_workspace as any).zoomCenter(is_zoom_in ? 1 : -1);
         }
     };
 
@@ -254,8 +254,10 @@ export default class LoadModalStore {
 
     toggleLoadModal = (): void => {
         this.is_load_modal_open = !this.is_load_modal_open;
-        this.recent_workspace?.dispose();
-        this.recent_workspace = null;
+        if (this.recent_workspace) {
+            (this.recent_workspace as any).dispose();
+            this.recent_workspace = null;
+        }
         this.setLoadedLocalFile(null);
     };
 
@@ -375,14 +377,16 @@ export default class LoadModalStore {
             setTimeout(() => {
                 // Dispose of recent workspace when switching away from Recent tab.
                 // Process in next cycle so user doesn't have to wait.
-                this.recent_workspace?.dispose();
-                this.recent_workspace = null;
+                if (this.recent_workspace) {
+                    (this.recent_workspace as any).dispose();
+                    this.recent_workspace = null;
+                }
             });
         }
 
         if (this.tab_name === tabs_title.TAB_LOCAL) {
             if (!this.drop_zone) {
-                this.drop_zone = document.querySelector('load-strategy__local-dropzone-area');
+                this.drop_zone = document.querySelector('load-strategy__local-dropzone-area') as HTMLElement;
 
                 if (this.drop_zone) {
                     this.drop_zone.addEventListener('drop', event => this.handleFileChange(event, false));
@@ -393,8 +397,10 @@ export default class LoadModalStore {
         // Dispose of local workspace when switching away from Local tab.
         else if (this.local_workspace) {
             setTimeout(() => {
-                this.local_workspace?.dispose();
-                this.local_workspace = null;
+                if (this.local_workspace) {
+                    (this.local_workspace as any).dispose();
+                    this.local_workspace = null;
+                }
                 this.setLoadedLocalFile(null);
             }, 0);
         }
@@ -407,21 +413,29 @@ export default class LoadModalStore {
     };
 
     handleFileChange = (
-        event: React.MouseEvent | React.FormEvent<HTMLFormElement> | DragEvent,
+        event: React.MouseEvent | React.FormEvent<HTMLFormElement> | DragEvent | Event,
         is_body = true
     ): boolean => {
         this.imported_strategy_type = 'pending';
         this.upload_id = uuidv4();
-        let files;
+        let files: FileList | null = null;
         if (event.type === 'drop') {
             event.stopPropagation();
-            event.preventDefault();
-            ({ files } = event.dataTransfer as DragEvent);
+            event.preventDefault(); // Cast to DragEvent if needed in check
+            const dragEvent = event as DragEvent;
+            if (dragEvent.dataTransfer) {
+                files = dragEvent.dataTransfer.files;
+            }
         } else {
-            ({ files } = event.target);
+            const target = event.target as HTMLInputElement;
+            if (target) {
+                files = target.files;
+            }
         }
 
-        const [file] = files;
+        if (!files || files.length === 0) return false;
+
+        const [file] = Array.from(files);
 
         if (!is_body) {
             if (file.name.includes('xml')) {
@@ -432,7 +446,9 @@ export default class LoadModalStore {
             }
         }
         this.readFile(!is_body, event as DragEvent, file);
-        (event.target as HTMLInputElement).value = '';
+        if (event.target) {
+            (event.target as HTMLInputElement).value = '';
+        }
         return true;
     };
 
@@ -451,7 +467,7 @@ export default class LoadModalStore {
                 showIncompatibleStrategyDialog: false,
             };
             if (this.local_workspace) {
-                this.local_workspace.dispose();
+                (this.local_workspace as any).dispose();
                 this.local_workspace = null;
             }
             this.loadStrategyOnModalLocalPreview(load_options);
@@ -502,7 +518,7 @@ export default class LoadModalStore {
         });
     };
 
-    loadStrategyOnModalRecentPreview = async workspace_id => {
+    loadStrategyOnModalRecentPreview = async (workspace_id: string) => {
         this.setOpenButtonDisabled(true);
         if (this.recent_strategies.length === 0 || this.tab_name !== tabs_title.TAB_RECENT) return;
 
@@ -530,7 +546,7 @@ export default class LoadModalStore {
         this.setOpenButtonDisabled(false);
     };
 
-    loadStrategyOnModalLocalPreview = async load_options => {
+    loadStrategyOnModalLocalPreview = async (load_options: any) => {
         this.setOpenButtonDisabled(true);
         const injectWorkspace = { ...inject_workspace_options, theme: window?.Blockly?.Themes?.zelos_renderer };
 
@@ -547,6 +563,21 @@ export default class LoadModalStore {
         const upload_type = getStrategyType(load_options?.block_string ?? '');
         const result = await load({ ...load_options, show_snackbar: false });
         if (!result?.error) {
+            // Ensure xmlValues is populated for the 'Open' button to work
+            if (load_options.block_string) {
+                const dom = window.Blockly.utils.xml.textToDom(load_options.block_string);
+                const block_string = load_options.block_string;
+                const file_name = load_options.file_name;
+
+                window.Blockly.xmlValues = {
+                    ...window.Blockly.xmlValues,
+                    block_string,
+                    convertedDom: dom,
+                    file_name,
+                    from: save_types.LOCAL,
+                    strategy_id: '',
+                };
+            }
             rudderStackSendUploadStrategyStartEvent({ upload_provider: 'my_computer', upload_id: this.upload_id });
         } else if (result?.error) {
             rudderStackSendUploadStrategyFailedEvent({

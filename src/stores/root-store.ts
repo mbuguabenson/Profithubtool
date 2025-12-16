@@ -6,6 +6,7 @@ import CommonStore from './common-store';
 import CopyTradingStore from './copy-trading-store';
 import DashboardStore from './dashboard-store';
 import DataCollectionStore from './data-collection-store';
+import DigitAnalysisStore from './digit-analysis-store';
 import FlyoutHelpStore from './flyout-help-store';
 import FlyoutStore from './flyout-store';
 import GoogleDriveStore from './google-drive-store';
@@ -40,6 +41,7 @@ export default class RootStore {
     public self_exclusion: SelfExclusionStore;
     public dashboard: DashboardStore;
     public copy_trading: CopyTradingStore;
+    public digit_analysis: DigitAnalysisStore;
 
     public chart_store: ChartStore;
     public blockly_store: BlocklyStore;
@@ -54,10 +56,10 @@ export default class RootStore {
         client: ClientStore;
         common: CommonStore;
     } = {
-            ui: {} as UiStore,
-            client: {} as ClientStore,
-            common: {} as CommonStore,
-        };
+        ui: {} as UiStore,
+        client: {} as ClientStore,
+        common: {} as CommonStore,
+    };
 
     constructor(dbot: unknown) {
         this.dbot = dbot;
@@ -93,5 +95,6 @@ export default class RootStore {
         this.chart_store = new ChartStore(this);
         this.blockly_store = new BlocklyStore(this);
         this.data_collection_store = new DataCollectionStore(this, this.core);
+        this.digit_analysis = new DigitAnalysisStore(this);
     }
 }

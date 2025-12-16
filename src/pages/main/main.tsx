@@ -41,6 +41,8 @@ const ProAnalysis = lazy(() => import('../pro-analysis'));
 const Bots = lazy(() => import('../bots/bots'));
 const CopyTrading = lazy(() => import('../copy-trading/copy-trading'));
 const BotBuilder = lazy(() => import('../bot-builder'));
+const RiskManagement = lazy(() => import('../risk-management/risk-management'));
+const DigitsAnalysis = lazy(() => import('../digits-analysis/digits-analysis'));
 
 const AppWrapper = observer(() => {
     const { connectionStatus } = useApiBase();
@@ -72,7 +74,16 @@ const AppWrapper = observer(() => {
     const { clear } = summary_card;
     const { DASHBOARD, BOT_BUILDER } = DBOT_TABS;
     const init_render = React.useRef(true);
-    const hash = ['dashboard', 'bot_builder', 'chart', 'tutorial', 'pro_analysis', 'bots_list', 'copy_trading'];
+    const hash = [
+        'dashboard',
+        'bot_builder',
+        'chart',
+        'tutorial',
+        'pro_analysis',
+        'bots_list',
+        'copy_trading',
+        'risk_management',
+    ];
     const { isDesktop } = useDevice();
     const location = useLocation();
     const navigate = useNavigate();
@@ -415,6 +426,44 @@ const AppWrapper = observer(() => {
                                     }
                                 >
                                     <CopyTrading />
+                                </Suspense>
+                            </div>
+                            <div
+                                label={
+                                    <>
+                                        <LabelPairedChartLineCaptionRegularIcon
+                                            height='24px'
+                                            width='24px'
+                                            fill='var(--text-general)'
+                                        />
+                                        <Localize i18n_default_text='Risk Mgmt' />
+                                    </>
+                                }
+                                id='id-risk-management'
+                            >
+                                <Suspense
+                                    fallback={<ChunkLoader message={localize('Please wait, loading calculator...')} />}
+                                >
+                                    <RiskManagement />
+                                </Suspense>
+                            </div>
+                            <div
+                                label={
+                                    <>
+                                        <LabelPairedChartLineCaptionRegularIcon
+                                            height='24px'
+                                            width='24px'
+                                            fill='var(--text-general)'
+                                        />
+                                        <Localize i18n_default_text='Digits' />
+                                    </>
+                                }
+                                id='id-digits-analysis'
+                            >
+                                <Suspense
+                                    fallback={<ChunkLoader message={localize('Please wait, loading analytics...')} />}
+                                >
+                                    <DigitsAnalysis />
                                 </Suspense>
                             </div>
                         </Tabs>

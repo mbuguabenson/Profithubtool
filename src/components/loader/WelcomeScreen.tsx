@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AppLogo } from '@/components/layout/app-logo';
+import { LegacyDerivIcon } from '@deriv/quill-icons/Legacy';
 import './welcome-screen.scss';
 
 const STEPS = [
@@ -40,17 +40,26 @@ export default function WelcomeScreen() {
     return (
         <div className='welcome-screen'>
             <div className='welcome-screen__content-wrapper'>
-                <h1 className='welcome-screen__title'>Profit Hub</h1>
+                {/* <h1 className='welcome-screen__title'>Profit Hub</h1> */}{' '}
+                {/* Removing title if screenshot doesn't imply big title, but keeping it is safer for branding unless asked to remove. Screenshot has text at top. */}
                 <p className='welcome-screen__subtitle'>
                     Smart Analysis tools, High accuracy strategies, Signals, Advanced Trading Engines, Automation
                     <br />
                     Setting up your trading environment...
                 </p>
-
-                <div className='welcome-screen__steps-container'>
-                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.6rem' }}>
-                        <AppLogo />
+                {/* Progress Bar Section */}
+                <div className='welcome-screen__progress-container'>
+                    <div className='welcome-screen__progress-bar-wrapper'>
+                        <div className='welcome-screen__progress-bar' style={{ width: `${progress}%` }} />
                     </div>
+                    <div className='welcome-screen__percentage'>{Math.round(progress)}%</div>
+                </div>
+                <div className='welcome-screen__steps-container'>
+                    {/* <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.6rem' }}>
+                        <AppLogo />
+                    </div> */}
+                    {/* Screenshot doesn't show logo inside the steps box, usually. Keeping it out. */}
+
                     <h3 className='welcome-screen__steps-title'>Initialization Progress</h3>
                     {STEPS.map((step, index) => {
                         const isCompleted = index < currentStepIndex;
@@ -59,16 +68,18 @@ export default function WelcomeScreen() {
                         return (
                             <div
                                 key={step}
-                                className={`welcome-screen__step ${isActive ? 'welcome-screen__step--active' : ''} ${isCompleted ? 'welcome-screen__step--completed' : ''
-                                    }`}
+                                className={`welcome-screen__step ${isActive ? 'welcome-screen__step--active' : ''} ${
+                                    isCompleted ? 'welcome-screen__step--completed' : ''
+                                }`}
                             >
                                 <div className='welcome-screen__step-icon' />
                                 <span className='welcome-screen__step-text'>{step}</span>
+                                {isCompleted && <span className='welcome-screen__step-check'>✓</span>}
+                                {isActive && <span className='welcome-screen__step-loading'>Loading...</span>}
                             </div>
                         );
                     })}
                 </div>
-
                 <div className='welcome-screen__footer'>
                     <h3>Contact & Support</h3>
                     <div className='welcome-screen__footer-content'>
@@ -82,6 +93,11 @@ export default function WelcomeScreen() {
                         </div>
                     </div>
                     <div className='welcome-screen__support-text'>24/7 Support Available</div>
+                </div>
+                <div className='welcome-screen__powered-by'>
+                    <span>Powered by</span>
+                    <LegacyDerivIcon iconSize='sm' fill='var(--text-prominent)' />
+                    <span style={{ fontWeight: 700, marginLeft: '4px' }}>DERIV</span>
                 </div>
             </div>
         </div>
