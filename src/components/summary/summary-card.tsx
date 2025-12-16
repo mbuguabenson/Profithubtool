@@ -1,7 +1,9 @@
 import React from 'react';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
+import { TContractInfo, TContractStore } from '@/components/shared/utils/contract/contract-types';
 import Text from '@/components/shared_ui/text';
+import { TGetContractTypeDisplay } from '@/components/shared_ui/types/common.types';
 import { getContractTypeDisplay } from '@/constants/contract';
 import { useStore } from '@/hooks/useStore';
 import { localize } from '@deriv-com/translations';
@@ -29,10 +31,10 @@ const SummaryCard = observer(({ contract_info, is_contract_loading, is_bot_runni
 
     const card_header = (
         <ContractCard.Header
-            contract_info={contract_info as any}
+            contract_info={contract_info as TContractInfo}
             display_name={contract_info?.display_name ?? ''}
             getCardLabels={getCardLabels}
-            getContractTypeDisplay={getContractTypeDisplay as any}
+            getContractTypeDisplay={getContractTypeDisplay as unknown as TGetContractTypeDisplay}
             has_progress_slider={!is_multiplier}
             is_mobile={!isDesktop}
             is_sell_requested={is_sell_requested}
@@ -58,13 +60,13 @@ const SummaryCard = observer(({ contract_info, is_contract_loading, is_bot_runni
     const card_body = (
         <ContractCard.Body
             addToast={addToast}
-            contract_info={modified_contract_info as any}
-            contract_update={contract_info?.contract_update}
+            contract_info={modified_contract_info as TContractInfo}
+            contract_update={(contract_info as TContractInfo)?.contract_update}
             currency={modified_contract_info?.currency ?? ''}
             current_focus={current_focus}
             error_message_alignment='left'
             getCardLabels={getCardLabels}
-            getContractById={() => summary_card as any}
+            getContractById={() => summary_card as unknown as TContractStore}
             has_progress_slider={!is_multiplier}
             is_mobile={!isDesktop}
             is_multiplier={is_multiplier}
@@ -80,7 +82,7 @@ const SummaryCard = observer(({ contract_info, is_contract_loading, is_bot_runni
 
     const card_footer = (
         <ContractCard.Footer
-            contract_info={contract_info as any}
+            contract_info={contract_info as TContractInfo}
             getCardLabels={getCardLabels}
             is_multiplier={is_multiplier}
             is_sell_requested={is_sell_requested}
@@ -113,7 +115,7 @@ const SummaryCard = observer(({ contract_info, is_contract_loading, is_bot_runni
             {is_bot_running && <ContractCardLoader speed={2} contract_stage={contract_stage} />}
             {!is_contract_loading && contract_info && !is_bot_running && (
                 <ContractCard
-                    contract_info={modified_contract_info as any}
+                    contract_info={modified_contract_info as TContractInfo}
                     getCardLabels={getCardLabels}
                     is_multiplier={is_multiplier}
                     profit_loss={modified_contract_info?.profit ?? 0}

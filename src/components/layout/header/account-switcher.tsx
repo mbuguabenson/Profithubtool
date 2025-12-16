@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import { lazy, Suspense, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
 import { CurrencyIcon } from '@/components/currency/currency-icon';
 import { addComma, getDecimalPlaces } from '@/components/shared';
@@ -97,13 +96,18 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
 
     const modifiedAccountList = useMemo(() => {
         return accountList?.map(account => {
+            const rawBalance = client.all_accounts_balance?.accounts?.[account?.loginid]?.balance;
+            let displayBalance = rawBalance ?? 0;
+            let displayCurrency = account?.currency;
+
+            if (client.is_kes_enabled && client.kes_rate && !account?.is_virtual) {
+                displayBalance = (Number(rawBalance) || 0) * client.kes_rate;
+                displayCurrency = 'KES';
+            }
+
             return {
                 ...account,
-                balance: addComma(
-                    client.all_accounts_balance?.accounts?.[account?.loginid]?.balance?.toFixed(
-                        getDecimalPlaces(account.currency)
-                    ) ?? '0'
-                ),
+                balance: addComma(displayBalance?.toFixed(getDecimalPlaces(account.currency)) ?? '0'),
                 currencyLabel: account?.is_virtual
                     ? tabs_labels.demo
                     : (client.website_status?.currencies_config?.[account?.currency]?.name ?? account?.currency),
@@ -115,6 +119,8 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
                 ),
                 isVirtual: Boolean(account?.is_virtual),
                 isActive: account?.loginid === activeAccount?.loginid,
+                displayCurrency, // Pass this for potential usage if needed, but UI uses currency property usually
+                currency: displayCurrency, // Override currency for display
             };
         });
     }, [
@@ -122,17 +128,45 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
         client.all_accounts_balance?.accounts,
         client.website_status?.currencies_config,
         activeAccount?.loginid,
+        client.is_kes_enabled,
+        client.kes_rate,
     ]);
+
+    const effectiveActiveAccount = useMemo(() => {
+        if (!activeAccount) return activeAccount;
+        // activeAccount properties might be readonly or typed specifically.
+        // We create a shallow copy. The 'balance' property in activeAccount is likely a number or string.
+        // If we assumed it was number in calculation, we should convert it back to what UI expects.
+        // Given 'addComma' usage elsewhere, let's keep it consistent.
+        // However, useActiveAccount return type likely has balance as number.
+        // If we want to override it for display in the switcher button (if it uses this object),
+        // we might need to cast or ensure it matches.
+        // As safe bet, we cast to any to allow overriding for UI purposes.
+        const account = { ...activeAccount } as any;
+
+        if (client.is_kes_enabled && client.kes_rate && !account.is_virtual) {
+            const rawBalance = client.all_accounts_balance?.accounts?.[account.loginid]?.balance;
+            account.currency = 'KES';
+            // For the button display, it likely formats the balance.
+            // If account.balance is expected to be a number:
+            account.balance = (Number(rawBalance) || 0) * client.kes_rate;
+        }
+        return account;
+    }, [activeAccount, client.is_kes_enabled, client.kes_rate, client.all_accounts_balance]);
+
     const modifiedCRAccountList = useMemo(() => {
-        return modifiedAccountList?.filter(account => account?.loginid?.includes('CR')) ?? [];
+        return (modifiedAccountList?.filter(account => account?.loginid?.includes('CR')) ??
+            []) as unknown as TModifiedAccount[];
     }, [modifiedAccountList]);
 
     const modifiedMFAccountList = useMemo(() => {
-        return modifiedAccountList?.filter(account => account?.loginid?.includes('MF')) ?? [];
+        return (modifiedAccountList?.filter(account => account?.loginid?.includes('MF')) ??
+            []) as unknown as TModifiedAccount[];
     }, [modifiedAccountList]);
 
     const modifiedVRTCRAccountList = useMemo(() => {
-        return modifiedAccountList?.filter(account => account?.loginid?.includes('VRT')) ?? [];
+        return (modifiedAccountList?.filter(account => account?.loginid?.includes('VRT')) ??
+            []) as unknown as TModifiedAccount[];
     }, [modifiedAccountList]);
 
     const switchAccount = async (loginId: number) => {
@@ -153,9 +187,10 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
         });
         await api_base?.init(true);
         const search_params = new URLSearchParams(window.location.search);
-        const selected_account = modifiedAccountList.find(acc => acc.loginid === loginId.toString());
-        if (!selected_account) return;
-        const account_param = selected_account.is_virtual ? 'demo' : selected_account.currency;
+        // Find in unmodified list to get original currency for URL
+        const original_account = accountList?.find(acc => acc.loginid === loginId.toString());
+        if (!original_account) return;
+        const account_param = original_account.is_virtual ? 'demo' : original_account.currency;
         search_params.set('account', account_param);
         sessionStorage.setItem('query_param_currency', account_param);
         window.history.pushState({}, '', `${window.location.pathname}?${search_params.toString()}`);
@@ -176,7 +211,7 @@ const AccountSwitcher = observer(({ activeAccount }: TAccountSwitcher) => {
                 zIndex='5'
             >
                 <UIAccountSwitcher
-                    activeAccount={activeAccount}
+                    activeAccount={effectiveActiveAccount}
                     isDisabled={is_stop_button_visible}
                     tabsLabels={tabs_labels}
                     modalContentStyle={{

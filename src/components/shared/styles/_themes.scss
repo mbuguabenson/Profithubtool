@@ -102,10 +102,10 @@
         --text-prominent: #{constants.$color-black-1};
         --text-disabled: #{constants.$color-grey-1};
         --text-disabled-1: #{constants.$color-grey-6};
-        --text-loss-danger: #{constants.$color-red-1};
+        --text-loss-danger: #e31c4b;
         --text-profit-success: #{constants.$color-green-1};
         --text-warning: #{constants.$color-yellow};
-        --text-red: #{constants.$color-red};
+        --text-red: #e31c4b;
         --text-green: #{constants.$color-green-6};
         --text-blue: #{constants.$color-blue-3};
         --text-info-blue: #{constants.$color-blue};
@@ -250,8 +250,8 @@
         --text-disabled: #{constants.$color-black-6};
         --text-disabled-1: #{constants.$color-black-6};
         --text-profit-success: #{constants.$color-green-3};
-        --text-loss-danger: #{constants.$color-red-2};
-        --text-red: #{constants.$color-red};
+        --text-loss-danger: #e31c4b;
+        --text-red: #e31c4b;
         --text-colored-background: #{constants.$color-white};
         --text-info-blue: #{constants.$color-blue-6};
         --text-info-blue-background: #{constants.$color-blue-7};

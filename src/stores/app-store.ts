@@ -13,6 +13,19 @@ import { TApiHelpersStore } from '@/types/stores.types';
 import { localize } from '@deriv-com/translations';
 import RootStore from './root-store';
 
+type TBlocklyBlock = {
+    type: string;
+    isDescendantOf: (type: string) => boolean;
+    category_?: string;
+    getFieldValue?: (field: string) => string;
+    [key: string]: unknown;
+};
+
+type TAccounts = {
+    residence?: string;
+    landing_company_shortcode?: string;
+};
+
 export default class AppStore {
     root_store: RootStore;
     core: RootStore['core'];
@@ -137,7 +150,7 @@ export default class AppStore {
 
         if (
             (!client.is_bot_allowed && client.is_eu && client.should_show_eu_error) ||
-            isEuResidenceWithOnlyVRTC(client.active_accounts as any) ||
+            isEuResidenceWithOnlyVRTC(client.active_accounts as TAccounts[]) ||
             client.is_options_blocked
         ) {
             return showDigitalOptionsUnavailableError(
@@ -253,7 +266,7 @@ export default class AppStore {
         // TODO: fix
         const { ui } = this.core;
 
-        ui.setAccountSwitcherDisabledMessage();
+        ui.setAccountSwitcherDisabledMessage('');
         ui.setPromptHandler(false);
 
         if (this.timer) clearInterval(this.timer);
@@ -270,14 +283,14 @@ export default class AppStore {
                 const trade_options_blocks = window.Blockly?.derivWorkspace
                     .getAllBlocks()
                     .filter(
-                        (b: any) =>
+                        (b: TBlocklyBlock) =>
                             b.type === 'trade_definition_tradeoptions' ||
                             b.type === 'trade_definition_multiplier' ||
                             b.type === 'trade_definition_accumulator' ||
                             (b.isDescendantOf('trade_definition_multiplier') && b.category_ === 'trade_parameters')
                     );
 
-                trade_options_blocks.forEach((trade_options_block: any) => setCurrency(trade_options_block));
+                trade_options_blocks.forEach((trade_options_block: TBlocklyBlock) => setCurrency(trade_options_block));
             }
         );
     };
@@ -298,8 +311,18 @@ export default class AppStore {
 
                 this.showDigitalOptionsMaltainvestError();
 
-                const active_symbols = (ApiHelpers?.instance as any)?.active_symbols;
-                const contracts_for = (ApiHelpers?.instance as any)?.contracts_for;
+                type TActiveSymbols = {
+                    retrieveActiveSymbols: (active: boolean) => Promise<void>;
+                };
+
+                type TContractsFor = {
+                    disposeCache: () => void;
+                };
+
+                const active_symbols = (ApiHelpers?.instance as unknown as { active_symbols: TActiveSymbols })
+                    ?.active_symbols;
+                const contracts_for = (ApiHelpers?.instance as unknown as { contracts_for: TContractsFor })
+                    ?.contracts_for;
 
                 if (ApiHelpers?.instance && active_symbols && contracts_for) {
                     if (window.Blockly?.derivWorkspace) {
@@ -307,8 +330,8 @@ export default class AppStore {
                             contracts_for.disposeCache();
                             window.Blockly?.derivWorkspace
                                 .getAllBlocks()
-                                .filter((block: any) => block.type === 'trade_definition_market')
-                                .forEach((block: any) => {
+                                .filter((block: TBlocklyBlock) => block.type === 'trade_definition_market')
+                                .forEach((block: TBlocklyBlock) => {
                                     runIrreversibleEvents(() => {
                                         const fake_create_event = new window.Blockly.Events.BlockCreate(block);
                                         window.Blockly.Events.fire(fake_create_event);
@@ -374,7 +397,7 @@ export default class AppStore {
 
     onClickOutsideBlockly = (event: Event) => {
         if (document.querySelector('.injectionDiv')) {
-            const path = (event as any).path || (event.composedPath && event.composedPath());
+            const path = (event as Event & { path: Element[] }).path || (event.composedPath && event.composedPath());
             const is_click_outside_blockly = !path.some(
                 (el: Element) => el.classList && el.classList.contains('injectionDiv')
             );
