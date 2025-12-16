@@ -43,6 +43,7 @@ const CopyTrading = lazy(() => import('../copy-trading/copy-trading'));
 const BotBuilder = lazy(() => import('../bot-builder'));
 const RiskManagement = lazy(() => import('../risk-management/risk-management'));
 const DigitsAnalysis = lazy(() => import('../digits-analysis/digits-analysis'));
+const BulkTraderTab = lazy(() => import('../bulk-trader/bulk-trader-tab'));
 
 const AppWrapper = observer(() => {
     const { connectionStatus } = useApiBase();
@@ -72,7 +73,7 @@ const AppWrapper = observer(() => {
         [key: string]: string;
     };
     const { clear } = summary_card;
-    const { DASHBOARD, BOT_BUILDER } = DBOT_TABS;
+    const { DASHBOARD, BOT_BUILDER, BULK_TRADER } = DBOT_TABS;
     const init_render = React.useRef(true);
     const hash = [
         'dashboard',
@@ -464,6 +465,25 @@ const AppWrapper = observer(() => {
                                     fallback={<ChunkLoader message={localize('Please wait, loading analytics...')} />}
                                 >
                                     <DigitsAnalysis />
+                                </Suspense>
+                            </div>
+                            <div
+                                label={
+                                    <>
+                                        <LabelPairedChartLineCaptionRegularIcon
+                                            height='24px'
+                                            width='24px'
+                                            fill='var(--text-general)'
+                                        />
+                                        <Localize i18n_default_text='Bulk Trader' />
+                                    </>
+                                }
+                                id='id-bulk-trader'
+                            >
+                                <Suspense
+                                    fallback={<ChunkLoader message={localize('Please wait, loading bulk trader...')} />}
+                                >
+                                    <BulkTraderTab />
                                 </Suspense>
                             </div>
                         </Tabs>

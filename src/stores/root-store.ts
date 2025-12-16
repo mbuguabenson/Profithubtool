@@ -21,6 +21,7 @@ import ToolbarStore from './toolbar-store';
 import ToolboxStore from './toolbox-store';
 import TransactionsStore from './transactions-store';
 import UiStore from './ui-store';
+import BulkTradeStore from './bulk-trade-store';
 
 // TODO: need to write types for the individual classes and convert them to ts
 export default class RootStore {
@@ -42,6 +43,7 @@ export default class RootStore {
     public dashboard: DashboardStore;
     public copy_trading: CopyTradingStore;
     public digit_analysis: DigitAnalysisStore;
+    public bulk_trade: BulkTradeStore;
 
     public chart_store: ChartStore;
     public blockly_store: BlocklyStore;
@@ -96,5 +98,6 @@ export default class RootStore {
         this.blockly_store = new BlocklyStore(this);
         this.data_collection_store = new DataCollectionStore(this, this.core);
         this.digit_analysis = new DigitAnalysisStore(this);
+        this.bulk_trade = new BulkTradeStore(this);
     }
 }

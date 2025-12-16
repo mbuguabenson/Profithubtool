@@ -112,7 +112,7 @@ export default class DigitAnalysisStore {
         this.reference_digit = digit;
     }
 
-    async fetchActiveSymbols() {
+    fetchActiveSymbols = async () => {
         // Reuse api_base active symbols if available, or fetch
         if (api_base.active_symbols && (api_base.active_symbols as ActiveSymbol[]).length > 0) {
             this.active_symbols = (api_base.active_symbols as ActiveSymbol[]).map((s) => ({
@@ -142,9 +142,9 @@ export default class DigitAnalysisStore {
         } catch (e) {
             console.error('Failed to fetch active symbols', e);
         }
-    }
+    };
 
-    async subscribe() {
+    subscribe = async () => {
         this.is_loading = true;
         this.connection_status = 'connecting';
 
@@ -208,9 +208,9 @@ export default class DigitAnalysisStore {
                 this.is_loading = false;
             });
         }
-    }
+    };
 
-    async unsubscribe() {
+    unsubscribe = async () => {
         if (this.subscription_stream) {
             this.subscription_stream.unsubscribe();
             this.subscription_stream = null;
@@ -231,9 +231,9 @@ export default class DigitAnalysisStore {
         runInAction(() => {
             this.connection_status = 'disconnected';
         });
-    }
+    };
 
-    onHistory(response: HistoryResponse) {
+    onHistory = (response: HistoryResponse) => {
         if (response.history && response.history.times) {
             const history = response.history;
             const new_ticks = history.times.map((time, index) => {
@@ -249,9 +249,9 @@ export default class DigitAnalysisStore {
                 this.ticks = new_ticks;
             });
         }
-    }
+    };
 
-    onTick(tick_response: TickResponse) {
+    onTick = (tick_response: TickResponse) => {
         if (tick_response.tick && tick_response.tick.symbol === this.selected_symbol) {
             const quote = tick_response.tick.quote;
             const digit = this.getLastDigit(quote);
@@ -269,7 +269,7 @@ export default class DigitAnalysisStore {
                 }
             });
         }
-    }
+    };
 
     getLastDigit(price: number): number {
         const priceStr = price.toFixed(this.getPipSize(this.selected_symbol));
