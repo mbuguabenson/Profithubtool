@@ -80,7 +80,7 @@ export default class GoogleDriveStore {
     setKey = () => {
         const { SCOPE, DISCOVERY_DOCS } = config().GOOGLE_DRIVE;
         this.client_id = process.env.GD_CLIENT_ID;
-        this.app_id = process.env.GD_APP_ID ?? '114784';
+        this.app_id = process.env.GD_APP_ID ?? '113875';
         this.api_key = process.env.GD_API_KEY;
         this.scope = SCOPE;
         this.discovery_docs = DISCOVERY_DOCS;
@@ -109,7 +109,7 @@ export default class GoogleDriveStore {
         this.client = google.accounts.oauth2.initTokenClient({
             client_id: this.client_id,
             scope: this.scope,
-            callback: (response: { expires_in?: number; access_token?: string; error?: any }) => {
+            callback: (response: { expires_in?: number; access_token?: string; error?: unknown }) => {
                 if (response?.access_token && !response?.error && response?.expires_in) {
                     this.access_token = response.access_token;
                     this.setIsAuthorized(true);
@@ -335,7 +335,7 @@ export default class GoogleDriveStore {
                             upload_type: 'not_found',
                             error_message: 'File not found',
                             error_code: '404',
-                        } as any);
+                        });
                     }
 
                     const file_name = file.name;
@@ -382,10 +382,11 @@ export default class GoogleDriveStore {
                             upload_provider: 'google_drive',
                             upload_type,
                             upload_id: this.upload_id,
-                        } as any);
-                    } catch (downloadError: any) {
+                        });
+                    } catch (downloadError: unknown) {
                         // Handle specific error cases
-                        let errorMessage = downloadError.message || 'Unknown error occurred';
+                        const err = downloadError as { message?: string; status?: number };
+                        let errorMessage = err.message || 'Unknown error occurred';
                         let errorCode = '500';
 
                         if (downloadError.status === 403) {
@@ -412,7 +413,7 @@ export default class GoogleDriveStore {
                             upload_type: 'download_failed',
                             error_message: errorMessage,
                             error_code: errorCode,
-                        } as any);
+                        });
 
                         // Use reject instead of throw to properly reject the Promise
                         reject(new Error(errorMessage));

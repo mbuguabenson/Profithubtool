@@ -1,14 +1,14 @@
 import { LocalStorageConstants, LocalStorageUtils, URLUtils } from '@deriv-com/utils';
 
 export const APP_IDS = {
-    LOCALHOST: 114784, // Default for local dev
-    TMP_STAGING: 114784,
-    STAGING: 114784, // TODO: Update with real staging ID if different
-    STAGING_BE: 114784,
-    STAGING_ME: 114784,
-    PRODUCTION: 114784, // Example production ID - needs verification
-    PRODUCTION_BE: 114784,
-    PRODUCTION_ME: 114784,
+    LOCALHOST: 113875, // Default for local dev
+    TMP_STAGING: 113875,
+    STAGING: 113875, // TODO: Update with real staging ID if different
+    STAGING_BE: 113875,
+    STAGING_ME: 113875,
+    PRODUCTION: 113875, // Example production ID - needs verification
+    PRODUCTION_BE: 113875,
+    PRODUCTION_ME: 113875,
 };
 
 export const livechat_license_id = 12049137;
@@ -88,7 +88,7 @@ export const getAppId = (): number => {
     }
 
     // Default universal fallback
-    return 114784;
+    return 113875;
 };
 
 export const getSocketURL = () => {
@@ -119,8 +119,9 @@ export const checkAndSetEndpointFromUrl = () => {
             const params = url_params.toString();
             const hash = location.hash;
 
-            location.href = `${location.protocol}//${location.hostname}${location.pathname}${params ? `?${params}` : ''
-                }${hash || ''}`;
+            location.href = `${location.protocol}//${location.hostname}${location.pathname}${
+                params ? `?${params}` : ''
+            }${hash || ''}`;
 
             return true;
         }

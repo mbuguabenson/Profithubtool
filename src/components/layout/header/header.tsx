@@ -11,7 +11,7 @@ import { useStore } from '@/hooks/useStore';
 import useTMB from '@/hooks/useTMB';
 import { clearAuthData, handleOidcAuthFailure } from '@/utils/auth-utils';
 import { AuthManager } from '@/utils/AuthManager';
-import { StandaloneCircleUserRegularIcon } from '@deriv/quill-icons/Standalone';
+import { StandaloneArrowRotateRightRegularIcon, StandaloneCircleUserRegularIcon } from '@deriv/quill-icons/Standalone';
 import { Localize, useTranslations } from '@deriv-com/translations';
 import { Header, useDevice, Wrapper } from '@deriv-com/ui';
 import { Tooltip } from '@deriv-com/ui';
@@ -41,7 +41,6 @@ const AppHeader = observer(({ isAuthenticating }: TAppHeaderProps) => {
 
     const { hubEnabledCountryList } = useFirebaseCountriesConfig();
     const { onRenderTMBCheck, isTmbEnabled } = useTMB();
-    const is_tmb_enabled = isTmbEnabled() || window.is_tmb_enabled === true;
     // No need for additional state management here since we're handling it in the layout component
 
     const renderAccountSection = useCallback(() => {
@@ -127,6 +126,14 @@ const AppHeader = observer(({ isAuthenticating }: TAppHeaderProps) => {
                                 </Tooltip>
                             );
                         })()}
+                    <Button
+                        tertiary
+                        onClick={() => client?.toggleKes()}
+                        className='kes-toggle-button'
+                        style={{ marginLeft: '8px' }}
+                    >
+                        {client?.is_kes_enabled ? 'KES' : 'USD'}
+                    </Button>
                 </>
             );
         } else {
@@ -175,7 +182,6 @@ const AppHeader = observer(({ isAuthenticating }: TAppHeaderProps) => {
         isAuthorizing,
         isDesktop,
         activeLoginid,
-        standalone_routes,
         client,
         has_wallet,
         currency,
@@ -183,7 +189,9 @@ const AppHeader = observer(({ isAuthenticating }: TAppHeaderProps) => {
         activeAccount,
         is_virtual,
         onRenderTMBCheck,
-        is_tmb_enabled,
+        currentLang,
+        hubEnabledCountryList,
+        isTmbEnabled,
     ]);
 
     if (client?.should_hide_header) return null;
@@ -201,6 +209,11 @@ const AppHeader = observer(({ isAuthenticating }: TAppHeaderProps) => {
             </Wrapper>
             <Wrapper variant='right'>
                 <WhatsApp />
+                {!isDesktop && (
+                    <Button tertiary className='mobile-refresh-btn' onClick={() => window.location.reload()}>
+                        <StandaloneArrowRotateRightRegularIcon fill='var(--text-prominent)' iconSize='sm' />
+                    </Button>
+                )}
                 {!isDesktop && <PWAInstallButton variant='primary' size='medium' />}
                 {renderAccountSection()}
             </Wrapper>

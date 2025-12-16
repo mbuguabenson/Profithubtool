@@ -2,6 +2,9 @@
 @use 'components/shared/styles/mixins' as *;
 
 .app-header {
+    position: relative;
+    z-index: 40;
+
     &__account-settings {
         padding-inline-end: 1.2rem;
         border-inline-end: 0.1rem solid var(--general-section-1);
@@ -107,7 +110,7 @@
     width: 100%;
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 10;
     background: var(--general-main-1);
 
     .derivs-text__size--md {

@@ -106,7 +106,7 @@ export default class AppStore {
             return showDigitalOptionsUnavailableError(common.showError, this.getErrorForEuClients());
         }
 
-        if (is_landing_company_loaded !== undefined && !is_landing_company_loaded) {
+        if (!is_landing_company_loaded) {
             common.setError(false, {});
             return false;
         }
@@ -127,7 +127,8 @@ export default class AppStore {
                 this.getErrorForNonEuClients(),
                 () => {
                     // TODOL: need to fix this from the deriv ui package
-                    document.querySelector('.deriv-account-switcher__button')?.click();
+                    const switcher = document.querySelector('.deriv-account-switcher__button');
+                    if (switcher instanceof HTMLElement) switcher.click();
                 },
                 false,
                 false
@@ -136,7 +137,7 @@ export default class AppStore {
 
         if (
             (!client.is_bot_allowed && client.is_eu && client.should_show_eu_error) ||
-            isEuResidenceWithOnlyVRTC(client.active_accounts) ||
+            isEuResidenceWithOnlyVRTC(client.active_accounts as any) ||
             client.is_options_blocked
         ) {
             return showDigitalOptionsUnavailableError(
@@ -144,7 +145,8 @@ export default class AppStore {
                 this.getErrorForNonEuClients(),
                 () => {
                     // TODOL: need to fix this from the deriv ui package
-                    document.querySelector('.deriv-account-switcher__button')?.click();
+                    const switcher = document.querySelector('.deriv-account-switcher__button');
+                    if (switcher instanceof HTMLElement) switcher.click();
                 },
                 false,
                 false
@@ -209,7 +211,7 @@ export default class AppStore {
         blockly_store.getCachedActiveTab();
 
         when(
-            () => client?.should_show_eu_error || client?.is_landing_company_loaded,
+            () => !!(client?.should_show_eu_error || client?.is_landing_company_loaded),
             () => this.showDigitalOptionsMaltainvestError()
         );
 
@@ -230,19 +232,19 @@ export default class AppStore {
             window.Blockly.derivWorkspace?.dispose();
         }
         if (typeof this.disposeReloadOnLanguageChangeReaction === 'function') {
-            this.disposeReloadOnLanguageChangeReaction();
+            (this.disposeReloadOnLanguageChangeReaction as () => void)();
         }
         if (typeof this.disposeCurrencyReaction === 'function') {
-            this.disposeCurrencyReaction();
+            (this.disposeCurrencyReaction as () => void)();
         }
         if (typeof this.disposeSwitchAccountListener === 'function') {
-            this.disposeSwitchAccountListener();
+            (this.disposeSwitchAccountListener as () => void)();
         }
         if (typeof this.disposeLandingCompanyChangeReaction === 'function') {
-            this.disposeLandingCompanyChangeReaction();
+            (this.disposeLandingCompanyChangeReaction as () => void)();
         }
         if (typeof this.disposeResidenceChangeReaction === 'function') {
-            this.disposeResidenceChangeReaction();
+            (this.disposeResidenceChangeReaction as () => void)();
         }
 
         window.removeEventListener('click', this.onClickOutsideBlockly);
@@ -268,14 +270,14 @@ export default class AppStore {
                 const trade_options_blocks = window.Blockly?.derivWorkspace
                     .getAllBlocks()
                     .filter(
-                        b =>
+                        (b: any) =>
                             b.type === 'trade_definition_tradeoptions' ||
                             b.type === 'trade_definition_multiplier' ||
                             b.type === 'trade_definition_accumulator' ||
                             (b.isDescendantOf('trade_definition_multiplier') && b.category_ === 'trade_parameters')
                     );
 
-                trade_options_blocks.forEach(trade_options_block => setCurrency(trade_options_block));
+                trade_options_blocks.forEach((trade_options_block: any) => setCurrency(trade_options_block));
             }
         );
     };
@@ -296,8 +298,8 @@ export default class AppStore {
 
                 this.showDigitalOptionsMaltainvestError();
 
-                const active_symbols = ApiHelpers?.instance?.active_symbols;
-                const contracts_for = ApiHelpers?.instance?.contracts_for;
+                const active_symbols = (ApiHelpers?.instance as any)?.active_symbols;
+                const contracts_for = (ApiHelpers?.instance as any)?.contracts_for;
 
                 if (ApiHelpers?.instance && active_symbols && contracts_for) {
                     if (window.Blockly?.derivWorkspace) {
@@ -305,8 +307,8 @@ export default class AppStore {
                             contracts_for.disposeCache();
                             window.Blockly?.derivWorkspace
                                 .getAllBlocks()
-                                .filter(block => block.type === 'trade_definition_market')
-                                .forEach(block => {
+                                .filter((block: any) => block.type === 'trade_definition_market')
+                                .forEach((block: any) => {
                                     runIrreversibleEvents(() => {
                                         const fake_create_event = new window.Blockly.Events.BlockCreate(block);
                                         window.Blockly.Events.fire(fake_create_event);
@@ -357,12 +359,12 @@ export default class AppStore {
             dashboard,
             load_modal,
             run_panel,
-            setLoading,
+            setLoading: setLoading as unknown as (loading: boolean) => void,
             setContractUpdateConfig,
             handleFileChange,
             is_mobile,
             common,
-        };
+        } as unknown as RootStore;
 
         this.api_helpers_store = {
             server_time: this.core.common.server_time,

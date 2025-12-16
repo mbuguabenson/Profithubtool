@@ -31,6 +31,9 @@ export default class ClientStore {
     all_accounts_balance: Balance | null = null;
     is_logging_out = false;
 
+    is_kes_enabled = false;
+    kes_rate = 0;
+
     // TODO: fix with self exclusion
     updateSelfExclusion = () => {};
 
@@ -59,6 +62,8 @@ export default class ClientStore {
             upgradeable_landing_companies: observable,
             website_status: observable,
             is_logging_out: observable,
+            is_kes_enabled: observable,
+            kes_rate: observable,
             active_accounts: computed,
             clients_country: computed,
             is_bot_allowed: computed,
@@ -86,6 +91,8 @@ export default class ClientStore {
             setWebsiteStatus: action,
             setUpgradeableLandingCompanies: action,
             updateTncStatus: action,
+            toggleKes: action,
+            setKesRate: action,
             is_trading_experience_incomplete: computed,
             is_cr_account: computed,
             account_open_date: computed,
@@ -392,5 +399,25 @@ export default class ClientStore {
                 resolveNavigation();
                 return Promise.reject(error);
             });
+    };
+
+    toggleKes = async () => {
+        if (!this.is_kes_enabled && this.kes_rate === 0) {
+            try {
+                const currency = this.currency || 'USD';
+                const response = await fetch(`https://open.er-api.com/v6/latest/${currency}`);
+                const data = await response.json();
+                if (data.rates && data.rates.KES) {
+                    this.setKesRate(data.rates.KES);
+                }
+            } catch (error) {
+                console.error('Failed to fetch KES rate:', error);
+            }
+        }
+        this.is_kes_enabled = !this.is_kes_enabled;
+    };
+
+    setKesRate = (rate: number) => {
+        this.kes_rate = rate;
     };
 }

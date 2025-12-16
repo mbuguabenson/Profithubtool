@@ -1,11 +1,16 @@
 import classnames from 'classnames';
+import { observer } from 'mobx-react-lite';
 import { formatMoney, getCurrencyDisplayCode } from '@/components/shared';
 import Text from '@/components/shared_ui/text';
 import { LogTypes } from '@/external/bot-skeleton';
+import { useStore } from '@/hooks/useStore';
 import { Localize, localize } from '@deriv-com/translations';
 import { TFormatMessageProps } from '../journal.types';
 
-const FormatMessage = ({ logType, className, extra }: TFormatMessageProps) => {
+const FormatMessage = observer(({ logType, className, extra }: TFormatMessageProps) => {
+    const { client } = useStore();
+    const { is_kes_enabled, kes_rate } = client;
+
     const getLogMessage = () => {
         switch (logType) {
             case LogTypes.LOAD_BLOCK: {
@@ -27,21 +32,38 @@ const FormatMessage = ({ logType, className, extra }: TFormatMessageProps) => {
             }
             case LogTypes.SELL: {
                 const { sold_for } = extra;
+                const display_sold_for = sold_for;
+
+                // Note: sold_for typically comes as a string with currency symbol in this context,
+                // but if it's a raw number or if we need to parse it, we might need more logic.
+                // Assuming 'sold_for' for now remains as is unless we want to parse string prices which is risky.
+                // However, usually LogTypes.SELL sold_for is a formatted string.
+                // If we want to convert it, we would need the raw value.
+                // Let's stick to PROFIT/LOST which use extra.profit (number) and extra.currency.
+
                 return (
                     <Localize
                         i18n_default_text='<0>Sold for</0>: {{sold_for}}'
-                        values={{ sold_for }}
+                        values={{ sold_for: display_sold_for }}
                         components={[<Text key={0} size='xxs' styles={{ color: 'var(--status-warning)' }} />]}
                     />
                 );
             }
             case LogTypes.PROFIT: {
                 const { currency, profit } = extra;
+                let display_currency = currency;
+                let display_profit = profit;
+
+                if (is_kes_enabled && kes_rate) {
+                    display_currency = 'KES';
+                    display_profit = Number(profit) * kes_rate;
+                }
+
                 return (
                     <Localize
                         i18n_default_text='Profit amount: <0>{{profit}}</0>'
                         values={{
-                            profit: `${formatMoney(currency, profit, true)} ${getCurrencyDisplayCode(currency)}`,
+                            profit: `${formatMoney(display_currency, display_profit, true)} ${getCurrencyDisplayCode(display_currency)}`,
                         }}
                         components={[<Text key={0} size='xxs' styles={{ color: 'var(--status-success)' }} />]}
                     />
@@ -49,11 +71,19 @@ const FormatMessage = ({ logType, className, extra }: TFormatMessageProps) => {
             }
             case LogTypes.LOST: {
                 const { currency, profit } = extra;
+                let display_currency = currency;
+                let display_profit = profit;
+
+                if (is_kes_enabled && kes_rate) {
+                    display_currency = 'KES';
+                    display_profit = Number(profit) * kes_rate;
+                }
+
                 return (
                     <Localize
                         i18n_default_text='Loss amount: <0>{{profit}}</0>'
                         values={{
-                            profit: `${formatMoney(currency, profit, true)} ${getCurrencyDisplayCode(currency)}`,
+                            profit: `${formatMoney(display_currency, display_profit, true)} ${getCurrencyDisplayCode(display_currency)}`,
                         }}
                         components={[<Text key={0} size='xxs' styles={{ color: 'var(--status-danger)' }} />]}
                     />
@@ -92,6 +122,6 @@ const FormatMessage = ({ logType, className, extra }: TFormatMessageProps) => {
     };
 
     return <div className={classnames('journal__text', className)}>{getLogMessage()}</div>;
-};
+});
 
 export default FormatMessage;

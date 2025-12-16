@@ -141,10 +141,8 @@
             color: var(--brand-white) !important;
             font-weight: 600;
             border-radius: 0 !important;
-            box-shadow: var(--glow-green);
 
             &:hover:not([disabled]) {
-                box-shadow: var(--glow-green-intense);
                 transform: translateY(-2px);
             }
         }
@@ -271,17 +269,11 @@
         color: var(--brand-white) !important;
         font-weight: 700;
         border-radius: 0 !important;
-        box-shadow: var(--glow-green);
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
         &:hover:not([disabled]) {
-            box-shadow: var(--glow-green-intense);
             transform: translateY(-2px);
             background: var(--gradient-green-primary) !important;
-        }
-
-        &:not([disabled]) {
-            animation: button-glow-pulse 3s ease-in-out infinite;
         }
     }
 
@@ -498,16 +490,3 @@
 /* run/stop theme moved into component nested selector to prevent duplicate selectors */
 
 /* Moved to nested selector under &__footer to avoid duplicate selectors */
-
-// Button glow pulse animation
-@keyframes button-glow-pulse {
-
-    0%,
-    100% {
-        box-shadow: var(--glow-green);
-    }
-
-    50% {
-        box-shadow: var(--glow-green-intense);
-    }
-}

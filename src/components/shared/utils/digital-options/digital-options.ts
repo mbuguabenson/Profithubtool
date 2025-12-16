@@ -10,7 +10,7 @@ type TShowError = {
     message: string;
     header: string;
     redirect_label: string;
-    redirectOnClick?: (() => void) | null;
+    redirectOnClick?: () => void;
     should_show_refresh: boolean;
     redirect_to: string;
     should_clear_error_on_click: boolean;
@@ -34,7 +34,7 @@ export const showDigitalOptionsUnavailableError = (
         message: text,
         header: title,
         redirect_label: link,
-        redirectOnClick,
+        redirectOnClick: redirectOnClick || undefined,
         should_show_refresh: false,
         redirect_to: '/appstore/traders-hub',
         should_clear_error_on_click,
