@@ -25,8 +25,8 @@ const BotCategoryFilter: React.FC<BotCategoryFilterProps> = ({
     ];
 
     return (
-        <div className="bot-filter">
-            <div className="bot-filter__buttons">
+        <div className='bot-filter'>
+            <div className='bot-filter__buttons'>
                 {filters.map(filter => (
                     <button
                         key={filter.value}
@@ -36,8 +36,8 @@ const BotCategoryFilter: React.FC<BotCategoryFilterProps> = ({
                         })}
                         onClick={() => onFilterChange(filter.value)}
                     >
-                        <span className="bot-filter__btn-label">{filter.label}</span>
-                        <span className="bot-filter__btn-count">{filter.count}</span>
+                        <span className='bot-filter__btn-label'>{filter.label}</span>
+                        <span className='bot-filter__btn-count'>{filter.count}</span>
                     </button>
                 ))}
             </div>

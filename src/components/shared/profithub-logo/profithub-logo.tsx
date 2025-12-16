@@ -17,7 +17,7 @@ const ProfithubLogo: React.FC<ProfithubLogoProps> = ({ variant = 'horizontal', h
     return (
         <img
             src={logoSrc[variant]}
-            alt="Profithub - Trade smarter, earn faster"
+            alt='Profithub - Trade smarter, earn faster'
             height={height}
             className={`profithub-logo profithub-logo--${variant} ${className || ''}`}
         />

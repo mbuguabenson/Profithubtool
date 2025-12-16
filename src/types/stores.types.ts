@@ -36,4 +36,3 @@ export type TApiHelpersStore = {
     server_time: CommonStore['server_time'];
     ws: TWebSocket;
 };
-

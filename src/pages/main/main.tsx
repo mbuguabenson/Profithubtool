@@ -43,7 +43,7 @@ const CopyTrading = lazy(() => import('../copy-trading/copy-trading'));
 const BotBuilder = lazy(() => import('../bot-builder'));
 const RiskManagement = lazy(() => import('../risk-management/risk-management'));
 const DigitsAnalysis = lazy(() => import('../digits-analysis/digits-analysis'));
-const BulkTraderTab = lazy(() => import('../bulk-trader/bulk-trader-tab'));
+const TradingHub = lazy(() => import('../trading-hub/trading-hub'));
 
 const AppWrapper = observer(() => {
     const { connectionStatus } = useApiBase();
@@ -475,15 +475,15 @@ const AppWrapper = observer(() => {
                                             width='24px'
                                             fill='var(--text-general)'
                                         />
-                                        <Localize i18n_default_text='Bulk Trader' />
+                                        <Localize i18n_default_text='Trading Hub' />
                                     </>
                                 }
                                 id='id-bulk-trader'
                             >
                                 <Suspense
-                                    fallback={<ChunkLoader message={localize('Please wait, loading bulk trader...')} />}
+                                    fallback={<ChunkLoader message={localize('Please wait, loading trading hub...')} />}
                                 >
-                                    <BulkTraderTab />
+                                    <TradingHub />
                                 </Suspense>
                             </div>
                         </Tabs>

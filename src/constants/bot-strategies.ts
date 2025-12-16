@@ -71,7 +71,6 @@ export const BOT_STRATEGIES: BotStrategy[] = [
         xmlPath: 'Hybridbots/Hybrid Bot 2.xml',
     },
 
-
     // Normal Bots (3) - Require manual oversight and parameter tuning
     {
         id: 'profit-hub-pro',

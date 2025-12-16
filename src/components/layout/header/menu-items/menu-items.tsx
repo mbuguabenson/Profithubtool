@@ -65,28 +65,28 @@ export const MenuItems = observer(() => {
             {is_logged_in &&
                 (isDesktop
                     ? filtered_items.map(({ as, href, icon, label }) => (
-                        <MenuItem
-                            as={as}
-                            className='app-header__menu'
-                            href={getModifiedHref(href)}
-                            key={label}
-                            leftComponent={icon}
-                        >
-                            <Text>{localize(label)}</Text>
-                        </MenuItem>
-                    ))
+                          <MenuItem
+                              as={as}
+                              className='app-header__menu'
+                              href={getModifiedHref(href)}
+                              key={label}
+                              leftComponent={icon}
+                          >
+                              <Text>{localize(label)}</Text>
+                          </MenuItem>
+                      ))
                     : // For mobile, show the first available item after filtering
-                    filtered_items.length > 0 && (
-                        <MenuItem
-                            as={filtered_items[0].as}
-                            className='flex gap-2 p-5'
-                            href={getModifiedHref(filtered_items[0].href)}
-                            key={filtered_items[0].label}
-                            leftComponent={filtered_items[0].icon}
-                        >
-                            <Text>{localize(filtered_items[0].label)}</Text>
-                        </MenuItem>
-                    ))}
+                      filtered_items.length > 0 && (
+                          <MenuItem
+                              as={filtered_items[0].as}
+                              className='flex gap-2 p-5'
+                              href={getModifiedHref(filtered_items[0].href)}
+                              key={filtered_items[0].label}
+                              leftComponent={filtered_items[0].icon}
+                          >
+                              <Text>{localize(filtered_items[0].label)}</Text>
+                          </MenuItem>
+                      ))}
         </>
     );
 });

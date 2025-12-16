@@ -138,11 +138,14 @@ const DrawerContent = ({ active_index, is_drawer_open, active_tour, setActiveTab
     const location = useLocation();
 
     // Adapter for Tabs which expects history.replace/location (legacy compat)
-    const history = React.useMemo(() => ({
-        replace: (path: string) => navigate(path, { replace: true }),
-        push: (path: string) => navigate(path),
-        location
-    }), [navigate, location]);
+    const history = React.useMemo(
+        () => ({
+            replace: (path: string) => navigate(path, { replace: true }),
+            push: (path: string) => navigate(path),
+            location,
+        }),
+        [navigate, location]
+    );
 
     React.useEffect(() => {
         if (!isDesktop && is_drawer_open) {
@@ -322,7 +325,8 @@ const RunPanel = observer(() => {
         />
     );
 
-    const show_run_panel = [BOT_BUILDER, CHART, BOTS, DASHBOARD, PRO_ANALYSIS, COPY_TRADING].includes(active_tab) || active_tour;
+    const show_run_panel =
+        [BOT_BUILDER, CHART, BOTS, DASHBOARD, PRO_ANALYSIS, COPY_TRADING].includes(active_tab) || active_tour;
     if ((!show_run_panel && isDesktop) || active_tour === 'bot_builder') return null;
 
     // Cast SelfExclusion to any to avoid strict prop type checking for JS component

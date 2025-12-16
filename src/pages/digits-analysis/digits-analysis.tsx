@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
-import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, YAxis } from 'recharts';
+import { CartesianGrid, LabelList,Line, LineChart, ResponsiveContainer, Tooltip, YAxis } from 'recharts';
 import { localize } from '@deriv-com/translations';
 import { useStore } from '../../hooks/useStore';
 import './digits-analysis.scss';
@@ -138,7 +138,9 @@ const DigitsAnalysis = observer(() => {
                                             dot={{ r: 2, fill: '#00a8ff' }}
                                             activeDot={{ r: 5, fill: '#39ff14' }}
                                             isAnimationActive={false}
-                                        />
+                                        >
+                                            <LabelList dataKey='digit' position='top' className='chart-point-label' />
+                                        </Line>
                                     </LineChart>
                                 </ResponsiveContainer>
                             </div>
@@ -152,6 +154,9 @@ const DigitsAnalysis = observer(() => {
                             <div className='frequency-grid'>
                                 {digit_frequency.map(item => (
                                     <div key={item.digit} className='digit-ring'>
+                                        <div className='ring-top-label'>
+                                            {item.count}/{tick_count}
+                                        </div>
                                         <div className='ring-wrapper'>
                                             <svg viewBox='0 0 36 36' className='circular-chart'>
                                                 <path
@@ -219,11 +224,12 @@ const DigitsAnalysis = observer(() => {
                                         <span className='stat-val'>{even_odd_stats.odd.toFixed(1)}%</span>
                                     </div>
                                 </div>
-                                <div className='progress-bar-container'>
+                                <div className='multi-progress-bar'>
                                     <div
-                                        className='progress-fill even'
+                                        className='bar-segment even'
                                         style={{ width: `${even_odd_stats.even}%` }}
                                     ></div>
+                                    <div className='bar-segment odd' style={{ width: `${even_odd_stats.odd}%` }}></div>
                                 </div>
                             </div>
                         </div>
@@ -296,14 +302,10 @@ const DigitsAnalysis = observer(() => {
                                 <h3>{localize('History')}</h3>
                             </div>
                             <div className='history-grid-scroller' ref={scrollRef}>
-                                {/* Grid Visualization */}
+                                {/* Grid Visualization - Even/Odd */}
                                 <div className='history-grid'>
                                     {[...ticks].reverse().map((tick, index) => {
-                                        let type = 'match';
-                                        if (tick.digit > reference_digit) type = 'over';
-                                        else if (tick.digit < reference_digit) type = 'under';
-
-                                        // Latest tick (index 0) gets special effect
+                                        const type = tick.digit % 2 === 0 ? 'even' : 'odd';
                                         const isLatest = index === 0;
 
                                         return (
@@ -312,9 +314,7 @@ const DigitsAnalysis = observer(() => {
                                                 className={classNames('history-tile', type, { latest: isLatest })}
                                             >
                                                 <span className='digit'>{tick.digit}</span>
-                                                <span className='type-indicator'>
-                                                    {type === 'over' ? 'O' : type === 'under' ? 'U' : '-'}
-                                                </span>
+                                                <span className='type-indicator'>{type === 'even' ? 'E' : 'O'}</span>
                                             </div>
                                         );
                                     })}

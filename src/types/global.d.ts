@@ -4,8 +4,7 @@ declare global {
     interface Window {
         sendRequestsStatistic: (is_running: boolean) => void;
         Blockly: any;
-
     }
 }
 
-export { };
+export {};

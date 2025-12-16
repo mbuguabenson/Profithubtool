@@ -14,6 +14,12 @@ const GTM = (() => {
         if (initialized) return;
         initialized = true;
 
+        // Skip GTM in non-production/staging environments to avoid noisy console errors
+        const env = process.env.APP_ENV;
+        if (env !== 'production' && env !== 'staging') {
+            return;
+        }
+
         function loadGTM() {
             (function (w, d, s, l, i) {
                 w[l] = w[l] || [];

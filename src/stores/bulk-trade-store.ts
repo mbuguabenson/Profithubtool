@@ -38,7 +38,9 @@ export default class BulkTradeStore {
         this.root_store = root_store;
     }
 
-    addStrategy = (strategy: Omit<TStrategy, 'id' | 'status' | 'total_profit' | 'total_trades' | 'last_result_time'>) => {
+    addStrategy = (
+        strategy: Omit<TStrategy, 'id' | 'status' | 'total_profit' | 'total_trades' | 'last_result_time'>
+    ) => {
         const new_strategy: TStrategy = {
             ...strategy,
             id: `strategy_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -91,11 +93,13 @@ export default class BulkTradeStore {
     subscribeToSymbol = (symbol: string) => {
         if (!this.active_symbols_subscriptions.has(symbol)) {
             // New subscription needed
-            const subscription = api_base.api.onMessage().subscribe(({ data }: { data: { msg_type: string; tick: { quote: number, symbol: string } } }) => {
-                if (data.msg_type === 'tick' && data.tick.symbol === symbol) {
-                    this.handleTick(symbol, data.tick);
-                }
-            });
+            const subscription = api_base.api
+                .onMessage()
+                .subscribe(({ data }: { data: { msg_type: string; tick: { quote: number; symbol: string } } }) => {
+                    if (data.msg_type === 'tick' && data.tick.symbol === symbol) {
+                        this.handleTick(symbol, data.tick);
+                    }
+                });
             api_base.api.send({ ticks: symbol, subscribe: 1 });
             this.active_symbols_subscriptions.set(symbol, subscription);
         }
@@ -124,7 +128,9 @@ export default class BulkTradeStore {
         const last_digit = parseInt(quote.toFixed(this.getPipSize(symbol)).slice(-1));
 
         // Get all active strategies for this symbol
-        const relevant_strategies = this.strategies.filter(s => s.is_active && s.symbol === symbol && s.status === 'RUNNING');
+        const relevant_strategies = this.strategies.filter(
+            s => s.is_active && s.symbol === symbol && s.status === 'RUNNING'
+        );
 
         relevant_strategies.forEach(strategy => {
             if (this.checkCondition(strategy, last_digit)) {
@@ -163,67 +169,79 @@ export default class BulkTradeStore {
         // User asked for "Trade every tick". If we are already buying, do we buy again?
         // Yes, "Bulk" implies concurrency. But let's set status to BUYING to give visual feedback.
         // We won't block re-entry unless user wants to (maybe add a "Max Concurrent" setting later).
-        
+
         // For visual clarity, we might want to flicker 'BUYING'
         runInAction(() => {
             strategy.status = 'BUYING';
         });
 
-        const contract_request = {
-            buy: 1,
-            price: strategy.amount,
-            parameters: {
-                amount: strategy.amount,
-                basis: 'stake',
-                contract_type: strategy.contract_type,
-                currency: strategy.currency,
-                duration: strategy.duration,
-                duration_unit: strategy.duration_unit,
-                symbol: strategy.symbol,
-                ...(strategy.contract_type.startsWith('DIGIT') ? { barrier: strategy.parameter.toString(), selected_tick: strategy.parameter } : {}),
-            },
+        const proposal_params = {
+            amount: strategy.amount,
+            basis: 'stake' as const,
+            contract_type: strategy.contract_type,
+            currency: strategy.currency,
+            duration: strategy.duration,
+            duration_unit: strategy.duration_unit,
+            symbol: strategy.symbol,
+            ...(strategy.contract_type.startsWith('DIGIT') ? { barrier: strategy.parameter.toString() } : {}),
         };
 
         try {
-            const buy_response: { error?: any; buy?: { contract_id: number } } = await api_base.api.send(contract_request);
-            if (buy_response.error) {
-                console.error('Bulk Trade Error:', buy_response.error);
+            const proposal_response: { error?: Record<string, unknown>; proposal?: { id: string } } =
+                await api_base.api.send({ proposal: 1, ...proposal_params });
+
+            if (proposal_response.error || !proposal_response.proposal?.id) {
+                console.error('Bulk Trade Proposal Error:', proposal_response.error);
                 runInAction(() => {
                     strategy.status = 'ERROR';
                 });
                 return;
             }
 
-            const contract_id = buy_response.buy?.contract_id;
-            if (!contract_id) {
-                 runInAction(() => {
+            const proposal_id = proposal_response.proposal.id;
+            const buy_response: { error?: Record<string, unknown>; buy?: { contract_id: number } } =
+                await api_base.api.send({ buy: proposal_id, price: strategy.amount });
+            if (buy_response.error || !buy_response.buy?.contract_id) {
+                runInAction(() => {
                     strategy.status = 'ERROR';
-                 });
-                 return;
+                });
+                return;
             }
-            
+
+            const contract_id = buy_response.buy.contract_id;
             // Subscribe to contract proposal to get result
             // Or just Proposal Open Contract
-            const poc_subscription = api_base.api.onMessage().subscribe(({ data }: { data: { msg_type: string; proposal_open_contract: { contract_id: number; is_sold: boolean; profit: number } } }) => {
-                if (data.msg_type === 'proposal_open_contract' && data.proposal_open_contract.contract_id === contract_id) {
-                    const contract = data.proposal_open_contract;
-                    if (contract.is_sold) {
-                         const profit = contract.profit;
-                         runInAction(() => {
-                             this.updateStrategyProfit(strategy.id, profit);
-                             strategy.status = profit >= 0 ? 'WON' : 'LOST';
-                             // Reset to RUNNING after a short delay for visual effect?
-                             // Or immediately.
-                             setTimeout(() => {
-                                 if (strategy.is_active) strategy.status = 'RUNNING';
-                             }, 1000);
-                         });
-                         poc_subscription.unsubscribe();
+            const poc_subscription = api_base.api.onMessage().subscribe(
+                ({
+                    data,
+                }: {
+                    data: {
+                        msg_type: string;
+                        proposal_open_contract: { contract_id: number; is_sold: boolean; profit: number };
+                    };
+                }) => {
+                    if (
+                        data.msg_type === 'proposal_open_contract' &&
+                        data.proposal_open_contract.contract_id === contract_id
+                    ) {
+                        const contract = data.proposal_open_contract;
+                        if (contract.is_sold) {
+                            const profit = contract.profit;
+                            runInAction(() => {
+                                this.updateStrategyProfit(strategy.id, profit);
+                                strategy.status = profit >= 0 ? 'WON' : 'LOST';
+                                // Reset to RUNNING after a short delay for visual effect?
+                                // Or immediately.
+                                setTimeout(() => {
+                                    if (strategy.is_active) strategy.status = 'RUNNING';
+                                }, 1000);
+                            });
+                            poc_subscription.unsubscribe();
+                        }
                     }
                 }
-            });
+            );
             api_base.api.send({ proposal_open_contract: 1, contract_id, subscribe: 1 });
-
         } catch (e) {
             console.error('Bulk Trade Exception:', e);
             runInAction(() => {

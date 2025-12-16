@@ -203,7 +203,10 @@ export const load = async ({
 
     if (invalid_blocks.length) {
         // eslint-disable-next-line no-console
-        console.warn('XML contained unknown block types:', invalid_blocks.map(b => b.getAttribute('type')));
+        console.warn(
+            'XML contained unknown block types:',
+            invalid_blocks.map(b => b.getAttribute('type'))
+        );
         // Proceeding anyway to allow partial recovery or "unknown block" rendering
         // return showInvalidStrategyError();
     }

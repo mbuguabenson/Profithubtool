@@ -54,7 +54,7 @@ type SubscriptionResponse = {
         id: string;
     };
     error?: unknown;
-} & (HistoryResponse | TickResponse); 
+} & (HistoryResponse | TickResponse);
 
 interface TRootStore {
     ui: unknown;
@@ -80,12 +80,32 @@ export default class DigitAnalysisStore {
     subscription_stream: { unsubscribe: () => void } | null = null;
 
     constructor(root_store: TRootStore | null) {
-        makeAutoObservable(this);
+        // Ensure methods are auto-bound so destructuring in components works reliably
+        makeAutoObservable(this, {}, { autoBind: true });
         this.root_store = root_store;
 
-        // Auto-fetch symbols on init
-        this.fetchActiveSymbols();
+        // Initialize active symbols with a safe retry in case API isn't ready yet
+        this.initActiveSymbols();
     }
+
+    // Attempt to fetch active symbols immediately; if API is not yet ready, retry shortly
+    initActiveSymbols = () => {
+        if (api_base.api) {
+            this.fetchActiveSymbols();
+            return;
+        }
+        // Retry once API becomes available (simple short backoff)
+        setTimeout(() => {
+            if (api_base.api) {
+                this.fetchActiveSymbols();
+            } else {
+                // Try one more time a bit later to avoid empty selectors
+                setTimeout(() => {
+                    if (api_base.api) this.fetchActiveSymbols();
+                }, 1000);
+            }
+        }, 500);
+    };
 
     setSymbol(symbol: string) {
         if (this.selected_symbol !== symbol) {
@@ -115,7 +135,7 @@ export default class DigitAnalysisStore {
     fetchActiveSymbols = async () => {
         // Reuse api_base active symbols if available, or fetch
         if (api_base.active_symbols && (api_base.active_symbols as ActiveSymbol[]).length > 0) {
-            this.active_symbols = (api_base.active_symbols as ActiveSymbol[]).map((s) => ({
+            this.active_symbols = (api_base.active_symbols as ActiveSymbol[]).map(s => ({
                 symbol: s.symbol,
                 display_name: s.display_name,
                 market_display_name: s.market_display_name,
@@ -129,10 +149,13 @@ export default class DigitAnalysisStore {
         if (!api) return;
 
         try {
-            const response = (await api.send({ active_symbols: 'brief', product_type: 'basic' })) as ActiveSymbolsResponse;
+            const response = (await api.send({
+                active_symbols: 'brief',
+                product_type: 'basic',
+            })) as ActiveSymbolsResponse;
             if (response.active_symbols) {
                 runInAction(() => {
-                    this.active_symbols = response.active_symbols.map((s) => ({
+                    this.active_symbols = response.active_symbols.map(s => ({
                         symbol: s.symbol,
                         display_name: s.display_name,
                         market_display_name: s.market_display_name,
@@ -170,14 +193,19 @@ export default class DigitAnalysisStore {
                 subscribe: 1,
             };
 
-            this.subscription_stream = api.onMessage().subscribe(({ data }: { data: TickResponse | HistoryResponse }) => {
-                if (data.msg_type === 'tick') {
-                    this.onTick(data as TickResponse);
-                }
-                if (data.msg_type === 'history' && (data as HistoryResponse).echo_req.ticks_history === this.selected_symbol) {
-                    this.onHistory(data as HistoryResponse);
-                }
-            });
+            this.subscription_stream = api
+                .onMessage()
+                .subscribe(({ data }: { data: TickResponse | HistoryResponse }) => {
+                    if (data.msg_type === 'tick') {
+                        this.onTick(data as TickResponse);
+                    }
+                    if (
+                        data.msg_type === 'history' &&
+                        (data as HistoryResponse).echo_req.ticks_history === this.selected_symbol
+                    ) {
+                        this.onHistory(data as HistoryResponse);
+                    }
+                });
 
             const response = (await api.send(request)) as SubscriptionResponse;
 
@@ -299,7 +327,7 @@ export default class DigitAnalysisStore {
 
     get even_odd_stats() {
         if (this.ticks.length === 0) return { even: 0, odd: 0 };
-        
+
         let even = 0;
         this.ticks.forEach(t => {
             if (t.digit % 2 === 0) even++;
@@ -308,7 +336,7 @@ export default class DigitAnalysisStore {
         const total = this.ticks.length;
         return {
             even: (even / total) * 100,
-            odd: ((total - even) / total) * 100
+            odd: ((total - even) / total) * 100,
         };
     }
 
@@ -330,7 +358,7 @@ export default class DigitAnalysisStore {
         return {
             over: (over / total) * 100,
             under: (under / total) * 100,
-            matches: (matches / total) * 100
+            matches: (matches / total) * 100,
         };
     }
 
@@ -339,7 +367,7 @@ export default class DigitAnalysisStore {
 
         const ref = this.reference_digit;
         const lastTick = this.ticks[this.ticks.length - 1];
-        
+
         let type: 'over' | 'under' | 'match' = 'match';
         if (lastTick.digit > ref) type = 'over';
         else if (lastTick.digit < ref) type = 'under';
@@ -362,11 +390,11 @@ export default class DigitAnalysisStore {
     get latest_tick() {
         return this.ticks[this.ticks.length - 1];
     }
-    
+
     get current_stats() {
         return {
-             price: this.latest_tick?.quote,
-             digit: this.latest_tick?.digit
+            price: this.latest_tick?.quote,
+            digit: this.latest_tick?.digit,
         };
     }
 }

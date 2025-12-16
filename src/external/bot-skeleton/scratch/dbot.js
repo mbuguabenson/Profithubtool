@@ -102,198 +102,216 @@ class DBot {
             }
         };
 
-        return new Promise(async (resolve, reject) => {
-            __webpack_public_path__ = public_path; // eslint-disable-line no-global-assign
-            ApiHelpers.setInstance(api_helpers_store);
-            DBotStore.setInstance(store);
-            const window_width = window.innerWidth;
-            try {
-                let workspaceScale = 0.7;
+        return new Promise((resolve, reject) => {
+            (async () => {
+                __webpack_public_path__ = public_path; // eslint-disable-line no-global-assign
+                ApiHelpers.setInstance(api_helpers_store);
+                DBotStore.setInstance(store);
+                const window_width = window.innerWidth;
+                try {
+                    let workspaceScale = 0.7;
 
-                const { handleFileChange } = DBotStore.instance;
-                if (window_width < 1640) {
-                    if (is_mobile) {
-                        workspaceScale = 0.6;
-                    } else {
-                        const scratch_div_width = document.getElementById('scratch_div')?.offsetWidth;
-                        const zoom_scale = scratch_div_width / window_width / 1.5;
-                        workspaceScale = zoom_scale;
-                    }
-                }
-                const el_scratch_div = document.getElementById('scratch_div');
-                // Debug: report whether scratch_div found
-                // eslint-disable-next-line no-console
-                console.log('[DEBUG] DBot.initWorkspace: scratch_div element', !!el_scratch_div);
-                if (!el_scratch_div) {
-                    return;
-                }
-
-                // Debug: injecting Blockly workspace
-                // eslint-disable-next-line no-console
-                console.log('[DEBUG] DBot.initWorkspace: injecting Blockly into element', el_scratch_div);
-                this.workspace = window.Blockly.inject(el_scratch_div, {
-                    media: 'assets/media/',
-                    renderer: 'zelos',
-                    trashcan: false, // Disabled to avoid iframe access error
-                    sounds: false, // Disabled to avoid iframe access error
-                    zoom: { wheel: true, startScale: workspaceScale },
-                    scrollbars: true,
-                    theme: window.Blockly.Themes.zelos_renderer,
-                });
-
-                this.workspace.RTL = isDbotRTL();
-
-                this.workspace.cached_xml = { main: main_xml };
-
-                this.workspace.addChangeListener(this.valueInputLimitationsListener.bind(this));
-                this.workspace.addChangeListener(event => updateDisabledBlocks(this.workspace, event));
-                this.workspace.addChangeListener(event => this.workspace.dispatchBlockEventEffects(event));
-                this.workspace.addChangeListener(event => {
-                    if (event.type === 'drag' && !event.isStart && !is_mobile) validateErrorOnBlockDelete();
-                    if (event.type == window.Blockly.Events.BLOCK_CHANGE) {
-                        const block = this.workspace.getBlockById(event.blockId);
-                        if (is_mobile && block && event.element == 'collapsed') {
-                            block.contextMenu = false;
+                    const { handleFileChange } = DBotStore.instance;
+                    if (window_width < 1640) {
+                        if (is_mobile) {
+                            workspaceScale = 0.6;
+                        } else {
+                            const scratch_div_width = document.getElementById('scratch_div')?.offsetWidth;
+                            const zoom_scale = scratch_div_width / window_width / 1.5;
+                            workspaceScale = zoom_scale;
                         }
                     }
-                });
-
-                window.Blockly.derivWorkspace = this.workspace;
-
-                // Debug: wrap Workspace.dispose to log calls and stack traces in dev
-                try {
-                    if (process.env.NODE_ENV !== 'production' && window.Blockly && window.Blockly.Workspace && !window.Blockly._deriv_dispose_wrapped) {
-                        const origDispose = window.Blockly.Workspace.prototype.dispose;
-                        window.Blockly.Workspace.prototype.dispose = function () {
-                            // eslint-disable-next-line no-console
-                            console.warn('[DEBUG] Blockly.Workspace.dispose called on workspace', this, new Error().stack);
-                            return origDispose.apply(this, arguments);
-                        };
-                        window.Blockly._deriv_dispose_wrapped = true;
-                    }
-                } catch (e) {
+                    const el_scratch_div = document.getElementById('scratch_div');
+                    // Debug: report whether scratch_div found
                     // eslint-disable-next-line no-console
-                    console.error('[DEBUG] DBot.initWorkspace: failed to wrap dispose for debugging', e);
-                }
+                    console.log('[DEBUG] DBot.initWorkspace: scratch_div element', !!el_scratch_div);
+                    if (!el_scratch_div) {
+                        return;
+                    }
 
-                const varDB = new window.Blockly.Names('window');
-                varDB.variableMap = window.Blockly.derivWorkspace.getVariableMap();
+                    // Debug: injecting Blockly workspace
+                    // eslint-disable-next-line no-console
+                    console.log('[DEBUG] DBot.initWorkspace: injecting Blockly into element', el_scratch_div);
+                    this.workspace = window.Blockly.inject(el_scratch_div, {
+                        media: 'assets/media/',
+                        renderer: 'zelos',
+                        trashcan: false, // Disabled to avoid iframe access error
+                        sounds: false, // Disabled to avoid iframe access error
+                        zoom: { wheel: true, startScale: workspaceScale },
+                        scrollbars: true,
+                        theme: window.Blockly.Themes.zelos_renderer,
+                    });
 
-                window.Blockly.JavaScript.variableDB_ = varDB;
+                    this.workspace.RTL = isDbotRTL();
 
-                this.addBeforeRunFunction(this.unselectBlocks.bind(this));
-                this.addBeforeRunFunction(this.disableStrayBlocks.bind(this));
-                this.addBeforeRunFunction(this.checkForErroredBlocks.bind(this));
-                this.addBeforeRunFunction(this.checkForRequiredBlocks.bind(this));
+                    this.workspace.cached_xml = { main: main_xml };
 
-                // Push main.xml to workspace and reset the undo stack.
-                this.workspace.current_strategy_id = window.Blockly.utils.idGenerator.genUid();
+                    this.workspace.addChangeListener(this.valueInputLimitationsListener.bind(this));
+                    this.workspace.addChangeListener(event => updateDisabledBlocks(this.workspace, event));
+                    this.workspace.addChangeListener(event => this.workspace.dispatchBlockEventEffects(event));
+                    this.workspace.addChangeListener(event => {
+                        if (event.type === 'drag' && !event.isStart && !is_mobile) validateErrorOnBlockDelete();
+                        if (event.type == window.Blockly.Events.BLOCK_CHANGE) {
+                            const block = this.workspace.getBlockById(event.blockId);
+                            if (is_mobile && block && event.element == 'collapsed') {
+                                block.contextMenu = false;
+                            }
+                        }
+                    });
 
-                window.Blockly.derivWorkspace.strategy_to_load = main_xml;
-                window.Blockly.getMainWorkspace().strategy_to_load = main_xml;
-                window.Blockly.getMainWorkspace().RTL = isDbotRTL();
+                    window.Blockly.derivWorkspace = this.workspace;
 
-                let file_name = config().default_file_name;
-                if (recent_files && recent_files.length) {
-                    const latest_file = recent_files[0];
-                    window.Blockly.derivWorkspace.strategy_to_load = latest_file.xml;
-                    window.Blockly.getMainWorkspace().strategy_to_load = latest_file.xml;
-                    file_name = latest_file.name;
-                    window.Blockly.derivWorkspace.current_strategy_id = latest_file.id;
-                    window.Blockly.getMainWorkspace().current_strategy_id = latest_file.id;
-                }
+                    // Debug: wrap Workspace.dispose to log calls and stack traces in dev
+                    try {
+                        if (
+                            process.env.NODE_ENV !== 'production' &&
+                            window.Blockly &&
+                            window.Blockly.Workspace &&
+                            !window.Blockly._deriv_dispose_wrapped
+                        ) {
+                            const origDispose = window.Blockly.Workspace.prototype.dispose;
+                            window.Blockly.Workspace.prototype.dispose = function () {
+                                // eslint-disable-next-line no-console
+                                console.warn(
+                                    '[DEBUG] Blockly.Workspace.dispose called on workspace',
+                                    this,
+                                    new Error().stack
+                                );
+                                return origDispose.apply(this, arguments);
+                            };
+                            window.Blockly._deriv_dispose_wrapped = true;
+                        }
+                    } catch (e) {
+                        // eslint-disable-next-line no-console
+                        console.error('[DEBUG] DBot.initWorkspace: failed to wrap dispose for debugging', e);
+                    }
 
-                const event_group = `dbot-load${Date.now()}`;
-                window.Blockly.Events.setGroup(event_group);
+                    const varDB = new window.Blockly.Names('window');
+                    varDB.variableMap = window.Blockly.derivWorkspace.getVariableMap();
 
-                // Robust import: try bulk import with retries, then per-block fallback,
-                // and finally fall back to `main_xml` if saved xml consistently fails.
-                const importStrategy = async xmlString => {
-                    // Try a few quick retries in case of transient timing issues
-                    for (let attempt = 0; attempt < 3; attempt++) {
+                    window.Blockly.JavaScript.variableDB_ = varDB;
+
+                    this.addBeforeRunFunction(this.unselectBlocks.bind(this));
+                    this.addBeforeRunFunction(this.disableStrayBlocks.bind(this));
+                    this.addBeforeRunFunction(this.checkForErroredBlocks.bind(this));
+                    this.addBeforeRunFunction(this.checkForRequiredBlocks.bind(this));
+
+                    // Push main.xml to workspace and reset the undo stack.
+                    this.workspace.current_strategy_id = window.Blockly.utils.idGenerator.genUid();
+
+                    window.Blockly.derivWorkspace.strategy_to_load = main_xml;
+                    window.Blockly.getMainWorkspace().strategy_to_load = main_xml;
+                    window.Blockly.getMainWorkspace().RTL = isDbotRTL();
+
+                    let file_name = config().default_file_name;
+                    if (recent_files && recent_files.length) {
+                        const latest_file = recent_files[0];
+                        window.Blockly.derivWorkspace.strategy_to_load = latest_file.xml;
+                        window.Blockly.getMainWorkspace().strategy_to_load = latest_file.xml;
+                        file_name = latest_file.name;
+                        window.Blockly.derivWorkspace.current_strategy_id = latest_file.id;
+                        window.Blockly.getMainWorkspace().current_strategy_id = latest_file.id;
+                    }
+
+                    const event_group = `dbot-load${Date.now()}`;
+                    window.Blockly.Events.setGroup(event_group);
+
+                    // Robust import: try bulk import with retries, then per-block fallback,
+                    // and finally fall back to `main_xml` if saved xml consistently fails.
+                    const importStrategy = async xmlString => {
+                        // Try a few quick retries in case of transient timing issues
+                        for (let attempt = 0; attempt < 3; attempt++) {
+                            try {
+                                window.Blockly.Xml.domToWorkspace(
+                                    window.Blockly.utils.xml.textToDom(xmlString),
+                                    this.workspace
+                                );
+                                return true;
+                            } catch (err) {
+                                // eslint-disable-next-line no-console
+                                console.warn(
+                                    '[WARN] DBot.initWorkspace: domToWorkspace attempt',
+                                    attempt + 1,
+                                    'failed',
+                                    err
+                                );
+                                // small backoff
+                                // eslint-disable-next-line no-await-in-loop
+                                await new Promise(r => setTimeout(r, 50));
+                            }
+                        }
+
+                        // Bulk import failed: try per-block import to skip bad blocks
                         try {
-                            window.Blockly.Xml.domToWorkspace(
-                                window.Blockly.utils.xml.textToDom(xmlString),
-                                this.workspace
-                            );
+                            const xml = window.Blockly.utils.xml.textToDom(xmlString);
+                            const blocks = xml.querySelectorAll('block');
+                            Array.from(blocks).forEach(block_node => {
+                                try {
+                                    window.Blockly.Xml.domToBlock(block_node, this.workspace);
+                                } catch (blockErr) {
+                                    // eslint-disable-next-line no-console
+                                    console.error(
+                                        '[ERROR] DBot.initWorkspace: failed to import block',
+                                        block_node?.getAttribute?.('type'),
+                                        blockErr
+                                    );
+                                }
+                            });
                             return true;
-                        } catch (err) {
+                        } catch (fallbackErr) {
+                            // eslint-disable-next-line no-console
+                            console.error('[ERROR] DBot.initWorkspace: per-block fallback also failed', fallbackErr);
+                            return false;
+                        }
+                    };
+
+                    // Ensure executor can use await
+                    try {
+                        const xml_to_load = window.Blockly.derivWorkspace.strategy_to_load;
+                        let imported = await importStrategy(xml_to_load);
+                        if (!imported && xml_to_load !== main_xml) {
+                            // Try a safe known-good fallback (main_xml)
                             // eslint-disable-next-line no-console
                             console.warn(
-                                '[WARN] DBot.initWorkspace: domToWorkspace attempt',
-                                attempt + 1,
-                                'failed',
-                                err
+                                '[WARN] DBot.initWorkspace: failed to import saved xml; attempting main_xml fallback'
                             );
-                            // small backoff
-                            // eslint-disable-next-line no-await-in-loop
-                            await new Promise(r => setTimeout(r, 50));
+                            imported = await importStrategy(main_xml);
                         }
+                        if (!imported) {
+                            // At this point we failed to import anything; log and continue with empty workspace
+                            // eslint-disable-next-line no-console
+                            console.error(
+                                '[ERROR] DBot.initWorkspace: unable to import any blocks; workspace will be empty'
+                            );
+                        }
+                    } catch (err) {
+                        // eslint-disable-next-line no-console
+                        console.error('[ERROR] DBot.initWorkspace: unexpected error during import', err);
                     }
+                    const { save_modal } = DBotStore.instance;
 
-                    // Bulk import failed: try per-block import to skip bad blocks
-                    try {
-                        const xml = window.Blockly.utils.xml.textToDom(xmlString);
-                        const blocks = xml.querySelectorAll('block');
-                        Array.from(blocks).forEach(block_node => {
-                            try {
-                                window.Blockly.Xml.domToBlock(block_node, this.workspace);
-                            } catch (blockErr) {
-                                // eslint-disable-next-line no-console
-                                console.error(
-                                    '[ERROR] DBot.initWorkspace: failed to import block',
-                                    block_node?.getAttribute?.('type'),
-                                    blockErr
-                                );
-                            }
-                        });
-                        return true;
-                    } catch (fallbackErr) {
-                        // eslint-disable-next-line no-console
-                        console.error('[ERROR] DBot.initWorkspace: per-block fallback also failed', fallbackErr);
-                        return false;
-                    }
-                };
+                    save_modal.updateBotName(file_name);
+                    this.workspace.cleanUp(0, is_mobile ? 60 : 56);
+                    this.workspace.clearUndo();
 
-                // Ensure executor can use await
-                try {
-                    const xml_to_load = window.Blockly.derivWorkspace.strategy_to_load;
-                    let imported = await importStrategy(xml_to_load);
-                    if (!imported && xml_to_load !== main_xml) {
-                        // Try a safe known-good fallback (main_xml)
-                        // eslint-disable-next-line no-console
-                        console.warn('[WARN] DBot.initWorkspace: failed to import saved xml; attempting main_xml fallback');
-                        imported = await importStrategy(main_xml);
-                    }
-                    if (!imported) {
-                        // At this point we failed to import anything; log and continue with empty workspace
-                        // eslint-disable-next-line no-console
-                        console.error('[ERROR] DBot.initWorkspace: unable to import any blocks; workspace will be empty');
-                    }
-                } catch (err) {
+                    window.dispatchEvent(new Event('resize'));
+                    // Debug: injection completed
                     // eslint-disable-next-line no-console
-                    console.error('[ERROR] DBot.initWorkspace: unexpected error during import', err);
+                    console.log(
+                        '[DEBUG] DBot.initWorkspace: injection completed, workspace assigned',
+                        !!this.workspace
+                    );
+                    window.addEventListener('dragover', DBot.handleDragOver);
+                    window.addEventListener('drop', e => DBot.handleDropOver(e, handleFileChange));
+                    // disable overflow
+                    el_scratch_div.parentNode.style.overflow = 'hidden';
+                    resolve();
+                } catch (error) {
+                    // TODO: Handle error.
+                    reject(error);
+                    throw error;
                 }
-                const { save_modal } = DBotStore.instance;
-
-                save_modal.updateBotName(file_name);
-                this.workspace.cleanUp(0, is_mobile ? 60 : 56);
-                this.workspace.clearUndo();
-
-                window.dispatchEvent(new Event('resize'));
-                // Debug: injection completed
-                // eslint-disable-next-line no-console
-                console.log('[DEBUG] DBot.initWorkspace: injection completed, workspace assigned', !!this.workspace);
-                window.addEventListener('dragover', DBot.handleDragOver);
-                window.addEventListener('drop', e => DBot.handleDropOver(e, handleFileChange));
-                // disable overflow
-                el_scratch_div.parentNode.style.overflow = 'hidden';
-                resolve();
-            } catch (error) {
-                // TODO: Handle error.
-                reject(error);
-                throw error;
-            }
+            })().catch(reject);
         });
     }
 

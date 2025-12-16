@@ -33,4 +33,3 @@ export const AuthWrapper = () => {
 
     return <App />;
 };
-

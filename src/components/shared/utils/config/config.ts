@@ -82,6 +82,16 @@ export const getDefaultAppIdAndUrl = () => {
 };
 
 export const getAppId = (): number => {
+    // Prefer environment variables if provided
+    const env_app_id =
+        (typeof process !== 'undefined' && (process.env?.DERIV_APP_ID as string)) ||
+        // Rsbuild/Vite-style env fallback
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ((import.meta as any)?.env?.VITE_DERIV_APP_ID as string);
+    if (env_app_id && /^[0-9]+$/.test(env_app_id)) {
+        return parseInt(env_app_id);
+    }
+
     const config_app_id = localStorage.getItem('config.app_id');
     if (config_app_id) {
         return parseInt(config_app_id);
@@ -92,6 +102,15 @@ export const getAppId = (): number => {
 };
 
 export const getSocketURL = () => {
+    // Prefer environment variables if provided
+    const env_server_url =
+        (typeof process !== 'undefined' && process.env?.DERIV_SERVER_URL) ||
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ((import.meta as any)?.env?.VITE_DERIV_SERVER_URL as string);
+    if (env_server_url && typeof env_server_url === 'string') {
+        return env_server_url;
+    }
+
     const local_storage_server_url = window.localStorage.getItem('config.server_url');
     if (local_storage_server_url) return local_storage_server_url;
 

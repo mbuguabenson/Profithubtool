@@ -1,5 +1,6 @@
 import AppStore from './app-store';
 import BlocklyStore from './blockly-store';
+import BulkTradeStore from './bulk-trade-store';
 import ChartStore from './chart-store';
 import ClientStore from './client-store';
 import CommonStore from './common-store';
@@ -12,18 +13,19 @@ import FlyoutStore from './flyout-store';
 import GoogleDriveStore from './google-drive-store';
 import JournalStore from './journal-store';
 import LoadModalStore from './load-modal-store';
+import ManualTradeStore from './manual-trade-store';
 import QuickStrategyStore from './quick-strategy-store';
 import RunPanelStore from './run-panel-store';
 import SaveModalStore from './save-modal-store';
 import SelfExclusionStore from './self-exclusion-store';
+import SpeedBotStore from './speed-bot-store';
 import SummaryCardStore from './summary-card-store';
 import ToolbarStore from './toolbar-store';
 import ToolboxStore from './toolbox-store';
+import TradingHubStore from './trading-hub-store';
 import TransactionsStore from './transactions-store';
 import UiStore from './ui-store';
-import BulkTradeStore from './bulk-trade-store';
 
-// TODO: need to write types for the individual classes and convert them to ts
 export default class RootStore {
     public dbot;
     public app: AppStore;
@@ -44,6 +46,9 @@ export default class RootStore {
     public copy_trading: CopyTradingStore;
     public digit_analysis: DigitAnalysisStore;
     public bulk_trade: BulkTradeStore;
+    public trading_hub: TradingHubStore;
+    public speed_bot: SpeedBotStore;
+    public manual_trade: ManualTradeStore;
 
     public chart_store: ChartStore;
     public blockly_store: BlocklyStore;
@@ -66,7 +71,6 @@ export default class RootStore {
     constructor(dbot: unknown) {
         this.dbot = dbot;
 
-        // Need to fix later without using this.core
         this.ui = new UiStore();
         this.client = new ClientStore();
         this.common = new CommonStore();
@@ -93,11 +97,13 @@ export default class RootStore {
         this.dashboard = new DashboardStore(this, this.core);
         this.copy_trading = new CopyTradingStore(this);
 
-        // need to be at last for dependency
         this.chart_store = new ChartStore(this);
         this.blockly_store = new BlocklyStore(this);
         this.data_collection_store = new DataCollectionStore(this, this.core);
         this.digit_analysis = new DigitAnalysisStore(this);
         this.bulk_trade = new BulkTradeStore(this);
+        this.trading_hub = new TradingHubStore(this);
+        this.speed_bot = new SpeedBotStore(this);
+        this.manual_trade = new ManualTradeStore(this);
     }
 }
