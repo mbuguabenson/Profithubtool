@@ -1,14 +1,14 @@
 import { LocalStorageConstants, LocalStorageUtils, URLUtils } from '@deriv-com/utils';
 
 export const APP_IDS = {
-    LOCALHOST: 96502, // Default for local dev
-    TMP_STAGING: 96502,
-    STAGING: 96502, // TODO: Update with real staging ID if different
-    STAGING_BE: 96502,
-    STAGING_ME: 96502,
-    PRODUCTION: 96502, // Example production ID - needs verification
-    PRODUCTION_BE: 96502,
-    PRODUCTION_ME: 96502,
+    LOCALHOST: 113875, // Default for local dev
+    TMP_STAGING: 113875,
+    STAGING: 113875, // TODO: Update with real staging ID if different
+    STAGING_BE: 113875,
+    STAGING_ME: 113875,
+    PRODUCTION: 113875, // Example production ID - needs verification
+    PRODUCTION_BE: 113875,
+    PRODUCTION_ME: 113875,
 };
 
 export const livechat_license_id = 12049137;
@@ -88,7 +88,7 @@ export const getAppId = (): number => {
     }
 
     // Default universal fallback
-    return 96502;
+    return 113875;
 };
 
 export const getSocketURL = () => {
